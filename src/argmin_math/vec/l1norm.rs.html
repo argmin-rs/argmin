@@ -134,13 +134,6 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -188,24 +181,20 @@
 <span class="macro">make_l1norm_unsigned!</span>(u16);
 <span class="macro">make_l1norm_unsigned!</span>(u32);
 <span class="macro">make_l1norm_unsigned!</span>(u64);
-<span class="macro">make_l1norm_unsigned!</span>(usize);
 <span class="macro">make_l1norm!</span>(i8);
 <span class="macro">make_l1norm!</span>(i16);
 <span class="macro">make_l1norm!</span>(i32);
 <span class="macro">make_l1norm!</span>(i64);
-<span class="macro">make_l1norm!</span>(isize);
 <span class="macro">make_l1norm!</span>(f32);
 <span class="macro">make_l1norm!</span>(f64);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;i8&gt;, i8);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;i16&gt;, i16);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;i32&gt;, i32);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;i64&gt;, i64);
-<span class="macro">make_l1norm_complex!</span>(Complex&lt;isize&gt;, isize);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;u8&gt;, u8);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;u16&gt;, u16);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;u32&gt;, u32);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;u64&gt;, u64);
-<span class="macro">make_l1norm_complex!</span>(Complex&lt;usize&gt;, usize);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;f32&gt;, f32);
 <span class="macro">make_l1norm_complex!</span>(Complex&lt;f64&gt;, f64);
 
@@ -263,8 +252,6 @@
         };
     }
 
-    <span class="macro">make_test!</span>(isize);
-    <span class="macro">make_test!</span>(usize);
     <span class="macro">make_test!</span>(i8);
     <span class="macro">make_test!</span>(u8);
     <span class="macro">make_test!</span>(i16);
@@ -276,7 +263,6 @@
     <span class="macro">make_test!</span>(f32);
     <span class="macro">make_test!</span>(f64);
 
-    <span class="macro">make_test_signed!</span>(isize);
     <span class="macro">make_test_signed!</span>(i8);
     <span class="macro">make_test_signed!</span>(i16);
     <span class="macro">make_test_signed!</span>(i32);

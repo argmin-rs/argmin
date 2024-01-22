@@ -5,6 +5,7 @@ var srcIndex = JSON.parse('{\
 "argmin_observer_paramwriter":["",[],["lib.rs"]],\
 "argmin_observer_slog":["",[],["lib.rs"]],\
 "argmin_observer_spectator":["",[],["lib.rs","observer.rs","sender.rs"]],\
+"argmin_testfunctions":["",[],["ackley.rs","beale.rs","booth.rs","bukin.rs","crossintray.rs","easom.rs","eggholder.rs","goldsteinprice.rs","himmelblau.rs","holdertable.rs","levy.rs","lib.rs","matyas.rs","mccorminck.rs","picheny.rs","rastrigin.rs","rosenbrock.rs","schaffer.rs","sphere.rs","styblinskitang.rs","threehumpcamel.rs","zero.rs"]],\
 "example_backtracking":["",[],["main.rs"]],\
 "example_bfgs":["",[],["main.rs"]],\
 "example_brentopt":["",[],["main.rs"]],\
@@ -28,6 +29,7 @@ var srcIndex = JSON.parse('{\
 "example_nonlinear_cg":["",[],["main.rs"]],\
 "example_observer":["",[],["main.rs"]],\
 "example_owl_qn":["",[],["main.rs"]],\
+"example_paramwriter":["",[],["main.rs"]],\
 "example_particleswarm":["",[],["main.rs"]],\
 "example_particlswarm_nalgebra":["",[],["main.rs"]],\
 "example_simulatedannealing":["",[],["main.rs"]],\

@@ -14,7 +14,6 @@
 }</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Defines the computation of the Hessian.</p>
 <h2 id="example"><a href="#example">Example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>argmin::core::{Hessian, Error};
-<span class="kw">use </span>argmin_testfunctions::rosenbrock_2d_hessian;
 
 <span class="kw">struct </span>Rosenbrock {}
 
@@ -24,7 +23,7 @@
 
     <span class="doccomment">/// Compute gradient of rosenbrock function
     </span><span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock_2d_hessian(param, <span class="number">1.0</span>, <span class="number">100.0</span>))
+        <span class="prelude-val">Ok</span>(compute_hessian(<span class="kw-2">&amp;</span>param))
     }
 }</code></pre></div>
 </div></details><h2 id="required-associated-types" class="small-section-header">Required Associated Types<a href="#required-associated-types" class="anchor">§</a></h2><div class="methods"><details class="toggle" open><summary><section id="associatedtype.Param" class="method"><a class="src rightside" href="../../src/argmin/core/problem.rs.html#437">source</a><h4 class="code-header">type <a href="#associatedtype.Param" class="associatedtype">Param</a></h4></section></summary><div class="docblock"><p>Type of the parameter vector</p>

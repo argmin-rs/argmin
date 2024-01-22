@@ -17,7 +17,6 @@
 }</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Defines the computation of the gradient.</p>
 <h2 id="example"><a href="#example">Example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>argmin::core::{Gradient, Error};
-<span class="kw">use </span>argmin_testfunctions::rosenbrock_2d_derivative;
 
 <span class="kw">struct </span>Rosenbrock {}
 
@@ -27,7 +26,7 @@
 
     <span class="doccomment">/// Compute gradient of rosenbrock function
     </span><span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock_2d_derivative(param, <span class="number">1.0</span>, <span class="number">100.0</span>))
+        <span class="prelude-val">Ok</span>(compute_gradient(param))
     }
 }</code></pre></div>
 </div></details><h2 id="required-associated-types" class="small-section-header">Required Associated Types<a href="#required-associated-types" class="anchor">§</a></h2><div class="methods"><details class="toggle" open><summary><section id="associatedtype.Param" class="method"><a class="src rightside" href="../../src/argmin/core/problem.rs.html#406">source</a><h4 class="code-header">type <a href="#associatedtype.Param" class="associatedtype">Param</a></h4></section></summary><div class="docblock"><p>Type of the parameter vector</p>

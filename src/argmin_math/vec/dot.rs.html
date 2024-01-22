@@ -558,12 +558,6 @@
 <a href="#558" id="558">558</a>
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -670,8 +664,6 @@
 <span class="macro">make_dot_vec!</span>(u16);
 <span class="macro">make_dot_vec!</span>(u32);
 <span class="macro">make_dot_vec!</span>(u64);
-<span class="macro">make_dot_vec!</span>(isize);
-<span class="macro">make_dot_vec!</span>(usize);
 <span class="macro">make_dot_vec!</span>(Complex&lt;f32&gt;);
 <span class="macro">make_dot_vec!</span>(Complex&lt;f64&gt;);
 <span class="macro">make_dot_vec!</span>(Complex&lt;i8&gt;);
@@ -682,8 +674,6 @@
 <span class="macro">make_dot_vec!</span>(Complex&lt;u16&gt;);
 <span class="macro">make_dot_vec!</span>(Complex&lt;u32&gt;);
 <span class="macro">make_dot_vec!</span>(Complex&lt;u64&gt;);
-<span class="macro">make_dot_vec!</span>(Complex&lt;isize&gt;);
-<span class="macro">make_dot_vec!</span>(Complex&lt;usize&gt;);
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
@@ -1117,8 +1107,6 @@
         };
     }
 
-    <span class="macro">make_test!</span>(isize);
-    <span class="macro">make_test!</span>(usize);
     <span class="macro">make_test!</span>(i8);
     <span class="macro">make_test!</span>(u8);
     <span class="macro">make_test!</span>(i16);

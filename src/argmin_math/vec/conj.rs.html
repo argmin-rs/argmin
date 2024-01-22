@@ -130,9 +130,6 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -163,14 +160,12 @@
     };
 }
 
-<span class="macro">make_conj!</span>(isize);
 <span class="macro">make_conj!</span>(i8);
 <span class="macro">make_conj!</span>(i16);
 <span class="macro">make_conj!</span>(i32);
 <span class="macro">make_conj!</span>(i64);
 <span class="macro">make_conj!</span>(f32);
 <span class="macro">make_conj!</span>(f64);
-<span class="macro">make_conj!</span>(Complex&lt;isize&gt;);
 <span class="macro">make_conj!</span>(Complex&lt;i8&gt;);
 <span class="macro">make_conj!</span>(Complex&lt;i16&gt;);
 <span class="macro">make_conj!</span>(Complex&lt;i32&gt;);
@@ -260,7 +255,6 @@
         };
     }
 
-    <span class="macro">make_test!</span>(isize);
     <span class="macro">make_test!</span>(i8);
     <span class="macro">make_test!</span>(i16);
     <span class="macro">make_test!</span>(i32);

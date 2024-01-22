@@ -101,9 +101,6 @@
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -141,14 +138,12 @@
     };
 }
 
-<span class="macro">make_signum!</span>(isize);
 <span class="macro">make_signum!</span>(i8);
 <span class="macro">make_signum!</span>(i16);
 <span class="macro">make_signum!</span>(i32);
 <span class="macro">make_signum!</span>(i64);
 <span class="macro">make_signum!</span>(f32);
 <span class="macro">make_signum!</span>(f64);
-<span class="macro">make_signum_complex!</span>(Complex&lt;isize&gt;);
 <span class="macro">make_signum_complex!</span>(Complex&lt;i8&gt;);
 <span class="macro">make_signum_complex!</span>(Complex&lt;i16&gt;);
 <span class="macro">make_signum_complex!</span>(Complex&lt;i32&gt;);
@@ -202,7 +197,6 @@
         };
     }
 
-    <span class="macro">make_test!</span>(isize);
     <span class="macro">make_test!</span>(i8);
     <span class="macro">make_test!</span>(i16);
     <span class="macro">make_test!</span>(i32);

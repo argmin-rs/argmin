@@ -81,6 +81,8 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -106,7 +108,7 @@
     <span class="kw">type </span>Output = f64;
 
     <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock_2d(<span class="kw-2">&amp;</span>p.to_vec(), <span class="self">self</span>.a, <span class="self">self</span>.b))
+        <span class="prelude-val">Ok</span>(rosenbrock_2d(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="self">self</span>.a, <span class="self">self</span>.b))
     }
 }
 
@@ -115,11 +117,9 @@
     <span class="kw">type </span>Gradient = Array1&lt;f64&gt;;
 
     <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
-        <span class="prelude-val">Ok</span>(Array1::from(rosenbrock_2d_derivative(
-            <span class="kw-2">&amp;</span>p.to_vec(),
-            <span class="self">self</span>.a,
-            <span class="self">self</span>.b,
-        )))
+        <span class="prelude-val">Ok</span>(Array1::from(
+            rosenbrock_2d_derivative(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="self">self</span>.a, <span class="self">self</span>.b).to_vec(),
+        ))
     }
 }
 
@@ -128,7 +128,11 @@
     <span class="kw">type </span>Hessian = Array2&lt;f64&gt;;
 
     <span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
-        <span class="kw">let </span>h = rosenbrock_2d_hessian(<span class="kw-2">&amp;</span>p.to_vec(), <span class="self">self</span>.a, <span class="self">self</span>.b);
+        <span class="kw">let </span>h = rosenbrock_2d_hessian(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="self">self</span>.a, <span class="self">self</span>.b)
+            .iter()
+            .flatten()
+            .cloned()
+            .collect();
         <span class="prelude-val">Ok</span>(Array::from_shape_vec((<span class="number">2</span>, <span class="number">2</span>), h)<span class="question-mark">?</span>)
     }
 }

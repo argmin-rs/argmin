@@ -69,6 +69,8 @@
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -94,11 +96,9 @@
     <span class="kw">type </span>Gradient = Array1&lt;f64&gt;;
 
     <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
-        <span class="prelude-val">Ok</span>(Array1::from(rosenbrock_2d_derivative(
-            <span class="kw-2">&amp;</span>p.to_vec(),
-            <span class="self">self</span>.a,
-            <span class="self">self</span>.b,
-        )))
+        <span class="prelude-val">Ok</span>(Array1::from(
+            rosenbrock_2d_derivative(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="self">self</span>.a, <span class="self">self</span>.b).to_vec(),
+        ))
     }
 }
 
@@ -107,7 +107,11 @@
     <span class="kw">type </span>Hessian = Array2&lt;f64&gt;;
 
     <span class="kw">fn </span>hessian(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Hessian, Error&gt; {
-        <span class="kw">let </span>h = rosenbrock_2d_hessian(<span class="kw-2">&amp;</span>p.to_vec(), <span class="self">self</span>.a, <span class="self">self</span>.b);
+        <span class="kw">let </span>h = rosenbrock_2d_hessian(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="self">self</span>.a, <span class="self">self</span>.b)
+            .iter()
+            .flatten()
+            .cloned()
+            .collect();
         <span class="prelude-val">Ok</span>(Array::from_shape_vec((<span class="number">2</span>, <span class="number">2</span>), h)<span class="question-mark">?</span>)
     }
 }

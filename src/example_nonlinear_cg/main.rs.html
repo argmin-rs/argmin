@@ -101,7 +101,7 @@
     <span class="kw">type </span>Output = f64;
 
     <span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock_2d(p, <span class="number">1.0</span>, <span class="number">100.0</span>))
+        <span class="prelude-val">Ok</span>(rosenbrock_2d(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="number">1.0</span>, <span class="number">100.0</span>))
     }
 }
 
@@ -110,7 +110,7 @@
     <span class="kw">type </span>Gradient = Vec&lt;f64&gt;;
 
     <span class="kw">fn </span>gradient(<span class="kw-2">&amp;</span><span class="self">self</span>, p: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Gradient, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock_2d_derivative(p, <span class="number">1.0</span>, <span class="number">100.0</span>))
+        <span class="prelude-val">Ok</span>(rosenbrock_2d_derivative(<span class="kw-2">&amp;</span>[p[<span class="number">0</span>], p[<span class="number">1</span>]], <span class="number">1.0</span>, <span class="number">100.0</span>).to_vec())
     }
 }
 
