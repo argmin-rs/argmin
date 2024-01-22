@@ -19,8 +19,6 @@ macro_rules! make_add {
     };
 }
 
-make_add!(isize);
-make_add!(usize);
 make_add!(i8);
 make_add!(i16);
 make_add!(i32);
@@ -31,8 +29,6 @@ make_add!(u32);
 make_add!(u64);
 make_add!(f32);
 make_add!(f64);
-make_add!(Complex<isize>);
-make_add!(Complex<usize>);
 make_add!(Complex<i8>);
 make_add!(Complex<i16>);
 make_add!(Complex<i32>);
@@ -64,8 +60,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

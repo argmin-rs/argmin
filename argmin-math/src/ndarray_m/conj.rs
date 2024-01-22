@@ -34,14 +34,12 @@ macro_rules! make_conj {
     };
 }
 
-make_conj!(isize);
 make_conj!(i8);
 make_conj!(i16);
 make_conj!(i32);
 make_conj!(i64);
 make_conj!(f32);
 make_conj!(f64);
-make_conj!(Complex<isize>);
 make_conj!(Complex<i8>);
 make_conj!(Complex<i16>);
 make_conj!(Complex<i32>);

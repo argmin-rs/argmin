@@ -56,8 +56,6 @@ macro_rules! make_random {
     };
 }
 
-make_random!(isize);
-make_random!(usize);
 make_random!(i8);
 make_random!(u8);
 make_random!(i16);

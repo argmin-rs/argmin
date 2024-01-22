@@ -30,8 +30,6 @@ macro_rules! make_complex_conj {
     };
 }
 
-make_conj!(isize);
-make_conj!(usize);
 make_conj!(i8);
 make_conj!(i16);
 make_conj!(i32);
@@ -42,7 +40,6 @@ make_conj!(u32);
 make_conj!(u64);
 make_conj!(f32);
 make_conj!(f64);
-make_complex_conj!(Complex<isize>);
 make_complex_conj!(Complex<i8>);
 make_complex_conj!(Complex<i16>);
 make_complex_conj!(Complex<i32>);
@@ -84,15 +81,12 @@ mod tests {
         };
     }
 
-    make_test_complex!(isize);
     make_test_complex!(i8);
     make_test_complex!(i16);
     make_test_complex!(i32);
     make_test_complex!(i64);
     make_test_complex!(f32);
     make_test_complex!(f64);
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

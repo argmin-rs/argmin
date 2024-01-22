@@ -56,8 +56,6 @@ make_zero!(u8);
 make_zero!(u16);
 make_zero!(u32);
 make_zero!(u64);
-make_zero!(isize);
-make_zero!(usize);
 make_complex_zero!(f32);
 make_complex_zero!(f64);
 make_complex_zero!(i8);
@@ -68,8 +66,6 @@ make_complex_zero!(u8);
 make_complex_zero!(u16);
 make_complex_zero!(u32);
 make_complex_zero!(u64);
-make_complex_zero!(isize);
-make_complex_zero!(usize);
 
 #[cfg(test)]
 mod tests {
@@ -115,8 +111,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

@@ -26,8 +26,6 @@ macro_rules! make_eye {
     };
 }
 
-make_eye!(isize);
-make_eye!(usize);
 make_eye!(i8);
 make_eye!(i16);
 make_eye!(i32);

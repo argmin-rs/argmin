@@ -57,24 +57,20 @@ make_norm_unsigned!(u8);
 make_norm_unsigned!(u16);
 make_norm_unsigned!(u32);
 make_norm_unsigned!(u64);
-make_norm_unsigned!(usize);
 make_norm_integer!(i8);
 make_norm_integer!(i16);
 make_norm_integer!(i32);
 make_norm_integer!(i64);
-make_norm_integer!(isize);
 make_norm_float!(f32);
 make_norm_float!(f64);
 make_norm_complex!(Complex<i8>, i8);
 make_norm_complex!(Complex<i16>, i16);
 make_norm_complex!(Complex<i32>, i32);
 make_norm_complex!(Complex<i64>, i64);
-make_norm_complex!(Complex<isize>, isize);
 make_norm_complex!(Complex<u8>, u8);
 make_norm_complex!(Complex<u16>, u16);
 make_norm_complex!(Complex<u32>, u32);
 make_norm_complex!(Complex<u64>, u64);
-make_norm_complex!(Complex<usize>, usize);
 make_norm_complex!(Complex<f32>, f32);
 make_norm_complex!(Complex<f64>, f64);
 
@@ -132,8 +128,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);
@@ -145,7 +139,6 @@ mod tests {
     make_test!(f32);
     make_test!(f64);
 
-    make_test_signed!(isize);
     make_test_signed!(i8);
     make_test_signed!(i16);
     make_test_signed!(i32);

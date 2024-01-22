@@ -30,8 +30,6 @@ macro_rules! make_transpose {
     };
 }
 
-make_transpose!(isize);
-make_transpose!(usize);
 make_transpose!(i8);
 make_transpose!(u8);
 make_transpose!(i16);
@@ -42,8 +40,6 @@ make_transpose!(i64);
 make_transpose!(u64);
 make_transpose!(f32);
 make_transpose!(f64);
-make_transpose!(Complex<isize>);
-make_transpose!(Complex<usize>);
 make_transpose!(Complex<i8>);
 make_transpose!(Complex<u8>);
 make_transpose!(Complex<i16>);
@@ -106,8 +102,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

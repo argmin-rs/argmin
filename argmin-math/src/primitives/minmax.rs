@@ -33,8 +33,6 @@ make_minmax!(u8);
 make_minmax!(u16);
 make_minmax!(u32);
 make_minmax!(u64);
-make_minmax!(isize);
-make_minmax!(usize);
 make_minmax!(Complex<f32>);
 make_minmax!(Complex<f64>);
 make_minmax!(Complex<i8>);
@@ -45,8 +43,6 @@ make_minmax!(Complex<u8>);
 make_minmax!(Complex<u16>);
 make_minmax!(Complex<u32>);
 make_minmax!(Complex<u64>);
-make_minmax!(Complex<isize>);
-make_minmax!(Complex<usize>);
 
 #[cfg(test)]
 mod tests {
@@ -66,13 +62,11 @@ mod tests {
                     assert_eq!(<$t as ArgminMinMax>::max(&y, &x), y);
                 }
             }
-        }
+        };
     }
 
     make_test!(f32);
     make_test!(f64);
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

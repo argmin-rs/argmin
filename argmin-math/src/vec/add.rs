@@ -72,8 +72,6 @@ macro_rules! make_add {
     };
 }
 
-make_add!(isize);
-make_add!(usize);
 make_add!(i8);
 make_add!(i16);
 make_add!(i32);
@@ -253,8 +251,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

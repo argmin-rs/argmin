@@ -67,14 +67,12 @@ macro_rules! make_signum_complex {
     };
 }
 
-make_signum!(isize);
 make_signum!(i8);
 make_signum!(i16);
 make_signum!(i32);
 make_signum!(i64);
 make_signum!(f32);
 make_signum!(f64);
-make_signum_complex!(Complex<isize>);
 make_signum_complex!(Complex<i8>);
 make_signum_complex!(Complex<i16>);
 make_signum_complex!(Complex<i32>);

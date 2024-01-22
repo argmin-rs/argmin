@@ -19,8 +19,6 @@ macro_rules! make_div {
     };
 }
 
-make_div!(isize);
-make_div!(usize);
 make_div!(i8);
 make_div!(u8);
 make_div!(i16);
@@ -31,8 +29,6 @@ make_div!(i64);
 make_div!(u64);
 make_div!(f32);
 make_div!(f64);
-make_div!(Complex<isize>);
-make_div!(Complex<usize>);
 make_div!(Complex<i8>);
 make_div!(Complex<u8>);
 make_div!(Complex<i16>);
@@ -64,8 +60,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

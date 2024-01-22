@@ -246,8 +246,6 @@ make_mul!(i32);
 make_mul!(u32);
 make_mul!(i64);
 make_mul!(u64);
-make_mul!(isize);
-make_mul!(usize);
 make_mul!(f32);
 make_mul!(f64);
 make_complex_mul!(f32);
@@ -260,8 +258,6 @@ make_complex_integer_mul!(i32);
 make_complex_integer_mul!(u32);
 make_complex_integer_mul!(i64);
 make_complex_integer_mul!(u64);
-make_complex_integer_mul!(isize);
-make_complex_integer_mul!(usize);
 
 // All code that does not depend on a linked ndarray-linalg backend can still be tested as normal.
 // To avoid dublicating tests and to allow convenient testing of functionality that does not need ndarray-linalg the tests are still included here.
