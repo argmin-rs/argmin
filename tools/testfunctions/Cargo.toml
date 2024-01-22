@@ -10,10 +10,6 @@ repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
 keywords = ["test", "function", "optimization"]
 categories = ["science"]
-exclude = [ 
-	".travis.yml",
-	"push_docs",
-]
 
 [dependencies]
 num = "0.4"

@@ -1,11 +1,8 @@
-[![Build Status](https://travis-ci.org/argmin-rs/argmin-testfunctions.svg?branch=master)](https://travis-ci.org/argmin-rs/argmin-testfunctions)
-[![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
-
 # argmin-testfunctions
 
 Test functions for optimization algorithms in Rust.
 
-[Documentation](https://argmin-rs.github.io/argmin-testfunctions/argmin_testfunctions/).
+[Documentation](https://docs.rs/argmin_testfunctions/).
 
 
 ## License

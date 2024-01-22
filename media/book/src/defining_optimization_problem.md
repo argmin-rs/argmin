@@ -50,7 +50,7 @@ impl CostFunction for Rosenbrock {
     /// Apply the cost function to a parameter `p`
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         // Evaluate 2D Rosenbrock function
-        Ok(rosenbrock_2d(p, self.a, self.b))
+        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
     }
 }
 
@@ -68,7 +68,7 @@ impl Gradient for Rosenbrock {
     /// Compute the gradient at parameter `p`.
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         // Compute gradient of 2D Rosenbrock function
-        Ok(rosenbrock_2d_derivative(p, self.a, self.b))
+        Ok(rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec())
     }
 }
 
@@ -85,9 +85,9 @@ impl Hessian for Rosenbrock {
     /// Compute the Hessian at parameter `p`.
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         // Compute Hessian of 2D Rosenbrock function
-        let t = rosenbrock_2d_hessian(p, self.a, self.b);
+        let t = rosenbrock_2d_hessian(&[p[0], p[1]], self.a, self.b);
         // Reshape the output
-        Ok(vec![vec![t[0], t[1]], vec![t[2], t[3]]])
+        Ok(vec![vec![t[0][0], t[0][1]], vec![t[1][0], t[1][1]]])
     }
 }
 ```
@@ -149,7 +149,7 @@ impl CostFunction for Rosenbrock {
     /// Conventional cost function which only processes a single parameter vector
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         // [ ... ]
-        # Ok(rosenbrock_2d(p, self.a, self.b))
+        # Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
     }
     
     ////////////////////////////////////////////////////////////////////////////

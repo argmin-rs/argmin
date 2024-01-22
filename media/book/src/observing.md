@@ -47,7 +47,7 @@ use argmin_observer_slog::SlogLogger;
 #
 #     /// Apply the cost function to a parameter `p`
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-#         Ok(rosenbrock_2d(p, 1.0, 100.0))
+#         Ok(rosenbrock_2d(&[p[0], p[1]], 1.0, 100.0))
 #     }
 # }
 #
@@ -60,7 +60,7 @@ use argmin_observer_slog::SlogLogger;
 #
 #     /// Compute the gradient at parameter `p`.
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+#         Ok(rosenbrock_2d_derivative(&[p[0], p[1]], 1.0, 100.0).to_vec())
 #     }
 # }
 #
@@ -149,7 +149,7 @@ use argmin_observer_spectator::SpectatorBuilder;
 #
 #     /// Apply the cost function to a parameter `p`
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-#         Ok(rosenbrock_2d(p, 1.0, 100.0))
+#         Ok(rosenbrock_2d(&[p[0], p[1]], 1.0, 100.0))
 #     }
 # }
 #
@@ -162,7 +162,7 @@ use argmin_observer_spectator::SpectatorBuilder;
 #
 #     /// Compute the gradient at parameter `p`.
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+#         Ok(rosenbrock_2d_derivative(&[p[0], p[1]], 1.0, 100.0).to_vec())
 #     }
 # }
 #
