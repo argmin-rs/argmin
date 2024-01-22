@@ -72,6 +72,15 @@ jobs:
       - name: Test (spectator)
         run: cargo test -p spectator
 
+  tests-argmin-testfunctions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test (testfunctions)
+        run: cargo test -p argmin_testfunctions
+
   tests-argmin-math:
     runs-on: ubuntu-latest
     steps:

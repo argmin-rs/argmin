@@ -7,6 +7,7 @@ members = [
     "checkpointing/*",
     "observers/*",
     "tools/spectator",
+    "tools/testfunctions",
 
     "examples/*",
 ]
