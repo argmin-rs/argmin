@@ -19,7 +19,7 @@ jobs:
           components: rustfmt,rust-src
 
       - name: Build documentation
-        run: cargo doc --features "argmin-math/latest_all" --no-deps
+        run: cargo doc --features "argmin-math/latest_all,argmin/full" --no-deps --workspace --exclude "example-*"
 
       - name: Forwarding
         run: echo '<!doctype html><meta http-equiv="refresh" content="0; ./argmin/">' > ./target/doc/index.html
