@@ -29,8 +29,6 @@ make_random!(u8);
 make_random!(u16);
 make_random!(u32);
 make_random!(u64);
-make_random!(isize);
-make_random!(usize);
 
 #[cfg(test)]
 mod tests {
@@ -64,6 +62,4 @@ mod tests {
     make_test!(u32);
     make_test!(i64);
     make_test!(u64);
-    make_test!(isize);
-    make_test!(usize);
 }

@@ -44,8 +44,6 @@ make_eye!(u8);
 make_eye!(u16);
 make_eye!(u32);
 make_eye!(u64);
-make_eye!(isize);
-make_eye!(usize);
 
 #[cfg(test)]
 mod tests {
@@ -96,8 +94,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);

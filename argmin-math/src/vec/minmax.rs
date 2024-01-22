@@ -55,8 +55,6 @@ macro_rules! make_minmax {
     };
 }
 
-make_minmax!(isize);
-make_minmax!(usize);
 make_minmax!(i8);
 make_minmax!(u8);
 make_minmax!(i16);
@@ -132,8 +130,6 @@ mod tests {
     make_test!(u32);
     make_test!(i64);
     make_test!(u64);
-    make_test!(isize);
-    make_test!(usize);
     make_test!(f32);
     make_test!(f64);
 }

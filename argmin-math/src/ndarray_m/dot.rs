@@ -133,12 +133,10 @@ make_dot_ndarray!(i8);
 make_dot_ndarray!(i16);
 make_dot_ndarray!(i32);
 make_dot_ndarray!(i64);
-make_dot_ndarray!(isize);
 make_dot_ndarray!(u8);
 make_dot_ndarray!(u16);
 make_dot_ndarray!(u32);
 make_dot_ndarray!(u64);
-make_dot_ndarray!(usize);
 make_dot_ndarray!(f32);
 make_dot_ndarray!(f64);
 

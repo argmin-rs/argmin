@@ -66,8 +66,6 @@ macro_rules! make_minmax {
     };
 }
 
-make_minmax!(isize);
-make_minmax!(usize);
 make_minmax!(i8);
 make_minmax!(u8);
 make_minmax!(i16);

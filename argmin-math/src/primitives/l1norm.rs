@@ -52,26 +52,22 @@ macro_rules! make_l1norm_complex_unsigned {
     };
 }
 
-make_l1norm!(isize);
 make_l1norm!(i8);
 make_l1norm!(i16);
 make_l1norm!(i32);
 make_l1norm!(i64);
-make_l1norm_unsigned!(usize);
 make_l1norm_unsigned!(u8);
 make_l1norm_unsigned!(u16);
 make_l1norm_unsigned!(u32);
 make_l1norm_unsigned!(u64);
 make_l1norm!(f32);
 make_l1norm!(f64);
-make_l1norm_complex!(isize);
 make_l1norm_complex!(i8);
 make_l1norm_complex!(i16);
 make_l1norm_complex!(i32);
 make_l1norm_complex!(i64);
 make_l1norm_complex!(f32);
 make_l1norm_complex!(f64);
-make_l1norm_complex_unsigned!(usize);
 make_l1norm_complex_unsigned!(u8);
 make_l1norm_complex_unsigned!(u16);
 make_l1norm_complex_unsigned!(u32);
@@ -135,8 +131,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);
@@ -148,7 +142,6 @@ mod tests {
     make_test!(f32);
     make_test!(f64);
 
-    make_test_signed!(isize);
     make_test_signed!(i8);
     make_test_signed!(i16);
     make_test_signed!(i32);
@@ -156,19 +149,16 @@ mod tests {
     make_test_signed!(f32);
     make_test_signed!(f64);
 
-    make_test_complex_signed!(isize);
     make_test_complex_signed!(i8);
     make_test_complex_signed!(i16);
     make_test_complex_signed!(i32);
     make_test_complex_signed!(i64);
     make_test_complex_signed!(f32);
     make_test_complex_signed!(f64);
-    make_test_complex!(usize);
     make_test_complex!(u8);
     make_test_complex!(u16);
     make_test_complex!(u32);
     make_test_complex!(u64);
-    make_test_complex!(isize);
     make_test_complex!(i8);
     make_test_complex!(i16);
     make_test_complex!(i32);

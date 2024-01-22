@@ -104,8 +104,6 @@ make_dot_vec!(u8);
 make_dot_vec!(u16);
 make_dot_vec!(u32);
 make_dot_vec!(u64);
-make_dot_vec!(isize);
-make_dot_vec!(usize);
 make_dot_vec!(Complex<f32>);
 make_dot_vec!(Complex<f64>);
 make_dot_vec!(Complex<i8>);
@@ -116,8 +114,6 @@ make_dot_vec!(Complex<u8>);
 make_dot_vec!(Complex<u16>);
 make_dot_vec!(Complex<u32>);
 make_dot_vec!(Complex<u64>);
-make_dot_vec!(Complex<isize>);
-make_dot_vec!(Complex<usize>);
 
 #[cfg(test)]
 mod tests {
@@ -551,8 +547,6 @@ mod tests {
         };
     }
 
-    make_test!(isize);
-    make_test!(usize);
     make_test!(i8);
     make_test!(u8);
     make_test!(i16);
