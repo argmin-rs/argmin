@@ -24,7 +24,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&p.to_vec(), self.a, self.b))
+        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
     }
 }
 
@@ -33,11 +33,9 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(Array1::from(rosenbrock_2d_derivative(
-            &p.to_vec(),
-            self.a,
-            self.b,
-        )))
+        Ok(Array1::from(
+            rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec(),
+        ))
     }
 }
 
@@ -46,7 +44,11 @@ impl Hessian for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        let h = rosenbrock_2d_hessian(&p.to_vec(), self.a, self.b);
+        let h = rosenbrock_2d_hessian(&[p[0], p[1]], self.a, self.b)
+            .iter()
+            .flatten()
+            .cloned()
+            .collect();
         Ok(Array::from_shape_vec((2, 2), h)?)
     }
 }

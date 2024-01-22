@@ -9,6 +9,6 @@ publish = false
 argmin = { version = "*", path = "../../argmin" }
 argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
 argmin-observer-spectator = { version = "*", path = "../../observers/spectator" }
-argmin_testfunctions = "*"
+argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
 rand = "0.8.5"
 rand_xoshiro = "0.6.0"
