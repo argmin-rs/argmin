@@ -322,25 +322,6 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -375,8 +356,6 @@
 </span><span class="kw">pub struct </span>ConjugateGradient&lt;P, F&gt; {
     <span class="doccomment">/// b (right hand side of `A * x = b`)
     </span>b: P,
-    <span class="doccomment">/// Residual
-    </span>r: <span class="prelude-ty">Option</span>&lt;P&gt;,
     <span class="doccomment">/// p
     </span>p: <span class="prelude-ty">Option</span>&lt;P&gt;,
     <span class="doccomment">/// previous p
@@ -403,7 +382,6 @@
     </span><span class="kw">pub fn </span>new(b: P) -&gt; <span class="self">Self </span>{
         ConjugateGradient {
             b,
-            r: <span class="prelude-val">None</span>,
             p: <span class="prelude-val">None</span>,
             p_prev: <span class="prelude-val">None</span>,
             rtr: F::nan(),
@@ -430,15 +408,11 @@
     }
 }
 
-<span class="kw">impl</span>&lt;P, O, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), (), F&gt;&gt; <span class="kw">for </span>ConjugateGradient&lt;P, F&gt;
+<span class="kw">impl</span>&lt;P, O, R, F&gt; Solver&lt;O, IterState&lt;P, (), (), (), R, F&gt;&gt; <span class="kw">for </span>ConjugateGradient&lt;P, F&gt;
 <span class="kw">where
     </span>O: Operator&lt;Param = P, Output = P&gt;,
-    P: Clone
-        + ArgminDot&lt;P, F&gt;
-        + ArgminSub&lt;P, P&gt;
-        + ArgminScaledAdd&lt;P, F, P&gt;
-        + ArgminConj
-        + ArgminMul&lt;F, P&gt;,
+    P: Clone + ArgminDot&lt;P, F&gt; + ArgminSub&lt;P, R&gt; + ArgminScaledAdd&lt;P, F, P&gt; + ArgminConj,
+    R: ArgminMul&lt;F, R&gt; + ArgminMul&lt;F, P&gt; + ArgminConj + ArgminDot&lt;R, F&gt; + ArgminScaledAdd&lt;P, F, R&gt;,
     F: ArgminFloat + ArgminL2Norm&lt;F&gt;,
 {
     <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Conjugate Gradient&quot;</span>;
@@ -446,8 +420,8 @@
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, (), (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        state: IterState&lt;P, (), (), (), R, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), R, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>init_param = state.get_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
@@ -456,26 +430,25 @@
             </span>)
         ))<span class="question-mark">?</span>;
         <span class="kw">let </span>ap = problem.apply(init_param)<span class="question-mark">?</span>;
-        <span class="kw">let </span>r0 = <span class="self">self</span>.b.sub(<span class="kw-2">&amp;</span>ap).mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>)));
+        <span class="kw">let </span>r0: R = <span class="self">self</span>.b.sub(<span class="kw-2">&amp;</span>ap).mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>)));
         <span class="self">self</span>.p = <span class="prelude-val">Some</span>(r0.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))));
         <span class="self">self</span>.rtr = r0.dot(<span class="kw-2">&amp;</span>r0.conj());
-        <span class="self">self</span>.r = <span class="prelude-val">Some</span>(r0);
-        <span class="prelude-val">Ok</span>((state, <span class="prelude-val">None</span>))
+        <span class="prelude-val">Ok</span>((state.residuals(r0), <span class="prelude-val">None</span>))
     }
 
     <span class="doccomment">/// Perform one iteration of CG algorithm
     </span><span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
-        state: IterState&lt;P, (), (), (), (), F&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), (), F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
+        <span class="kw-2">mut </span>state: IterState&lt;P, (), (), (), R, F&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(IterState&lt;P, (), (), (), R, F&gt;, <span class="prelude-ty">Option</span>&lt;KV&gt;), Error&gt; {
         <span class="kw">let </span>p = <span class="self">self</span>.p.take().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             PotentialBug,
             <span class="string">&quot;`ConjugateGradient`: Field `p` not set&quot;
         </span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>r = <span class="self">self</span>.r.as_ref().ok_or_else(<span class="macro">argmin_error_closure!</span>(
+        <span class="kw">let </span>r = state.take_residuals().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             PotentialBug,
-            <span class="string">&quot;`ConjugateGradient`: Field `r` not set&quot;
+            <span class="string">&quot;`ConjugateGradient`: Residuals in `state` not set&quot;
         </span>))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>apk = problem.apply(<span class="kw-2">&amp;</span>p)<span class="question-mark">?</span>;
@@ -489,15 +462,14 @@
         <span class="kw">let </span>rtr_n = r.dot(<span class="kw-2">&amp;</span>r.conj());
         <span class="kw">let </span>beta = rtr_n.div(<span class="self">self</span>.rtr);
         <span class="self">self</span>.rtr = rtr_n;
-        <span class="kw">let </span>p_n = r.mul(<span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))).scaled_add(<span class="kw-2">&amp;</span>beta, <span class="kw-2">&amp;</span>p);
+        <span class="kw">let </span>p_n = &lt;R <span class="kw">as </span>ArgminMul&lt;F, P&gt;&gt;::mul(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>(<span class="macro">float!</span>(-<span class="number">1.0</span>))).scaled_add(<span class="kw-2">&amp;</span>beta, <span class="kw-2">&amp;</span>p);
         <span class="kw">let </span>norm = r.dot(<span class="kw-2">&amp;</span>r.conj()).l2_norm();
 
         <span class="self">self</span>.p = <span class="prelude-val">Some</span>(p_n);
         <span class="self">self</span>.p_prev = <span class="prelude-val">Some</span>(p);
-        <span class="self">self</span>.r = <span class="prelude-val">Some</span>(r);
 
         <span class="prelude-val">Ok</span>((
-            state.param(new_param).cost(norm),
+            state.param(new_param).residuals(r).cost(norm),
             <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;alpha&quot; </span>=&gt; alpha; <span class="string">&quot;beta&quot; </span>=&gt; beta;)),
         ))
     }
@@ -515,16 +487,9 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>cg: ConjugateGradient&lt;<span class="kw">_</span>, f64&gt; = ConjugateGradient::new(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
-        <span class="kw">let </span>ConjugateGradient {
-            b,
-            r,
-            p,
-            p_prev,
-            rtr,
-        } = cg;
+        <span class="kw">let </span>ConjugateGradient { b, p, p_prev, rtr } = cg;
         <span class="macro">assert_eq!</span>(b[<span class="number">0</span>].to_ne_bytes(), <span class="number">1.0f64</span>.to_ne_bytes());
         <span class="macro">assert_eq!</span>(b[<span class="number">1</span>].to_ne_bytes(), <span class="number">2.0f64</span>.to_ne_bytes());
-        <span class="macro">assert!</span>(r.is_none());
         <span class="macro">assert!</span>(p.is_none());
         <span class="macro">assert!</span>(p_prev.is_none());
         <span class="macro">assert!</span>(rtr.is_nan());
@@ -569,28 +534,28 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_init() {
         <span class="kw">let </span><span class="kw-2">mut </span>cg: ConjugateGradient&lt;<span class="kw">_</span>, f64&gt; = ConjugateGradient::new(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
-        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; =
+        <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), Vec&lt;f64&gt;, f64&gt; =
             IterState::new().param(<span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">4.0</span>]);
         <span class="kw">let </span>(state_out, kv) = cg
             .init(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state.clone())
             .unwrap();
         <span class="macro">assert!</span>(kv.is_none());
-        <span class="comment">// State remains unchanged in `init`.
-        </span><span class="macro">assert_eq!</span>(state_out, state);
 
-        <span class="kw">let </span>ConjugateGradient {
-            b,
-            r,
-            p,
-            p_prev,
-            rtr,
-        } = cg;
+        <span class="kw">let </span>ConjugateGradient { b, p, p_prev, rtr } = cg;
 
         <span class="macro">assert_relative_eq!</span>(b[<span class="number">0</span>], <span class="number">1.0</span>, epsilon = f64::EPSILON);
         <span class="macro">assert_relative_eq!</span>(b[<span class="number">1</span>], <span class="number">2.0</span>, epsilon = f64::EPSILON);
         <span class="kw">let </span>r0 = [<span class="number">2.0f64</span>, <span class="number">2.0</span>];
-        <span class="macro">assert_relative_eq!</span>(r0[<span class="number">0</span>], r.as_ref().unwrap()[<span class="number">0</span>], epsilon = f64::EPSILON);
-        <span class="macro">assert_relative_eq!</span>(r0[<span class="number">1</span>], r.as_ref().unwrap()[<span class="number">1</span>], epsilon = f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(
+            r0[<span class="number">0</span>],
+            state_out.get_residuals().as_ref().unwrap()[<span class="number">0</span>],
+            epsilon = f64::EPSILON
+        );
+        <span class="macro">assert_relative_eq!</span>(
+            r0[<span class="number">1</span>],
+            state_out.get_residuals().as_ref().unwrap()[<span class="number">1</span>],
+            epsilon = f64::EPSILON
+        );
         <span class="kw">let </span>pp = [-<span class="number">2.0f64</span>, -<span class="number">2.0</span>];
         <span class="macro">assert_relative_eq!</span>(pp[<span class="number">0</span>], p.as_ref().unwrap()[<span class="number">0</span>], epsilon = f64::EPSILON);
         <span class="macro">assert_relative_eq!</span>(pp[<span class="number">1</span>], p.as_ref().unwrap()[<span class="number">1</span>], epsilon = f64::EPSILON);
@@ -602,7 +567,6 @@
     </span><span class="kw">fn </span>test_next_iter_p_not_set() {
         <span class="kw">let </span><span class="kw-2">mut </span>cg: ConjugateGradient&lt;<span class="kw">_</span>, f64&gt; = ConjugateGradient::new(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
         <span class="kw">let </span>state = IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
-        cg.r = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
         <span class="macro">assert!</span>(cg.p.is_none());
         <span class="kw">let </span>res = cg.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
@@ -621,14 +585,13 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cg: ConjugateGradient&lt;<span class="kw">_</span>, f64&gt; = ConjugateGradient::new(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
         <span class="kw">let </span>state = IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>]);
         cg.p = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
-        <span class="macro">assert!</span>(cg.r.is_none());
         <span class="kw">let </span>res = cg.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
             res,
             ArgminError,
             <span class="macro">concat!</span>(
                 <span class="string">&quot;Potential bug: \&quot;`ConjugateGradient`: &quot;</span>,
-                <span class="string">&quot;Field `r` not set\&quot;. This is potentially a bug. &quot;</span>,
+                <span class="string">&quot;Residuals in `state` not set\&quot;. This is potentially a bug. &quot;</span>,
                 <span class="string">&quot;Please file a report on https://github.com/argmin-rs/argmin/issues&quot;
             </span>)
         );
@@ -637,9 +600,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_next_iter_state_param_not_set() {
         <span class="kw">let </span><span class="kw-2">mut </span>cg: ConjugateGradient&lt;<span class="kw">_</span>, f64&gt; = ConjugateGradient::new(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>]);
-        <span class="kw">let </span>state = IterState::new();
+        <span class="kw">let </span>state = IterState::new().residuals(<span class="macro">vec!</span>[]);
         cg.p = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
-        cg.r = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]);
         <span class="macro">assert!</span>(state.param.is_none());
         <span class="kw">let </span>res = cg.next_iter(<span class="kw-2">&amp;mut </span>Problem::new(TestProblem::new()), state);
         <span class="macro">assert_error!</span>(
@@ -661,7 +623,7 @@
         <span class="kw">let </span>(state, <span class="kw">_</span>) = cg.init(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
         <span class="kw">let </span>rtr = cg.rtr;
         <span class="kw">let </span>p = cg.p.clone().unwrap()[<span class="number">0</span>];
-        <span class="kw">let </span>r = cg.r.clone().unwrap()[<span class="number">0</span>];
+        <span class="kw">let </span>r = state.get_residuals().unwrap()[<span class="number">0</span>];
 
         <span class="kw">let </span>apk = p;
         <span class="kw">let </span>alpha = rtr / (p * apk);
@@ -675,7 +637,7 @@
         <span class="kw">let </span>(state, kv) = cg.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
         <span class="macro">assert!</span>(kv.is_some());
 
-        <span class="macro">assert_relative_eq!</span>(r, cg.r.as_ref().unwrap()[<span class="number">0</span>]);
+        <span class="macro">assert_relative_eq!</span>(r, state.get_residuals().unwrap()[<span class="number">0</span>]);
         <span class="macro">assert_relative_eq!</span>(p_n, cg.p.as_ref().unwrap()[<span class="number">0</span>]);
         <span class="macro">assert_relative_eq!</span>(p, cg.p_prev.as_ref().unwrap()[<span class="number">0</span>]);
         <span class="macro">assert_relative_eq!</span>(rtr_n, cg.rtr);
