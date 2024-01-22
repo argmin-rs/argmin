@@ -21,4 +21,4 @@ serde_json = { version = "1.0" }
 
 [dev-dependencies]
 argmin-math = { path = "../../argmin-math", features = ["vec"] }
-argmin_testfunctions = { version = "*", path = "/../../tools/testfunctions/" }
+argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
