@@ -23,7 +23,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(p.data.as_vec(), self.a, self.b))
+        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
     }
 }
 
@@ -32,11 +32,9 @@ impl Gradient for Rosenbrock {
     type Gradient = DVector<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(DVector::from(rosenbrock_2d_derivative(
-            p.data.as_vec(),
-            self.a,
-            self.b,
-        )))
+        Ok(DVector::from(
+            rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec(),
+        ))
     }
 }
 

@@ -10,5 +10,5 @@ argmin = { path = "../../../argmin", features = ["serde1", "ctrlc", "wasm-bindge
 argmin-math = { path = "../../../argmin-math", features = ["latest_all"] }
 argmin-observer-slog = { path = "../../../observers/slog", features = ["serde1"] }
 argmin-observer-spectator = { path = "../../../observers/spectator" }
-argmin_testfunctions = "*"
+argmin_testfunctions = { version = "*", path = "../../../tools/testfunctions/" }
 serde = "1"

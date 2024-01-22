@@ -387,7 +387,7 @@ pub trait CostFunction {
 ///
 /// ```
 /// use argmin::core::{Gradient, Error};
-/// use argmin_testfunctions::rosenbrock_2d_derivative;
+/// # fn compute_gradient(_a: &[f64]) -> Vec<f64> { vec![] }
 ///
 /// struct Rosenbrock {}
 ///
@@ -397,7 +397,7 @@ pub trait CostFunction {
 ///
 ///     /// Compute gradient of rosenbrock function
 ///     fn gradient(&self, param: &Self::Param) -> Result<Self::Gradient, Error> {
-///         Ok(rosenbrock_2d_derivative(param, 1.0, 100.0))
+///         Ok(compute_gradient(param))
 ///     }
 /// }
 /// ```
@@ -419,7 +419,7 @@ pub trait Gradient {
 ///
 /// ```
 /// use argmin::core::{Hessian, Error};
-/// use argmin_testfunctions::rosenbrock_2d_hessian;
+/// # fn compute_hessian(_a: &[f64]) -> Vec<f64> { vec![] }
 ///
 /// struct Rosenbrock {}
 ///
@@ -429,7 +429,7 @@ pub trait Gradient {
 ///
 ///     /// Compute gradient of rosenbrock function
 ///     fn hessian(&self, param: &Self::Param) -> Result<Self::Hessian, Error> {
-///         Ok(rosenbrock_2d_hessian(param, 1.0, 100.0))
+///         Ok(compute_hessian(&param))
 ///     }
 /// }
 pub trait Hessian {

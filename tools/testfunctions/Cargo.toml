@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 description = "Test functions for optimization algorithms"
 documentation = "https://docs.rs/argmin_testfunctions/"
 homepage = "http://argmin-rs.org"
-repository = "https://github.com/argmin-rs/argmin-testfunctions"
+repository = "https://github.com/argmin-rs/argmin"
 readme = "README.md"
 keywords = ["test", "function", "optimization"]
 categories = ["science"]
@@ -16,7 +16,7 @@ exclude = [
 ]
 
 [dependencies]
-num = "0.4.0"
+num = "0.4"
 
 [badges]
 maintenance = { status = "actively-developed" }

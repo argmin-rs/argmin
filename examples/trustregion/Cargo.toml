@@ -9,5 +9,5 @@ publish = false
 argmin = { version = "*", path = "../../argmin" }
 argmin-math = { version = "*", features = ["ndarray_latest-nolinalg"], path = "../../argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
-argmin_testfunctions = "*"
+argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
 ndarray = "0.15.6"
