@@ -1,4 +1,3 @@
 (function() {var implementors = {
-"argmin_math":[],
-"example_steepestdescent_manifold":[["impl <a class=\"trait\" href=\"argmin_math/trait.ArgminScaledAdd.html\" title=\"trait argmin_math::ArgminScaledAdd\">ArgminScaledAdd</a>&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/1.75.0/std/primitive.f64.html\">f64</a>, <a class=\"primitive\" href=\"https://doc.rust-lang.org/1.75.0/std/primitive.f64.html\">f64</a>, <a class=\"struct\" href=\"example_steepestdescent_manifold/struct.CirclePoint.html\" title=\"struct example_steepestdescent_manifold::CirclePoint\">CirclePoint</a>&gt; for <a class=\"struct\" href=\"example_steepestdescent_manifold/struct.CirclePoint.html\" title=\"struct example_steepestdescent_manifold::CirclePoint\">CirclePoint</a>"]]
+"argmin_math":[]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

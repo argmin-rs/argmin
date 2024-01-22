@@ -1,6 +1,3 @@
 (function() {var implementors = {
-"argmin":[],
-"example_gaussnewton":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Jacobian.html\" title=\"trait argmin::core::problem::Jacobian\">Jacobian</a> for <a class=\"struct\" href=\"example_gaussnewton/struct.Problem.html\" title=\"struct example_gaussnewton::Problem\">Problem</a>"]],
-"example_gaussnewton_linesearch":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Jacobian.html\" title=\"trait argmin::core::problem::Jacobian\">Jacobian</a> for <a class=\"struct\" href=\"example_gaussnewton_linesearch/struct.Problem.html\" title=\"struct example_gaussnewton_linesearch::Problem\">Problem</a>"]],
-"example_gaussnewton_nalgebra":[["impl <a class=\"trait\" href=\"argmin/core/problem/trait.Jacobian.html\" title=\"trait argmin::core::problem::Jacobian\">Jacobian</a> for <a class=\"struct\" href=\"example_gaussnewton_nalgebra/struct.Problem.html\" title=\"struct example_gaussnewton_nalgebra::Problem\">Problem</a>"]]
+"argmin":[]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

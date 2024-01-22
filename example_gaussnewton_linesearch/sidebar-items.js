@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["main","run"],"struct":["Problem"],"type":["Measurement","Rate","S"]};
