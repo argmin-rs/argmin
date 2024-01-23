@@ -10,7 +10,7 @@ use argmin::{
     solver::{linesearch::MoreThuenteLineSearch, newton::NewtonCG},
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+use argmin_testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_hessian};
 use ndarray::{Array, Array1, Array2};
 
 struct Rosenbrock {
@@ -23,7 +23,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
+        Ok(rosenbrock(p.as_slice().unwrap(), self.a, self.b))
     }
 }
 
@@ -33,7 +33,7 @@ impl Gradient for Rosenbrock {
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         Ok(Array1::from(
-            rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec(),
+            rosenbrock_derivative(p.as_slice().unwrap(), self.a, self.b).to_vec(),
         ))
     }
 }
@@ -43,12 +43,11 @@ impl Hessian for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        let h = rosenbrock_2d_hessian(&[p[0], p[1]], self.a, self.b)
-            .iter()
+        let h = rosenbrock_hessian(p.as_slice().unwrap(), self.a, self.b)
+            .into_iter()
             .flatten()
-            .cloned()
             .collect();
-        Ok(Array::from_shape_vec((2, 2), h)?)
+        Ok(Array::from_shape_vec((p.len(), p.len()), h)?)
     }
 }
 
@@ -57,7 +56,6 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from(vec![1.2, 1.2]);
     let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
 
     // set up line search

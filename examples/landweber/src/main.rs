@@ -10,7 +10,7 @@ use argmin::{
     solver::landweber::Landweber,
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::rosenbrock_2d_derivative;
+use argmin_testfunctions::rosenbrock_derivative;
 
 struct Rosenbrock {}
 
@@ -19,7 +19,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Vec<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_2d_derivative(&[p[0], p[1]], 1.0, 100.0).to_vec())
+        Ok(rosenbrock_derivative(p, 1.0, 100.0))
     }
 }
 

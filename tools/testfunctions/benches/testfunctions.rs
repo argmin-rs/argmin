@@ -104,9 +104,8 @@ mod tests {
     make_bench!(rastrigin_a(&[-43.0, 53.0, 3.4], 10.0));
 
     make_bench!(rosenbrock(&[-43.0, 53.0, 3.4], 1_f64, 100_f64));
-    make_bench!(rosenbrock_2d(&[-43.0, 53.0], 1_f64, 100_f64));
-    make_bench!(rosenbrock_2d_derivative(&[-43.0, 53.0], 1_f64, 100_f64));
-    make_bench!(rosenbrock_2d_hessian(&[-43.0, 53.0], 1_f64, 100_f64));
+    make_bench!(rosenbrock_derivative(&[-43.0, 53.0], 1_f64, 100_f64));
+    make_bench!(rosenbrock_hessian(&[-43.0, 53.0], 1_f64, 100_f64));
 
     make_bench!(sphere(&vec![-43.0, 53.0]));
     make_bench!(sphere_derivative(&[-43.0, 53.0]));

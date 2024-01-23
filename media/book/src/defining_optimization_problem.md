@@ -21,7 +21,7 @@ For the sake of simplicity, this example will use the `vec` math backend.
 # extern crate argmin;
 # extern crate argmin_testfunctions;
 use argmin_testfunctions::{
-    rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian
+    rosenbrock, rosenbrock_derivative, rosenbrock_hessian
 };
 use argmin::core::{Error, CostFunction, Gradient, Hessian};
 
@@ -50,7 +50,7 @@ impl CostFunction for Rosenbrock {
     /// Apply the cost function to a parameter `p`
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         // Evaluate 2D Rosenbrock function
-        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
+        Ok(rosenbrock(p, self.a, self.b))
     }
 }
 
@@ -68,7 +68,7 @@ impl Gradient for Rosenbrock {
     /// Compute the gradient at parameter `p`.
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
         // Compute gradient of 2D Rosenbrock function
-        Ok(rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec())
+        Ok(rosenbrock_derivative(p, self.a, self.b))
     }
 }
 
@@ -85,7 +85,7 @@ impl Hessian for Rosenbrock {
     /// Compute the Hessian at parameter `p`.
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
         // Compute Hessian of 2D Rosenbrock function
-        let t = rosenbrock_2d_hessian(&[p[0], p[1]], self.a, self.b);
+        let t = rosenbrock_hessian(p, self.a, self.b);
         // Reshape the output
         Ok(vec![vec![t[0][0], t[0][1]], vec![t[1][0], t[1][1]]])
     }
@@ -138,7 +138,7 @@ These `bulk_*` methods come with a default implementation, which essentially loo
 ```rust
 # extern crate argmin;
 # extern crate argmin_testfunctions;
-# use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+# use argmin_testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_hessian};
 use argmin::core::{Error, CostFunction, SyncAlias, SendAlias};
 # struct Rosenbrock { a: f64, b: f64 }
 
@@ -149,7 +149,7 @@ impl CostFunction for Rosenbrock {
     /// Conventional cost function which only processes a single parameter vector
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
         // [ ... ]
-        # Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
+        # Ok(rosenbrock(p, self.a, self.b))
     }
     
     ////////////////////////////////////////////////////////////////////////////

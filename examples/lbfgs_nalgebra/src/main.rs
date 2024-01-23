@@ -10,7 +10,7 @@ use argmin::{
     solver::{linesearch::MoreThuenteLineSearch, quasinewton::LBFGS},
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 use nalgebra::DVector;
 
 struct Rosenbrock {
@@ -23,7 +23,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
+        Ok(rosenbrock(p.as_slice(), self.a, self.b))
     }
 }
 
@@ -32,9 +32,11 @@ impl Gradient for Rosenbrock {
     type Gradient = DVector<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(DVector::from(
-            rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec(),
-        ))
+        Ok(DVector::from(rosenbrock_derivative(
+            p.as_slice(),
+            self.a,
+            self.b,
+        )))
     }
 }
 

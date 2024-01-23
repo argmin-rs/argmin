@@ -7,7 +7,8 @@ publish = false
 
 [dependencies]
 argmin = { version = "*", path = "../../argmin" }
-argmin-math = { version = "*", features = ["ndarray_latest-nolinalg"], path = "../../argmin-math" }
+argmin-math = { version = "*", features = ["ndarray_latest"], path = "../../argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
 argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
 ndarray = "0.15.6"
+ndarray-linalg = { version = "0.16.0", features = ["intel-mkl-static"] }
