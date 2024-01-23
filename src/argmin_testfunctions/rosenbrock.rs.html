@@ -106,6 +106,32 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -128,8 +154,7 @@
 //! The minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
 
 </span><span class="kw">use </span>num::{Float, FromPrimitive};
-<span class="kw">use </span>std::fmt::Debug;
-<span class="kw">use </span>std::iter::Sum;
+<span class="kw">use </span>std::{iter::Sum, ops::AddAssign};
 
 <span class="doccomment">/// Multidimensional Rosenbrock test function
 ///
@@ -140,7 +165,10 @@
 /// where `x_i \in (-\infty, \infty)`. The parameters a and b usually are: `a = 1` and `b = 100`.
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
-</span><span class="kw">pub fn </span>rosenbrock&lt;T: Float + FromPrimitive + Sum + Debug&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; T {
+</span><span class="kw">pub fn </span>rosenbrock&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive + Sum,
+{
     param
         .iter()
         .zip(param.iter().skip(<span class="number">1</span>))
@@ -148,43 +176,55 @@
         .sum()
 }
 
-<span class="doccomment">/// 2D Rosenbrock test function
-///
-/// Defined as
-///
-/// `f(x_1, x_2) = (a - x_1)^2 + b * (x_2 - x_1^2)^2`
-///
-/// where `x_i \in (-\infty, \infty)`. The parameters a and b usually are: `a = 1` and `b = 100`.
-///
-/// For 2D problems, this function is much faster than `rosenbrock`.
-///
-/// The global minimum is at `f(x_1, x_2) = f(1, 1) = 0`.
-</span><span class="kw">pub fn </span>rosenbrock_2d&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>], a: T, b: T) -&gt; T {
-    <span class="kw">let </span>[x, y] = <span class="kw-2">*</span>param;
-    (a - x).powi(<span class="number">2</span>) + b * (y - x.powi(<span class="number">2</span>)).powi(<span class="number">2</span>)
+<span class="doccomment">/// Derivative of the multidimensional Rosenbrock test function
+</span><span class="kw">pub fn </span>rosenbrock_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;T&gt;
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    <span class="kw">let </span>n0 = T::from_f64(<span class="number">0.0</span>).unwrap();
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>n4 = T::from_f64(<span class="number">4.0</span>).unwrap();
+
+    <span class="kw">let </span>n = param.len();
+
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[n0; n];
+
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(n - <span class="number">1</span>) {
+        <span class="kw">let </span>xi = param[i];
+        <span class="kw">let </span>xi1 = param[i + <span class="number">1</span>];
+
+        <span class="kw">let </span>t1 = -n4 * b * xi * (xi1 - xi.powi(<span class="number">2</span>));
+        <span class="kw">let </span>t2 = n2 * b * (xi1 - xi.powi(<span class="number">2</span>));
+
+        result[i] += t1 + n2 * (xi - a);
+        result[i + <span class="number">1</span>] += t2;
+    }
+    result
 }
 
-<span class="doccomment">/// Derivative of 2D Rosenbrock function
-</span><span class="kw">pub fn </span>rosenbrock_2d_derivative&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>], a: T, b: T) -&gt; [T; <span class="number">2</span>] {
-    <span class="kw">let </span>num2 = T::from_f64(<span class="number">2.0</span>).unwrap();
-    <span class="kw">let </span>num4 = T::from_f64(<span class="number">4.0</span>).unwrap();
-    <span class="kw">let </span>[x, y] = <span class="kw-2">*</span>param;
-    [
-        -num2 * a + num4 * b * x.powi(<span class="number">3</span>) - num4 * b * x * y + num2 * x,
-        num2 * b * (y - x.powi(<span class="number">2</span>)),
-    ]
-}
+<span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
+</span><span class="kw">pub fn </span>rosenbrock_hessian&lt;T&gt;(x: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    <span class="kw">let </span>n0 = T::from_f64(<span class="number">0.0</span>).unwrap();
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>n4 = T::from_f64(<span class="number">4.0</span>).unwrap();
+    <span class="kw">let </span>n12 = T::from_f64(<span class="number">12.0</span>).unwrap();
 
-<span class="doccomment">/// Hessian of 2D Rosenbrock function
-</span><span class="kw">pub fn </span>rosenbrock_2d_hessian&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>], _a: T, b: T) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>] {
-    <span class="kw">let </span>num2 = T::from_f64(<span class="number">2.0</span>).unwrap();
-    <span class="kw">let </span>num4 = T::from_f64(<span class="number">4.0</span>).unwrap();
-    <span class="kw">let </span>num12 = T::from_f64(<span class="number">12.0</span>).unwrap();
-    <span class="kw">let </span>[x, y] = <span class="kw-2">*</span>param;
-    [
-        [num12 * b * x.powi(<span class="number">2</span>) - num4 * b * y + num2, -num4 * b * x],
-        [-num4 * b * x, num2 * b],
-    ]
+    <span class="kw">let </span>n = x.len();
+    <span class="kw">let </span><span class="kw-2">mut </span>hessian = <span class="macro">vec!</span>[<span class="macro">vec!</span>[n0; n]; n];
+
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n - <span class="number">1 </span>{
+        <span class="kw">let </span>xi = x[i];
+        <span class="kw">let </span>xi1 = x[i + <span class="number">1</span>];
+
+        hessian[i][i] += n12 * b * xi.powi(<span class="number">2</span>) - n4 * b * xi1 + n2 * a;
+        hessian[i + <span class="number">1</span>][i + <span class="number">1</span>] = n2 * b;
+        hessian[i][i + <span class="number">1</span>] = -n4 * b * xi;
+        hessian[i + <span class="number">1</span>][i] = -n4 * b * xi;
+    }
+    hessian
 }
 
 <span class="attr">#[cfg(test)]
@@ -192,26 +232,38 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rosenbrock_optimum_2d() {
+    </span><span class="kw">fn </span>test_rosenbrock_optimum() {
         <span class="macro">assert!</span>(rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0_f32</span>, <span class="number">1.0_f32</span>], <span class="number">1.0</span>, <span class="number">100.0</span>).abs() &lt; std::f32::EPSILON);
         <span class="macro">assert!</span>(rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>).abs() &lt; std::f64::EPSILON);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rosenbrock_derivative() {
-        <span class="kw">let </span>res = rosenbrock_2d_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
-        <span class="kw">for </span>elem <span class="kw">in </span><span class="kw-2">&amp;</span>res {
-            <span class="macro">assert!</span>((elem - <span class="number">0.0</span>).abs() &lt; std::f64::EPSILON);
-        }
-        <span class="kw">let </span>res = rosenbrock_2d_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0_f32</span>, <span class="number">1.0_f32</span>], <span class="number">1.0_f32</span>, <span class="number">100.0_f32</span>);
-        <span class="kw">for </span>elem <span class="kw">in </span><span class="kw-2">&amp;</span>res {
-            <span class="macro">assert!</span>((elem - <span class="number">0.0</span>).abs() &lt; std::f32::EPSILON);
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_rosenbrock_optimum_3d() {
         <span class="macro">assert!</span>(rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>).abs() &lt; std::f64::EPSILON);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_rosenbrock_derivative_optimum() {
+        <span class="kw">let </span>derivative =
+            rosenbrock_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        <span class="kw">for </span>elem <span class="kw">in </span>derivative {
+            <span class="macro">assert!</span>(elem.abs() &lt; std::f64::EPSILON);
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_rosenbrock_hessian_2() {
+        <span class="comment">// Same testcase as in scipy
+        </span><span class="kw">let </span>hessian = rosenbrock_hessian(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        <span class="kw">let </span>res = <span class="macro">vec!</span>[
+            <span class="macro">vec!</span>[-<span class="number">38.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>],
+            <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">134.0</span>, -<span class="number">40.0</span>, <span class="number">0.0</span>],
+            <span class="macro">vec!</span>[<span class="number">0.0</span>, -<span class="number">40.0</span>, <span class="number">130.0</span>, -<span class="number">80.0</span>],
+            <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">0.0</span>, -<span class="number">80.0</span>, <span class="number">200.0</span>],
+        ];
+        <span class="kw">let </span>n = hessian.len();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="macro">assert_eq!</span>(hessian[i].len(), n);
+            <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
+                <span class="macro">assert!</span>((hessian[i][j] - res[i][j]).abs() &lt; std::f64::EPSILON);
+            }
+        }
     }
 }
 </code></pre></div></section></main></body></html>
