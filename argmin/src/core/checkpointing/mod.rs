@@ -35,7 +35,7 @@
 //! use argmin_checkpointing_file::FileCheckpoint;
 //! # use argmin_observer_slog::SlogLogger;
 //! # use argmin::solver::landweber::Landweber;
-//! # use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+//! # use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 //! #
 //! # #[derive(Default)]
 //! # struct Rosenbrock {}
@@ -49,7 +49,7 @@
 //! #
 //! #     /// Apply the cost function to a parameter `p`
 //! #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-//! #         Ok(rosenbrock_2d(&[p[0], p[1]], 1.0, 100.0))
+//! #         Ok(rosenbrock(p, 1.0, 100.0))
 //! #     }
 //! # }
 //! #
@@ -62,7 +62,7 @@
 //! #
 //! #     /// Compute the gradient at parameter `p`.
 //! #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-//! #         Ok(rosenbrock_2d_derivative(&[p[0], p[1]], 1.0, 100.0).to_vec())
+//! #         Ok(rosenbrock_derivative(p, 1.0, 100.0))
 //! #     }
 //! # }
 //! #

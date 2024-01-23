@@ -14,7 +14,7 @@ use argmin::{
     },
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 
 struct Rosenbrock {
     a: f64,
@@ -26,7 +26,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock_2d(&[p[0], p[1]], self.a, self.b))
+        Ok(rosenbrock(p, self.a, self.b))
     }
 }
 
@@ -35,7 +35,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Vec<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec())
+        Ok(rosenbrock_derivative(p, self.a, self.b))
     }
 }
 
@@ -58,7 +58,7 @@ fn run() -> Result<(), Error> {
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|state| state.param(init_param).max_iters(10))
+        .configure(|state| state.param(init_param).max_iters(100))
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 

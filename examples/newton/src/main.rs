@@ -10,7 +10,7 @@ use argmin::{
     solver::newton::Newton,
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::{rosenbrock_2d_derivative, rosenbrock_2d_hessian};
+use argmin_testfunctions::{rosenbrock_derivative, rosenbrock_hessian};
 use ndarray::{Array, Array1, Array2};
 
 struct Rosenbrock {
@@ -23,9 +23,11 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(Array1::from(
-            rosenbrock_2d_derivative(&[p[0], p[1]], self.a, self.b).to_vec(),
-        ))
+        Ok(Array1::from(rosenbrock_derivative(
+            p.as_slice().unwrap(),
+            self.a,
+            self.b,
+        )))
     }
 }
 
@@ -34,12 +36,11 @@ impl Hessian for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        let h = rosenbrock_2d_hessian(&[p[0], p[1]], self.a, self.b)
-            .iter()
+        let h = rosenbrock_hessian(p.as_slice().unwrap(), self.a, self.b)
+            .into_iter()
             .flatten()
-            .cloned()
             .collect();
-        Ok(Array::from_shape_vec((2, 2), h)?)
+        Ok(Array::from_shape_vec((p.len(), p.len()), h)?)
     }
 }
 
@@ -48,15 +49,14 @@ fn run() -> Result<(), Error> {
     let cost = Rosenbrock { a: 1.0, b: 100.0 };
 
     // Define initial parameter vector
-    // let init_param: Array1<f64> = Array1::from(vec![1.2, 1.2]);
-    let init_param: Array1<f64> = Array1::from(vec![-1.2, 1.0]);
+    let init_param: Array1<f64> = Array1::from(vec![1.2, 1.2]);
 
     // Set up solver
     let solver: Newton<f64> = Newton::new();
 
     // Run solver
     let res = Executor::new(cost, solver)
-        .configure(|state| state.param(init_param).max_iters(8))
+        .configure(|state| state.param(init_param).max_iters(10))
         .add_observer(SlogLogger::term(), ObserverMode::Always)
         .run()?;
 
