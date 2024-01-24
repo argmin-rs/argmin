@@ -93,6 +93,57 @@ where
     hessian
 }
 
+/// Derivative of the multidimensional Rosenbrock test function
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn rosenbrock_derivative_const<const N: usize, T>(param: &[T; N], a: T, b: T) -> [T; N]
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    let n0 = T::from_f64(0.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+
+    let mut result = [n0; N];
+
+    for i in 0..(N - 1) {
+        let xi = param[i];
+        let xi1 = param[i + 1];
+
+        let t1 = -n4 * b * xi * (xi1 - xi.powi(2));
+        let t2 = n2 * b * (xi1 - xi.powi(2));
+
+        result[i] += t1 + n2 * (xi - a);
+        result[i + 1] += t2;
+    }
+    result
+}
+
+/// Hessian of the multidimensional Rosenbrock test function
+pub fn rosenbrock_hessian_const<const N: usize, T>(x: &[T; N], a: T, b: T) -> [[T; N]; N]
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    let n0 = T::from_f64(0.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n12 = T::from_f64(12.0).unwrap();
+
+    let mut hessian = [[n0; N]; N];
+
+    for i in 0..(N - 1) {
+        let xi = x[i];
+        let xi1 = x[i + 1];
+
+        hessian[i][i] += n12 * b * xi.powi(2) - n4 * b * xi1 + n2 * a;
+        hessian[i + 1][i + 1] = n2 * b;
+        hessian[i][i + 1] = -n4 * b * xi;
+        hessian[i + 1][i] = -n4 * b * xi;
+    }
+    hessian
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
