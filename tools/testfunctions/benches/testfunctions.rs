@@ -9,63 +9,73 @@
 
 extern crate argmin_testfunctions;
 extern crate test;
-use argmin_testfunctions::*;
+use paste::item;
 
 macro_rules! make_bench {
     ($f:ident($p:expr)) => {
-        #[bench]
-        fn $f(b: &mut Bencher) {
-            b.iter(|| {
-                let params = $p;
-                // black_box(::$f($($x),*));
-                black_box(::$f(params));
-            });
+        item! {
+            #[bench]
+            fn [<bench_ $f>](b: &mut Bencher) {
+                b.iter(|| {
+                    let params = $p;
+                    // black_box(::$f($($x),*));
+                    black_box($f(params));
+                });
+            }
         }
     };
 
     ($f:ident($p:expr, $a:expr)) => {
-        #[bench]
-        fn $f(b: &mut Bencher) {
-            b.iter(|| {
-                let params = $p;
-                let a = $a;
-                black_box(::$f(params, a));
-            });
+        item! {
+            #[bench]
+            fn [<bench_ $f>](b: &mut Bencher) {
+                b.iter(|| {
+                    let params = $p;
+                    let a = $a;
+                    black_box($f(params, a));
+                });
+            }
         }
     };
 
     ($f:ident($p:expr, $a:expr, $b:expr)) => {
-        #[bench]
-        fn $f(b: &mut Bencher) {
-            b.iter(|| {
-                let params = $p;
-                let a = $a;
-                let b = $b;
-                black_box(::$f(params, a, b));
-            });
+        item! {
+            #[bench]
+            fn [<bench_ $f>](b: &mut Bencher) {
+                b.iter(|| {
+                    let params = $p;
+                    let a = $a;
+                    let b = $b;
+                    black_box($f(params, a, b));
+                });
+            }
         }
     };
 
     ($f:ident($p:expr, $a:expr, $b:expr, $c:expr)) => {
-        #[bench]
-        fn $f(b: &mut Bencher) {
-            b.iter(|| {
-                let params = $p;
-                let a = $a;
-                let b = $b;
-                let c = $b;
-                black_box(::$f(params, a, b, c));
-            });
+        item! {
+            #[bench]
+            fn [<bench_ $f>](b: &mut Bencher) {
+                b.iter(|| {
+                    let params = $p;
+                    let a = $a;
+                    let b = $b;
+                    let c = $b;
+                    black_box($f(params, a, b, c));
+                });
+            }
         }
     };
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use argmin_testfunctions::*;
     use test::{black_box, Bencher};
 
     make_bench!(ackley(&[-43.0, 53.0, 3.4]));
-    make_bench!(ackley_param(
+    make_bench!(ackley_abc(
         &[-43.0, 53.0, 3.4],
         20.0,
         0.2,
