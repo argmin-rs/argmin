@@ -2,13 +2,7 @@
 resolver = "2"
 
 members = [
-    "argmin",
-    "argmin-math",
-    "checkpointing/*",
-    "observers/*",
-    "tools/spectator",
-    "tools/testfunctions",
-
+    "crates/*",
     "examples/*",
 ]
 

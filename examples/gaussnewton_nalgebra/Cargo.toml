@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 publish = false
 
 [dependencies]
-argmin = { version = "*", path = "../../argmin" }
-argmin-math = { version = "*", features = ["nalgebra_latest"], path = "../../argmin-math" }
-argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["nalgebra_latest"], path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
 nalgebra = "0.32.3"

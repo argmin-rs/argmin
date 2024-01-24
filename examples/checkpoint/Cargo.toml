@@ -6,8 +6,8 @@ license = "MIT OR Apache-2.0"
 publish = false
 
 [dependencies]
-argmin = { version = "*", path = "../../argmin", features = ["serde1"] }
-argmin-checkpointing-file = { version = "*", path = "../../checkpointing/file" }
-argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
-argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
-argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
+argmin = { version = "*", path = "../../crates/argmin", features = ["serde1"] }
+argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-math" }
+argmin-checkpointing-file = { version = "*", path = "../../crates/argmin-checkpointing-file" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }

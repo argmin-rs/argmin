@@ -6,9 +6,9 @@ license = "MIT OR Apache-2.0"
 publish = false
 
 [dependencies]
-argmin = { version = "*", path = "../../argmin" }
-argmin-math = { version = "*", features = ["vec"], path = "../../argmin-math" }
-argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
-argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
 rand = "0.8.5"
 rand_xoshiro = "0.6.0"
