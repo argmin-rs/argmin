@@ -49,7 +49,8 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+<a href="#52" id="52">52</a>
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -79,25 +80,26 @@
 /// where `x_i \in [-4.5, 4.5]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(3, 0.5) = 0`.
-</span><span class="kw">pub fn </span>beale&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="macro">assert!</span>(param.len() == <span class="number">2</span>);
-    <span class="kw">let </span>(x1, x2) = (param[<span class="number">0</span>], param[<span class="number">1</span>]);
+</span><span class="kw">pub fn </span>beale&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
     (T::from_f64(<span class="number">1.5</span>).unwrap() - x1 + x1 * x2).powi(<span class="number">2</span>)
         + (T::from_f64(<span class="number">2.25</span>).unwrap() - x1 + x1 * (x2.powi(<span class="number">2</span>))).powi(<span class="number">2</span>)
         + (T::from_f64(<span class="number">2.625</span>).unwrap() - x1 + x1 * (x2.powi(<span class="number">3</span>))).powi(<span class="number">2</span>)
 }
 
-<span class="kw">mod </span>tests {
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_beale_optimum() {
-        <span class="macro">assert!</span>(::beale(<span class="kw-2">&amp;</span>[<span class="number">3.0_f32</span>, <span class="number">0.5_f32</span>]).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>(::beale(<span class="kw-2">&amp;</span>[<span class="number">3.0_f64</span>, <span class="number">0.5_f64</span>]).abs() &lt; ::std::f64::EPSILON);
-    }
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>std::{f32, f64};
 
     <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_beale_param_length() {
-        ::beale(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, -<span class="number">1.0_f32</span>, <span class="number">0.1_f32</span>]);
+    </span><span class="kw">fn </span>test_beale_optimum() {
+        <span class="macro">assert_relative_eq!</span>(beale(<span class="kw-2">&amp;</span>[<span class="number">3.0_f32</span>, <span class="number">0.5_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(beale(<span class="kw-2">&amp;</span>[<span class="number">3.0_f64</span>, <span class="number">0.5_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 }
 </code></pre></div></section></main></body></html>

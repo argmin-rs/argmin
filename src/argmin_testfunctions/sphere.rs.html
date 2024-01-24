@@ -54,7 +54,22 @@
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -83,7 +98,10 @@
 /// where `x_i \in (-\infty, \infty)` and `n &gt; 0`.
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
-</span><span class="kw">pub fn </span>sphere&lt;T: Float + FromPrimitive + Sum&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
+</span><span class="kw">pub fn </span>sphere&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive + Sum,
+{
     param.iter().map(|x| x.powi(<span class="number">2</span>)).sum()
 }
 
@@ -94,7 +112,10 @@
 /// `f(x_1, x_2, ..., x_n) = (2 * x_1, 2 * x_2, ... 2 * x_n)`
 ///
 /// where `x_i \in (-\infty, \infty)` and `n &gt; 0`.
-</span><span class="kw">pub fn </span>sphere_derivative&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;T&gt; {
+</span><span class="kw">pub fn </span>sphere_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;T&gt;
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
     <span class="kw">let </span>num2 = T::from_f64(<span class="number">2.0</span>).unwrap();
     param.iter().map(|x| num2 * <span class="kw-2">*</span>x).collect()
 }
@@ -102,12 +123,21 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>std;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_sphere_optimum() {
-        <span class="macro">assert!</span>(sphere(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>]).abs() &lt; std::f32::EPSILON);
-        <span class="macro">assert!</span>(sphere(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>]).abs() &lt; std::f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(
+            sphere(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>]),
+            <span class="number">0.0</span>,
+            epsilon = std::f32::EPSILON
+        );
+        <span class="macro">assert_relative_eq!</span>(
+            sphere(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>]),
+            <span class="number">0.0</span>,
+            epsilon = std::f64::EPSILON
+        );
     }
 }
 </code></pre></div></section></main></body></html>

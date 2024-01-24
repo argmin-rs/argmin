@@ -90,8 +90,7 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -129,10 +128,11 @@
 /// where `x_i \in [-100, 100]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
-</span><span class="kw">pub fn </span>schaffer_n2&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="kw">let </span>plen = param.len();
-    <span class="macro">assert!</span>(plen == <span class="number">2</span>);
-    <span class="kw">let </span>(x1, x2) = (param[<span class="number">0</span>], param[<span class="number">1</span>]);
+</span><span class="kw">pub fn </span>schaffer_n2&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
     <span class="kw">let </span>n05 = T::from_f64(<span class="number">0.5</span>).unwrap();
     <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
     <span class="kw">let </span>n0001 = T::from_f64(<span class="number">0.0001</span>).unwrap();
@@ -149,10 +149,11 @@
 /// where `x_i \in [-100, 100]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0, 1.25313) = 0.291992`.
-</span><span class="kw">pub fn </span>schaffer_n4&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="kw">let </span>plen = param.len();
-    <span class="macro">assert!</span>(plen == <span class="number">2</span>);
-    <span class="kw">let </span>(x1, x2) = (param[<span class="number">0</span>], param[<span class="number">1</span>]);
+</span><span class="kw">pub fn </span>schaffer_n4&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
     <span class="kw">let </span>n05 = T::from_f64(<span class="number">0.5</span>).unwrap();
     <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
     <span class="kw">let </span>n0001 = T::from_f64(<span class="number">0.0001</span>).unwrap();
@@ -160,28 +161,25 @@
         / (n1 + n0001 * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>))).powi(<span class="number">2</span>)
 }
 
-<span class="kw">mod </span>tests {
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>std::{f32, f64};
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_schaffer_n2_optimum() {
-        <span class="macro">assert!</span>((::schaffer_n2(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">0_f32</span>])).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>((::schaffer_n2(<span class="kw-2">&amp;</span>[<span class="number">0_f64</span>, <span class="number">0_f64</span>])).abs() &lt; ::std::f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(schaffer_n2(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">0_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(schaffer_n2(<span class="kw-2">&amp;</span>[<span class="number">0_f64</span>, <span class="number">0_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_schaffer_n4_optimum() {
-        <span class="macro">assert!</span>((::schaffer_n4(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">1.25313_f32</span>]) - <span class="number">0.291992</span>).abs() &lt; ::std::f32::EPSILON);
-    }
-
-    <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_schaffer_n2_param_length() {
-        ::schaffer_n2(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>]);
-    }
-
-    <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_schaffer_n4_param_length() {
-        ::schaffer_n4(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>]);
+        <span class="macro">assert_relative_eq!</span>(
+            schaffer_n4(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">1.25313_f32</span>]),
+            <span class="number">0.291992</span>,
+            epsilon = f32::EPSILON
+        );
     }
 }
 </code></pre></div></section></main></body></html>

@@ -74,7 +74,22 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -112,42 +127,57 @@
 /// where `\bar{x}_i = 4*x_i - 2` and `x_i \in [0, 1]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0.5, 0.25) = 3.3851993182036826`.
-</span><span class="kw">pub fn </span>picheny&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="macro">assert!</span>(param.len() == <span class="number">2</span>);
-    <span class="kw">let </span>(x1, x2) = (
-        T::from_f64(<span class="number">4.0</span>).unwrap() * param[<span class="number">0</span>] - T::from_f64(<span class="number">2.0</span>).unwrap(),
-        T::from_f64(<span class="number">4.0</span>).unwrap() * param[<span class="number">1</span>] - T::from_f64(<span class="number">2.0</span>).unwrap(),
-    );
+</span><span class="kw">pub fn </span>picheny&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>n3 = T::from_f64(<span class="number">3.0</span>).unwrap();
+    <span class="kw">let </span>n4 = T::from_f64(<span class="number">4.0</span>).unwrap();
+    <span class="kw">let </span>n6 = T::from_f64(<span class="number">6.0</span>).unwrap();
+    <span class="kw">let </span>n12 = T::from_f64(<span class="number">12.0</span>).unwrap();
+    <span class="kw">let </span>n14 = T::from_f64(<span class="number">14.0</span>).unwrap();
+    <span class="kw">let </span>n18 = T::from_f64(<span class="number">18.0</span>).unwrap();
+    <span class="kw">let </span>n19 = T::from_f64(<span class="number">19.0</span>).unwrap();
+    <span class="kw">let </span>n27 = T::from_f64(<span class="number">27.0</span>).unwrap();
+    <span class="kw">let </span>n30 = T::from_f64(<span class="number">30.0</span>).unwrap();
+    <span class="kw">let </span>n32 = T::from_f64(<span class="number">32.0</span>).unwrap();
+    <span class="kw">let </span>n36 = T::from_f64(<span class="number">36.0</span>).unwrap();
+    <span class="kw">let </span>n48 = T::from_f64(<span class="number">48.0</span>).unwrap();
+
+    <span class="kw">let </span>[x1, x2] = param.map(|x| n4 * x - n2);
+
     T::from_f64(<span class="number">1.0 </span>/ <span class="number">2.427</span>).unwrap()
-        * (((T::from_f64(<span class="number">1.0</span>).unwrap()
-            + (x1 + x2 + T::from_f64(<span class="number">1.0</span>).unwrap()).powi(<span class="number">2</span>)
-                * (T::from_f64(<span class="number">19.0</span>).unwrap() - T::from_f64(<span class="number">14.0</span>).unwrap() * (x1 + x2)
-                    + T::from_f64(<span class="number">3.0</span>).unwrap() * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>))
-                    + T::from_f64(<span class="number">6.0</span>).unwrap() * x1 * x2))
-            * (T::from_f64(<span class="number">30.0</span>).unwrap()
-                + (T::from_f64(<span class="number">2.0</span>).unwrap() * x1 - T::from_f64(<span class="number">3.0</span>).unwrap() * x2).powi(<span class="number">2</span>)
-                    * (T::from_f64(<span class="number">18.0</span>).unwrap() - T::from_f64(<span class="number">32.0</span>).unwrap() * x1
-                        + T::from_f64(<span class="number">12.0</span>).unwrap() * x1.powi(<span class="number">2</span>)
-                        + T::from_f64(<span class="number">48.0</span>).unwrap() * x2
-                        - T::from_f64(<span class="number">36.0</span>).unwrap() * x1 * x2
-                        + T::from_f64(<span class="number">27.0</span>).unwrap() * x2.powi(<span class="number">2</span>))))
+        * (((n1
+            + (x1 + x2 + n1).powi(<span class="number">2</span>)
+                * (n19 - n14 * (x1 + x2) + n3 * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>)) + n6 * x1 * x2))
+            * (n30
+                + (n2 * x1 - n3 * x2).powi(<span class="number">2</span>)
+                    * (n18 - n32 * x1 + n12 * x1.powi(<span class="number">2</span>) + n48 * x2 - n36 * x1 * x2
+                        + n27 * x2.powi(<span class="number">2</span>))))
         .log10()
             - T::from_f64(<span class="number">8.693</span>).unwrap())
 }
 
-<span class="kw">mod </span>tests {
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_picheny_optimum() {
-        <span class="macro">assert!</span>((::picheny(<span class="kw-2">&amp;</span>[<span class="number">0.5_f32</span>, <span class="number">0.25_f32</span>]) + <span class="number">3.3851993182_f32</span>).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>(
-            (::picheny(<span class="kw-2">&amp;</span>[<span class="number">0.5_f64</span>, <span class="number">0.25_f64</span>]) + <span class="number">3.3851993182036826_f64</span>).abs() &lt; ::std::f64::EPSILON
-        );
-    }
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>std::{f32, f64};
 
     <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_picheny_param_length() {
-        ::picheny(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, -<span class="number">1.0_f32</span>, <span class="number">0.1_f32</span>]);
+    </span><span class="kw">fn </span>test_picheny_optimum() {
+        <span class="macro">assert_relative_eq!</span>(
+            picheny(<span class="kw-2">&amp;</span>[<span class="number">0.5_f32</span>, <span class="number">0.25_f32</span>]),
+            -<span class="number">3.3851993182</span>,
+            epsilon = f32::EPSILON
+        );
+        <span class="macro">assert_relative_eq!</span>(
+            picheny(<span class="kw-2">&amp;</span>[<span class="number">0.5_f64</span>, <span class="number">0.25_f64</span>]),
+            -<span class="number">3.3851993182036826</span>,
+            epsilon = f64::EPSILON
+        );
     }
 }
 </code></pre></div></section></main></body></html>

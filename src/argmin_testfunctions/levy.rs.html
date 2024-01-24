@@ -107,7 +107,15 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -150,15 +158,21 @@
 /// where `w_i = 1 + (x_i - 1)/4` and `x_i \in [-10, 10]`.
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
-</span><span class="kw">pub fn </span>levy&lt;T: Float + FromPrimitive + Sum&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
+</span><span class="kw">pub fn </span>levy&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive + Sum,
+{
     <span class="kw">let </span>plen = param.len();
     <span class="macro">assert!</span>(plen &gt;= <span class="number">2</span>);
+
     <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
     <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
     <span class="kw">let </span>n4 = T::from_f64(<span class="number">4.0</span>).unwrap();
     <span class="kw">let </span>n10 = T::from_f64(<span class="number">10.0</span>).unwrap();
-    <span class="kw">let </span>w = |x: T| n1 - (x - n1) / n4;
     <span class="kw">let </span>pi = T::from_f64(PI).unwrap();
+
+    <span class="kw">let </span>w = |x: T| n1 - (x - n1) / n4;
+
     (pi * w(param[<span class="number">0</span>])).sin().powi(<span class="number">2</span>)
         + param[<span class="number">1</span>..(plen - <span class="number">1</span>)]
             .iter()
@@ -178,42 +192,44 @@
 /// where `x_i \in [-10, 10]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(1, 1) = 0`.
-</span><span class="kw">pub fn </span>levy_n13&lt;T: Float + FromPrimitive + Sum&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="kw">let </span>plen = param.len();
-    <span class="macro">assert!</span>(plen == <span class="number">2</span>);
+</span><span class="kw">pub fn </span>levy_n13&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive + Sum,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
+
     <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
     <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
     <span class="kw">let </span>n3 = T::from_f64(<span class="number">3.0</span>).unwrap();
     <span class="kw">let </span>pi = T::from_f64(PI).unwrap();
-    <span class="kw">let </span>(x1, x2) = (param[<span class="number">0</span>], param[<span class="number">1</span>]);
+
     (n3 * pi * x1).sin().powi(<span class="number">2</span>)
         + (x1 - n1).powi(<span class="number">2</span>) * (n1 + (n3 * pi * x2).sin().powi(<span class="number">2</span>))
         + (x2 - n1).powi(<span class="number">2</span>) * (n1 + (n2 * pi * x2).sin().powi(<span class="number">2</span>))
 }
 
-<span class="kw">mod </span>tests {
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>std::{f32, f64};
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_levy_optimum() {
-        <span class="macro">assert!</span>((::levy(<span class="kw-2">&amp;</span>[<span class="number">1_f32</span>, <span class="number">1_f32</span>, <span class="number">1_f32</span>])).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>((::levy(<span class="kw-2">&amp;</span>[<span class="number">1_f64</span>, <span class="number">1_f64</span>, <span class="number">1_f64</span>])).abs() &lt; ::std::f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(levy(<span class="kw-2">&amp;</span>[<span class="number">1_f32</span>, <span class="number">1_f32</span>, <span class="number">1_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(levy(<span class="kw-2">&amp;</span>[<span class="number">1_f64</span>, <span class="number">1_f64</span>, <span class="number">1_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_levy_n13_optimum() {
-        <span class="macro">assert!</span>((::levy_n13(<span class="kw-2">&amp;</span>[<span class="number">1_f32</span>, <span class="number">1_f32</span>])).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>((::levy_n13(<span class="kw-2">&amp;</span>[<span class="number">1_f64</span>, <span class="number">1_f64</span>])).abs() &lt; ::std::f64::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(levy_n13(<span class="kw-2">&amp;</span>[<span class="number">1_f32</span>, <span class="number">1_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
+        <span class="macro">assert_relative_eq!</span>(levy_n13(<span class="kw-2">&amp;</span>[<span class="number">1_f64</span>, <span class="number">1_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
     }
 
     <span class="attr">#[test]
     #[should_panic]
     </span><span class="kw">fn </span>test_levy_param_length() {
-        ::levy(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>]);
-    }
-
-    <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_levy_n13_param_length() {
-        ::levy_n13(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>, <span class="number">0.0_f32</span>]);
+        levy(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>]);
     }
 }
 </code></pre></div></section></main></body></html>

@@ -60,7 +60,22 @@
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2020 argmin developers
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+</pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -92,34 +107,49 @@
 /// where `x_i \in [-2, 2]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0, -1) = 3`.
-</span><span class="kw">pub fn </span>goldsteinprice&lt;T: Float + FromPrimitive&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T {
-    <span class="macro">assert!</span>(param.len() == <span class="number">2</span>);
-    <span class="kw">let </span>(x1, x2) = (param[<span class="number">0</span>], param[<span class="number">1</span>]);
-    (T::from_f64(<span class="number">1.0</span>).unwrap()
-        + (x1 + x2 + T::from_f64(<span class="number">1.0</span>).unwrap()).powi(<span class="number">2</span>)
-            * (T::from_f64(<span class="number">19.0</span>).unwrap() - T::from_f64(<span class="number">14.0</span>).unwrap() * (x1 + x2)
-                + T::from_f64(<span class="number">3.0</span>).unwrap() * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>))
-                + T::from_f64(<span class="number">6.0</span>).unwrap() * x1 * x2))
-        * (T::from_f64(<span class="number">30.0</span>).unwrap()
-            + (T::from_f64(<span class="number">2.0</span>).unwrap() * x1 - T::from_f64(<span class="number">3.0</span>).unwrap() * x2).powi(<span class="number">2</span>)
-                * (T::from_f64(<span class="number">18.0</span>).unwrap() - T::from_f64(<span class="number">32.0</span>).unwrap() * x1
-                    + T::from_f64(<span class="number">12.0</span>).unwrap() * x1.powi(<span class="number">2</span>)
-                    + T::from_f64(<span class="number">48.0</span>).unwrap() * x2
-                    - T::from_f64(<span class="number">36.0</span>).unwrap() * x1 * x2
-                    + T::from_f64(<span class="number">27.0</span>).unwrap() * x2.powi(<span class="number">2</span>)))
+</span><span class="kw">pub fn </span>goldsteinprice&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
+    <span class="kw">let </span>n1 = T::from_f64(<span class="number">1.0</span>).unwrap();
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>n3 = T::from_f64(<span class="number">3.0</span>).unwrap();
+    <span class="kw">let </span>n6 = T::from_f64(<span class="number">6.0</span>).unwrap();
+    <span class="kw">let </span>n12 = T::from_f64(<span class="number">12.0</span>).unwrap();
+    <span class="kw">let </span>n14 = T::from_f64(<span class="number">14.0</span>).unwrap();
+    <span class="kw">let </span>n18 = T::from_f64(<span class="number">18.0</span>).unwrap();
+    <span class="kw">let </span>n19 = T::from_f64(<span class="number">19.0</span>).unwrap();
+    <span class="kw">let </span>n27 = T::from_f64(<span class="number">27.0</span>).unwrap();
+    <span class="kw">let </span>n30 = T::from_f64(<span class="number">30.0</span>).unwrap();
+    <span class="kw">let </span>n32 = T::from_f64(<span class="number">32.0</span>).unwrap();
+    <span class="kw">let </span>n36 = T::from_f64(<span class="number">36.0</span>).unwrap();
+    <span class="kw">let </span>n48 = T::from_f64(<span class="number">48.0</span>).unwrap();
+    (n1 + (x1 + x2 + n1).powi(<span class="number">2</span>)
+        * (n19 - n14 * (x1 + x2) + n3 * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>)) + n6 * x1 * x2))
+        * (n30
+            + (n2 * x1 - n3 * x2).powi(<span class="number">2</span>)
+                * (n18 - n32 * x1 + n12 * x1.powi(<span class="number">2</span>) + n48 * x2 - n36 * x1 * x2 + n27 * x2.powi(<span class="number">2</span>)))
 }
 
-<span class="kw">mod </span>tests {
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_goldsteinprice_optimum() {
-        <span class="macro">assert!</span>((::goldsteinprice(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, -<span class="number">1.0_f32</span>]) - <span class="number">3_f32</span>).abs() &lt; ::std::f32::EPSILON);
-        <span class="macro">assert!</span>((::goldsteinprice(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, -<span class="number">1.0_f64</span>]) - <span class="number">3_f64</span>).abs() &lt; ::std::f64::EPSILON);
-    }
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>std::{f32, f64};
 
     <span class="attr">#[test]
-    #[should_panic]
-    </span><span class="kw">fn </span>test_goldsteinprice_param_length() {
-        ::goldsteinprice(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, -<span class="number">1.0_f32</span>, <span class="number">0.1_f32</span>]);
+    </span><span class="kw">fn </span>test_goldsteinprice_optimum() {
+        <span class="macro">assert_relative_eq!</span>(
+            goldsteinprice(<span class="kw-2">&amp;</span>[<span class="number">0.0_f32</span>, -<span class="number">1.0_f32</span>]),
+            <span class="number">3_f32</span>,
+            epsilon = f32::EPSILON
+        );
+        <span class="macro">assert_relative_eq!</span>(
+            goldsteinprice(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, -<span class="number">1.0_f64</span>]),
+            <span class="number">3_f64</span>,
+            epsilon = f64::EPSILON
+        );
     }
 }
 </code></pre></div></section></main></body></html>
