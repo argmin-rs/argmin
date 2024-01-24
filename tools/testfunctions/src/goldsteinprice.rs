@@ -47,16 +47,20 @@ pub fn goldsteinprice<T: Float + FromPrimitive>(param: &[T]) -> T {
                     + T::from_f64(27.0).unwrap() * x2.powi(2)))
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_goldsteinprice_optimum() {
-        assert!((::goldsteinprice(&[0.0_f32, -1.0_f32]) - 3_f32).abs() < ::std::f32::EPSILON);
-        assert!((::goldsteinprice(&[0.0_f64, -1.0_f64]) - 3_f64).abs() < ::std::f64::EPSILON);
+        assert!((goldsteinprice(&[0.0_f32, -1.0_f32]) - 3_f32).abs() < f32::EPSILON);
+        assert!((goldsteinprice(&[0.0_f64, -1.0_f64]) - 3_f64).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_goldsteinprice_param_length() {
-        ::goldsteinprice(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        goldsteinprice(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

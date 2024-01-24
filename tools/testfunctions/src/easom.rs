@@ -34,22 +34,20 @@ pub fn easom<T: Float + FromPrimitive>(param: &[T]) -> T {
     -x1.cos() * x2.cos() * (-(x1 - pi).powi(2) - (x2 - pi).powi(2)).exp()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_easom_optimum() {
-        assert!(
-            (::easom(&[::std::f32::consts::PI, ::std::f32::consts::PI]) + 1.0_f32).abs()
-                < ::std::f32::EPSILON
-        );
-        assert!(
-            (::easom(&[::std::f64::consts::PI, ::std::f64::consts::PI]) + 1.0_f64).abs()
-                < ::std::f64::EPSILON
-        );
+        assert!((easom(&[f32::consts::PI, f32::consts::PI]) + 1.0_f32).abs() < f32::EPSILON);
+        assert!((easom(&[f64::consts::PI, f64::consts::PI]) + 1.0_f64).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_easom_param_length() {
-        ::easom(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        easom(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

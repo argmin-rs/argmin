@@ -36,16 +36,20 @@ pub fn beale<T: Float + FromPrimitive>(param: &[T]) -> T {
         + (T::from_f64(2.625).unwrap() - x1 + x1 * (x2.powi(3))).powi(2)
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_beale_optimum() {
-        assert!(::beale(&[3.0_f32, 0.5_f32]).abs() < ::std::f32::EPSILON);
-        assert!(::beale(&[3.0_f64, 0.5_f64]).abs() < ::std::f64::EPSILON);
+        assert!(beale(&[3.0_f32, 0.5_f32]).abs() < f32::EPSILON);
+        assert!(beale(&[3.0_f64, 0.5_f64]).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_beale_param_length() {
-        ::beale(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        beale(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }
