@@ -30,7 +30,7 @@ impl TerminationStatus {
     /// assert!(TerminationStatus::Terminated(TerminationReason::MaxItersReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverConverged).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::Interrupt).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::Timeout).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverExit("Exit reason".to_string())).terminated());
     /// ```
@@ -56,8 +56,8 @@ pub enum TerminationReason {
     MaxItersReached,
     /// Reached target cost function value
     TargetCostReached,
-    /// Algorithm manually interrupted with Ctrl+C
-    KeyboardInterrupt,
+    /// Algorithm manually interrupted with SIGINT (Ctrl+C), SIGTERM or SIGHUP
+    Interrupt,
     /// Converged
     SolverConverged,
     /// Timeout reached
@@ -83,8 +83,8 @@ impl TerminationReason {
     ///     "Target cost value reached"
     /// );
     /// assert_eq!(
-    ///     TerminationReason::KeyboardInterrupt.text(),
-    ///     "Keyboard interrupt"
+    ///     TerminationReason::Interrupt.text(),
+    ///     "Interrupt"
     /// );
     /// assert_eq!(
     ///     TerminationReason::SolverConverged.text(),
@@ -103,7 +103,7 @@ impl TerminationReason {
         match self {
             TerminationReason::MaxItersReached => "Maximum number of iterations reached",
             TerminationReason::TargetCostReached => "Target cost value reached",
-            TerminationReason::KeyboardInterrupt => "Keyboard interrupt",
+            TerminationReason::Interrupt => "Interrupt",
             TerminationReason::SolverConverged => "Solver converged",
             TerminationReason::Timeout => "Timeout reached",
             TerminationReason::SolverExit(reason) => reason.as_ref(),

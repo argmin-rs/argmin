@@ -272,7 +272,7 @@ where
 
         if interrupt.load(Ordering::SeqCst) {
             // Solver execution has been interrupted manually
-            state = state.terminate_with(TerminationReason::KeyboardInterrupt);
+            state = state.terminate_with(TerminationReason::Interrupt);
         }
 
         if !self.observers.is_empty() {
