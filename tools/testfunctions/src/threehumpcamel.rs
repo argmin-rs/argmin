@@ -35,16 +35,19 @@ pub fn threehumpcamel<T: Float + FromPrimitive>(param: &[T]) -> T {
         + x2.powi(2)
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_threehumpcamel_optimum() {
-        assert!((::threehumpcamel(&[0.0_f32, 0.0_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::threehumpcamel(&[0.0_f64, 0.0_f64])).abs() < ::std::f64::EPSILON);
+        assert!((threehumpcamel(&[0.0_f32, 0.0_f32])).abs() < std::f32::EPSILON);
+        assert!((threehumpcamel(&[0.0_f64, 0.0_f64])).abs() < std::f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_threehumpcamel_param_length() {
-        ::threehumpcamel(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        threehumpcamel(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

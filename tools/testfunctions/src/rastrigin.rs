@@ -43,21 +43,21 @@ pub fn rastrigin_a<T: Float + FromPrimitive + Sum>(param: &[T], a: T) -> T {
             .sum()
 }
 
+#[cfg(test)]
 mod tests {
-    // use super::{rastrigin, rastrigin_a};
-    // use std;
+    use super::*;
+    use std::{f32, f64};
 
     #[test]
     fn test_rastrigin_optimum() {
-        assert!(::rastrigin(&[0.0_f32, 0.0_f32]).abs() < ::std::f32::EPSILON);
-        assert!(::rastrigin(&[0.0_f64, 0.0_f64]).abs() < ::std::f64::EPSILON);
+        assert!(rastrigin(&[0.0_f32, 0.0_f32]).abs() < f32::EPSILON);
+        assert!(rastrigin(&[0.0_f64, 0.0_f64]).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_parameter_a() {
         assert!(
-            ::rastrigin(&[0.0_f32, 0.0_f32]).abs()
-                == ::rastrigin_a(&[0.0_f32, 0.0_f32], 10.0).abs()
+            rastrigin(&[0.0_f32, 0.0_f32]).abs() == rastrigin_a(&[0.0_f32, 0.0_f32], 10.0).abs()
         );
     }
 }

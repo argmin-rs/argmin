@@ -54,33 +54,34 @@ pub fn cross_in_tray(param: &[f64]) -> f64 {
             .powf(0.1)
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::f32;
+
     #[test]
     fn test_cross_in_tray_optimum() {
         // This isnt exactly a great way to test this. The function can only be computed with the
         // use of f64; however, I only have the minimum points available in f32, which is why I use
         // the f32 EPSILONs.
         assert!(
-            (::cross_in_tray(&[1.34941_f64, 1.34941_f64]) + 2.062611870).abs()
-                < ::std::f32::EPSILON.into()
+            (cross_in_tray(&[1.34941_f64, 1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
         );
         assert!(
-            (::cross_in_tray(&[1.34941_f64, -1.34941_f64]) + 2.062611870).abs()
-                < ::std::f32::EPSILON.into()
+            (cross_in_tray(&[1.34941_f64, -1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
         );
         assert!(
-            (::cross_in_tray(&[-1.34941_f64, 1.34941_f64]) + 2.062611870).abs()
-                < ::std::f32::EPSILON.into()
+            (cross_in_tray(&[-1.34941_f64, 1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
         );
         assert!(
-            (::cross_in_tray(&[-1.34941_f64, -1.34941_f64]) + 2.062611870).abs()
-                < ::std::f32::EPSILON.into()
+            (cross_in_tray(&[-1.34941_f64, -1.34941_f64]) + 2.062611870).abs()
+                < f32::EPSILON.into()
         );
     }
 
     #[test]
     #[should_panic]
     fn test_cross_in_tray_param_length() {
-        ::cross_in_tray(&[0.0, -1.0, 0.1]);
+        cross_in_tray(&[0.0, -1.0, 0.1]);
     }
 }

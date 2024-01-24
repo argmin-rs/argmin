@@ -59,18 +59,20 @@ pub fn picheny<T: Float + FromPrimitive>(param: &[T]) -> T {
             - T::from_f64(8.693).unwrap())
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_picheny_optimum() {
-        assert!((::picheny(&[0.5_f32, 0.25_f32]) + 3.3851993182_f32).abs() < ::std::f32::EPSILON);
-        assert!(
-            (::picheny(&[0.5_f64, 0.25_f64]) + 3.3851993182036826_f64).abs() < ::std::f64::EPSILON
-        );
+        assert!((picheny(&[0.5_f32, 0.25_f32]) + 3.3851993182_f32).abs() < f32::EPSILON);
+        assert!((picheny(&[0.5_f64, 0.25_f64]) + 3.3851993182036826_f64).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_picheny_param_length() {
-        ::picheny(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        picheny(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

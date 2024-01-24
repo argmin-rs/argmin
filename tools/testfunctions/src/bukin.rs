@@ -33,16 +33,20 @@ pub fn bukin_n6<T: Float + FromPrimitive>(param: &[T]) -> T {
         + T::from_f64(0.01).unwrap() * (x1 + T::from_f64(10.0).unwrap()).abs()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_bukin_n6_optimum() {
-        assert!((::bukin_n6(&[-10_f32, 1_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::bukin_n6(&[-10_f64, 1_f64])).abs() < ::std::f64::EPSILON);
+        assert!((bukin_n6(&[-10_f32, 1_f32])).abs() < f32::EPSILON);
+        assert!((bukin_n6(&[-10_f64, 1_f64])).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_bukin_n6_param_length() {
-        ::bukin_n6(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        bukin_n6(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

@@ -34,18 +34,20 @@ pub fn mccorminck<T: Float + FromPrimitive>(param: &[T]) -> T {
         + T::from_f64(1.0).unwrap()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_mccorminck_optimum() {
         assert!(
-            (::mccorminck(&[-0.54719_f32, -1.54719_f32]) + 1.9132228_f32).abs()
-                < ::std::f32::EPSILON
+            (mccorminck(&[-0.54719_f32, -1.54719_f32]) + 1.9132228_f32).abs() < std::f32::EPSILON
         );
     }
 
     #[test]
     #[should_panic]
     fn test_mccorminck_param_length() {
-        ::mccorminck(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        mccorminck(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

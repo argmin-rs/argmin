@@ -47,26 +47,19 @@ pub fn holder_table<T: Float + FromPrimitive>(param: &[T]) -> T {
     .abs()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::f32;
+
     #[test]
     fn test_holder_table_optimum() {
-        assert!(
-            (::holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < ::std::f32::EPSILON
-        );
-        assert!(
-            (::holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < ::std::f32::EPSILON
-        );
-        assert!(
-            (::holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < ::std::f32::EPSILON
-        );
-        assert!(
-            (::holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < ::std::f32::EPSILON
-        );
+        assert!((holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < f32::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_holder_table_param_length() {
-        ::holder_table(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        holder_table(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

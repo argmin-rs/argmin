@@ -51,25 +51,28 @@ pub fn ackley_param<T: Float + FromPrimitive + Sum>(param: &[T], a: T, b: T, c: 
         + num1.exp()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
 
     #[test]
     fn test_ackley_optimum() {
         // There seem to be numerical problems which is why the epsilons are multiplied with a
         // factor. Not sure if this is acceptable...
-        assert!(::ackley(&[0.0_f32, 0.0_f32, 0.0_f32]).abs() < ::std::f32::EPSILON * 10_f32);
-        assert!(::ackley(&[0.0_f64, 0.0_f64, 0.0_f64]).abs() < ::std::f64::EPSILON * 3_f64);
+        assert!(ackley(&[0.0_f32, 0.0_f32, 0.0_f32]).abs() < f32::EPSILON * 10_f32);
+        assert!(ackley(&[0.0_f64, 0.0_f64, 0.0_f64]).abs() < f64::EPSILON * 3_f64);
     }
 
     #[test]
     fn test_parameters() {
         assert!(
-            ::ackley(&[0.0_f64, 0.0_f64, 0.0_f64]).abs()
-                == ::ackley_param(
+            ackley(&[0.0_f64, 0.0_f64, 0.0_f64]).abs()
+                == ackley_param(
                     &[0.0_f64, 0.0_f64, 0.0_f64],
                     20.0,
                     0.2,
-                    2.0 * ::std::f64::consts::PI
+                    2.0 * f64::consts::PI
                 )
                 .abs()
         );

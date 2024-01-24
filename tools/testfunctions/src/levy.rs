@@ -82,28 +82,37 @@ pub fn levy_n13<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
         + (x2 - n1).powi(2) * (n1 + (n2 * pi * x2).sin().powi(2))
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use approx::assert_relative_eq;
+    use std::{f32, f64};
+
     #[test]
     fn test_levy_optimum() {
-        assert!((::levy(&[1_f32, 1_f32, 1_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::levy(&[1_f64, 1_f64, 1_f64])).abs() < ::std::f64::EPSILON);
+        assert_relative_eq!(
+            levy(&[1_f32, 1_f32, 1_f32]),
+            0.0_f32,
+            epsilon = f32::EPSILON
+        );
+        assert!((levy(&[1_f64, 1_f64, 1_f64])).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_levy_n13_optimum() {
-        assert!((::levy_n13(&[1_f32, 1_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::levy_n13(&[1_f64, 1_f64])).abs() < ::std::f64::EPSILON);
+        assert!((levy_n13(&[1_f32, 1_f32])).abs() < f32::EPSILON);
+        assert!((levy_n13(&[1_f64, 1_f64])).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_levy_param_length() {
-        ::levy(&[0.0_f32]);
+        levy(&[0.0_f32]);
     }
 
     #[test]
     #[should_panic]
     fn test_levy_n13_param_length() {
-        ::levy_n13(&[0.0_f32, 0.0_f32, 0.0_f32]);
+        levy_n13(&[0.0_f32, 0.0_f32, 0.0_f32]);
     }
 }

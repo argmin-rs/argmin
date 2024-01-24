@@ -33,16 +33,20 @@ pub fn booth<T: Float + FromPrimitive>(param: &[T]) -> T {
         + (T::from_f64(2.0).unwrap() * x1 + x2 - T::from_f64(5.0).unwrap()).powi(2)
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_booth_optimum() {
-        assert!((::booth(&[1_f32, 3_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::booth(&[1_f64, 3_f64])).abs() < ::std::f64::EPSILON);
+        assert!((booth(&[1_f32, 3_f32])).abs() < f32::EPSILON);
+        assert!((booth(&[1_f64, 3_f64])).abs() < f64::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_booth_param_length() {
-        ::booth(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        booth(&[0.0_f32, -1.0_f32, 0.1_f32]);
     }
 }

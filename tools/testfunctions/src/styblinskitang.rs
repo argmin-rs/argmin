@@ -39,13 +39,16 @@ pub fn styblinski_tang<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
             .sum()
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::f32;
+
     #[test]
     fn test_styblinski_tang_optimum() {
         assert!(
-            (::styblinski_tang(&[-2.903534_f32, -2.903534_f32, -2.903534_f32]) + 117.49849_f32)
-                .abs()
-                < ::std::f32::EPSILON
+            (styblinski_tang(&[-2.903534_f32, -2.903534_f32, -2.903534_f32]) + 117.49849_f32).abs()
+                < f32::EPSILON
         );
     }
 }

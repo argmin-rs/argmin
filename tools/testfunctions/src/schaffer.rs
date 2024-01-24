@@ -67,27 +67,31 @@ pub fn schaffer_n4<T: Float + FromPrimitive>(param: &[T]) -> T {
         / (n1 + n0001 * (x1.powi(2) + x2.powi(2))).powi(2)
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    use std::{f32, f64};
+
     #[test]
     fn test_schaffer_n2_optimum() {
-        assert!((::schaffer_n2(&[0_f32, 0_f32])).abs() < ::std::f32::EPSILON);
-        assert!((::schaffer_n2(&[0_f64, 0_f64])).abs() < ::std::f64::EPSILON);
+        assert!((schaffer_n2(&[0_f32, 0_f32])).abs() < f32::EPSILON);
+        assert!((schaffer_n2(&[0_f64, 0_f64])).abs() < f64::EPSILON);
     }
 
     #[test]
     fn test_schaffer_n4_optimum() {
-        assert!((::schaffer_n4(&[0_f32, 1.25313_f32]) - 0.291992).abs() < ::std::f32::EPSILON);
+        assert!((schaffer_n4(&[0_f32, 1.25313_f32]) - 0.291992).abs() < f32::EPSILON);
     }
 
     #[test]
     #[should_panic]
     fn test_schaffer_n2_param_length() {
-        ::schaffer_n2(&[0.0_f32, 0.0_f32, 0.0_f32]);
+        schaffer_n2(&[0.0_f32, 0.0_f32, 0.0_f32]);
     }
 
     #[test]
     #[should_panic]
     fn test_schaffer_n4_param_length() {
-        ::schaffer_n4(&[0.0_f32, 0.0_f32, 0.0_f32]);
+        schaffer_n4(&[0.0_f32, 0.0_f32, 0.0_f32]);
     }
 }
