@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 publish = false
 
 [dependencies]
-argmin = { version = "*", path = "../../argmin" }
-argmin-math = { version = "*", default-features = false, path = "../../argmin-math" }
-argmin-observer-slog = { version = "*", path = "../../observers/slog/" }
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", default-features = false, path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
 serde = { version = "1.0.195", features = ["derive"] }

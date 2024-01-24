@@ -105,13 +105,13 @@ jobs:
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_13-nolinalg"
       # ndarray with linalg
       - name: argmin-math (ndarray_latest)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml
+        run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml
       - name: argmin-math (ndarray_v0_15)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_15/Cargo.toml
+        run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_0_15/Cargo.toml
       - name: argmin-math (ndarray_v0_14)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_14/Cargo.toml
+        run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_0_14/Cargo.toml
       - name: argmin-math (ndarray_v0_13)
-        run: cargo test --manifest-path ./argmin-math/ndarray-linalg-tests/ndarray_0_13/Cargo.toml
+        run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_0_13/Cargo.toml
       # nalgebra
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"

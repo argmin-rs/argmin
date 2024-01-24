@@ -4,7 +4,7 @@ version = "0.9.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Mathematical optimization in pure Rust"
+description = "Numerical optimization in pure Rust"
 documentation = "https://docs.rs/argmin/"
 homepage = "https://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
@@ -32,13 +32,13 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 [dev-dependencies]
 approx = "0.5.0"
 finitediff = { version = "0.1.4", features = ["ndarray"] }
-argmin_testfunctions = { version = "0.1.1", path = "../tools/testfunctions" }
+argmin_testfunctions = { version = "0.1.1", path = "../argmin-testfunctions" }
 ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.16", features = ["intel-mkl-static"] }
 argmin-math = { path = "../argmin-math", version = "0.3", features = ["vec"] }
-argmin-observer-slog = { path = "../observers/slog" }
-argmin-observer-paramwriter = { path = "../observers/paramwriter" }
-argmin-checkpointing-file = { path = "../checkpointing/file" }
+argmin-observer-slog = { path = "../argmin-observer-slog" }
+argmin-observer-paramwriter = { path = "../argmin-observer-paramwriter" }
+argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
 
 [features]
 default = []

@@ -14,11 +14,11 @@ categories = ["science"]
 exclude = []
 
 [dependencies]
-argmin = { version = "0.9.0", path = "../../argmin", default-features = false }
+argmin = { version = "0.9.0", path = "../argmin", default-features = false }
 bincode = { version = "1.3.3" }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = { version = "1.0" }
 
 [dev-dependencies]
-argmin-math = { path = "../../argmin-math", features = ["vec"] }
-argmin_testfunctions = { version = "*", path = "../../tools/testfunctions/" }
+argmin-math = { path = "../argmin-math", features = ["vec"] }
+argmin_testfunctions = { version = "*", path = "../argmin-testfunctions" }

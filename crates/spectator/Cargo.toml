@@ -16,7 +16,7 @@ exclude = []
 
 [dependencies]
 anyhow = "1.0"
-argmin = { version = "0.9.0", path = "../../argmin", default-features = false, features = ["serde1"] }
+argmin = { version = "0.9.0", path = "../argmin", default-features = false, features = ["serde1"] }
 bytes = "1.4.0"
 clap = { version = "4.1.7", features = ["derive"] }
 dashmap = { version = "5.4", features = ["serde"], optional = true }
