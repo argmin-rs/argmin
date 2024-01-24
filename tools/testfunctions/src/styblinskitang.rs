@@ -29,7 +29,10 @@ use std::iter::Sum;
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(-2.903534, -2.903534, ..., -2.903534) =
 /// -39.16616*n`.
-pub fn styblinski_tang<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
+pub fn styblinski_tang<T>(param: &[T]) -> T
+where
+    T: Float + FromPrimitive + Sum,
+{
     T::from_f64(0.5).unwrap()
         * param
             .iter()
@@ -42,13 +45,20 @@ pub fn styblinski_tang<T: Float + FromPrimitive + Sum>(param: &[T]) -> T {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::f32;
 
     #[test]
     fn test_styblinski_tang_optimum() {
-        assert!(
-            (styblinski_tang(&[-2.903534_f32, -2.903534_f32, -2.903534_f32]) + 117.49849_f32).abs()
-                < f32::EPSILON
+        assert_relative_eq!(
+            styblinski_tang(&[-2.903534_f32, -2.903534_f32, -2.903534_f32]),
+            -117.49849,
+            epsilon = f32::EPSILON
+        );
+        assert_relative_eq!(
+            styblinski_tang(&[-2.903534_f64, -2.903534_f64, -2.903534_f64]),
+            -117.4984971113142,
+            epsilon = f64::EPSILON
         );
     }
 }

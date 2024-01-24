@@ -17,7 +17,7 @@ impl CostFunction for Himmelblau {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(himmelblau(param.data.as_vec()))
+        Ok(himmelblau(&[param[0], param[1]]))
     }
 }
 

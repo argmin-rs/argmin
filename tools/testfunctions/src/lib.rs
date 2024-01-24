@@ -7,8 +7,6 @@
 
 //! # Test functions for optimization algorithms
 
-extern crate num;
-
 mod ackley;
 mod beale;
 mod booth;

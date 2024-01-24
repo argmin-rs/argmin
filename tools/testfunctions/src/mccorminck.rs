@@ -26,9 +26,11 @@ use num::{Float, FromPrimitive};
 /// where `x_1 \in [-1.5, 4]` and `x_2 \in [-3, 4]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(-0.54719, -1.54719) = -1.913228`.
-pub fn mccorminck<T: Float + FromPrimitive>(param: &[T]) -> T {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn mccorminck<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     (x1 + x2).sin() + (x1 - x2).powi(2) - T::from_f64(1.5).unwrap() * x1
         + T::from_f64(2.5).unwrap() * x2
         + T::from_f64(1.0).unwrap()
@@ -37,17 +39,19 @@ pub fn mccorminck<T: Float + FromPrimitive>(param: &[T]) -> T {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_mccorminck_optimum() {
-        assert!(
-            (mccorminck(&[-0.54719_f32, -1.54719_f32]) + 1.9132228_f32).abs() < std::f32::EPSILON
+        assert_relative_eq!(
+            mccorminck(&[-0.54719_f32, -1.54719_f32]),
+            -1.9132228,
+            epsilon = std::f32::EPSILON
         );
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_mccorminck_param_length() {
-        mccorminck(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        assert_relative_eq!(
+            mccorminck(&[-0.54719_f64, -1.54719_f64]),
+            -1.9132229544882274,
+            epsilon = std::f32::EPSILON.into()
+        );
     }
 }

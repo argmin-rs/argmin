@@ -36,10 +36,11 @@ use num::{Float, FromPrimitive};
 /// where `x_i \in [-100, 100]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
-pub fn schaffer_n2<T: Float + FromPrimitive>(param: &[T]) -> T {
-    let plen = param.len();
-    assert!(plen == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn schaffer_n2<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     let n05 = T::from_f64(0.5).unwrap();
     let n1 = T::from_f64(1.0).unwrap();
     let n0001 = T::from_f64(0.0001).unwrap();
@@ -56,10 +57,11 @@ pub fn schaffer_n2<T: Float + FromPrimitive>(param: &[T]) -> T {
 /// where `x_i \in [-100, 100]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(0, 1.25313) = 0.291992`.
-pub fn schaffer_n4<T: Float + FromPrimitive>(param: &[T]) -> T {
-    let plen = param.len();
-    assert!(plen == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn schaffer_n4<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     let n05 = T::from_f64(0.5).unwrap();
     let n1 = T::from_f64(1.0).unwrap();
     let n0001 = T::from_f64(0.0001).unwrap();
@@ -70,28 +72,21 @@ pub fn schaffer_n4<T: Float + FromPrimitive>(param: &[T]) -> T {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::{f32, f64};
 
     #[test]
     fn test_schaffer_n2_optimum() {
-        assert!((schaffer_n2(&[0_f32, 0_f32])).abs() < f32::EPSILON);
-        assert!((schaffer_n2(&[0_f64, 0_f64])).abs() < f64::EPSILON);
+        assert_relative_eq!(schaffer_n2(&[0_f32, 0_f32]), 0.0, epsilon = f32::EPSILON);
+        assert_relative_eq!(schaffer_n2(&[0_f64, 0_f64]), 0.0, epsilon = f64::EPSILON);
     }
 
     #[test]
     fn test_schaffer_n4_optimum() {
-        assert!((schaffer_n4(&[0_f32, 1.25313_f32]) - 0.291992).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_schaffer_n2_param_length() {
-        schaffer_n2(&[0.0_f32, 0.0_f32, 0.0_f32]);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_schaffer_n4_param_length() {
-        schaffer_n4(&[0.0_f32, 0.0_f32, 0.0_f32]);
+        assert_relative_eq!(
+            schaffer_n4(&[0_f32, 1.25313_f32]),
+            0.291992,
+            epsilon = f32::EPSILON
+        );
     }
 }

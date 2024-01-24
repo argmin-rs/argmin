@@ -28,9 +28,11 @@ use num::{Float, FromPrimitive};
 /// where `x_i \in [-512, 512]`.
 ///
 /// The global minimum is at * `f(x_1, x_2) = f(512, 404.2319) = -959.6407`.
-pub fn eggholder<T: Float + FromPrimitive>(param: &[T]) -> T {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn eggholder<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     let n47 = T::from_f64(47.0).unwrap();
     -(x2 + n47)
         * (x2 + x1 / T::from_f64(2.0).unwrap() + n47)
@@ -43,15 +45,20 @@ pub fn eggholder<T: Float + FromPrimitive>(param: &[T]) -> T {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
+    use std::{f32, f64};
 
     #[test]
     fn test_eggholder_optimum() {
-        assert!((eggholder(&[512.0_f32, 404.2319_f32]) + 959.6407_f32).abs() < std::f32::EPSILON);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_eggholder_param_length() {
-        eggholder(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        assert_relative_eq!(
+            eggholder(&[512.0_f32, 404.2319_f32]),
+            -959.6407_f32,
+            epsilon = f32::EPSILON
+        );
+        assert_relative_eq!(
+            eggholder(&[512.0_f64, 404.2319_f64]),
+            -959.6406627106155_f64,
+            epsilon = f64::EPSILON
+        );
     }
 }

@@ -26,9 +26,11 @@ use num::{Float, FromPrimitive};
 /// where `x_i \in [-10, 10]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(1, 3) = 0`.
-pub fn booth<T: Float + FromPrimitive>(param: &[T]) -> T {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn booth<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     (x1 + T::from_f64(2.0).unwrap() * x2 - T::from_f64(7.0).unwrap()).powi(2)
         + (T::from_f64(2.0).unwrap() * x1 + x2 - T::from_f64(5.0).unwrap()).powi(2)
 }
@@ -36,17 +38,12 @@ pub fn booth<T: Float + FromPrimitive>(param: &[T]) -> T {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::{f32, f64};
 
     #[test]
     fn test_booth_optimum() {
-        assert!((booth(&[1_f32, 3_f32])).abs() < f32::EPSILON);
-        assert!((booth(&[1_f64, 3_f64])).abs() < f64::EPSILON);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_booth_param_length() {
-        booth(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        assert_relative_eq!(booth(&[1_f32, 3_f32]), 0.0, epsilon = f32::EPSILON);
+        assert_relative_eq!(booth(&[1_f64, 3_f64]), 0.0, epsilon = f64::EPSILON);
     }
 }
