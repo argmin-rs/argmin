@@ -35,31 +35,43 @@ use std::f64::consts::PI;
 ///  * `f(x_1, x_2) = f(8.05502, -9.66459) = -19.2085`.
 ///  * `f(x_1, x_2) = f(-8.05502, 9.66459) = -19.2085`.
 ///  * `f(x_1, x_2) = f(-8.05502, -9.66459) = -19.2085`.
-pub fn holder_table<T: Float + FromPrimitive>(param: &[T]) -> T {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
+pub fn holder_table<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
     let pi = T::from_f64(PI).unwrap();
-    -(x1.sin()
-        * x2.cos()
-        * (T::from_f64(1.0).unwrap() - (x1.powi(2) + x2.powi(2)).sqrt() / pi)
-            .abs()
-            .exp())
-    .abs()
+    let n1 = T::from_f64(1.0).unwrap();
+    -(x1.sin() * x2.cos() * (n1 - (x1.powi(2) + x2.powi(2)).sqrt() / pi).abs().exp()).abs()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::f32;
 
     #[test]
     fn test_holder_table_optimum() {
-        assert!((holder_table(&[8.05502_f32, 9.66459_f32]) + 19.2085).abs() < f32::EPSILON);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_holder_table_param_length() {
-        holder_table(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        assert_relative_eq!(
+            holder_table(&[8.05502_f32, 9.66459_f32]),
+            -19.2085,
+            epsilon = f32::EPSILON
+        );
+        assert_relative_eq!(
+            holder_table(&[-8.05502_f32, 9.66459_f32]),
+            -19.2085,
+            epsilon = f32::EPSILON
+        );
+        assert_relative_eq!(
+            holder_table(&[8.05502_f32, -9.66459_f32]),
+            -19.2085,
+            epsilon = f32::EPSILON
+        );
+        assert_relative_eq!(
+            holder_table(&[-8.05502_f32, -9.66459_f32]),
+            -19.2085,
+            epsilon = f32::EPSILON
+        );
     }
 }

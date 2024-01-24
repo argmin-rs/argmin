@@ -26,27 +26,26 @@ use num::{Float, FromPrimitive};
 /// where `x_1 \in [-15, -5]` and `x_2 \in [-3, 3]`.
 ///
 /// The global minimum is at `f(x_1, x_2) = f(-10, 1) = 0`.
-pub fn bukin_n6<T: Float + FromPrimitive>(param: &[T]) -> T {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
-    T::from_f64(100.0).unwrap() * (x2 - T::from_f64(0.01).unwrap() * x1.powi(2)).abs().sqrt()
-        + T::from_f64(0.01).unwrap() * (x1 + T::from_f64(10.0).unwrap()).abs()
+pub fn bukin_n6<T>(param: &[T; 2]) -> T
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
+    let n001 = T::from_f64(0.01).unwrap();
+    let n10 = T::from_f64(10.0).unwrap();
+    let n100 = T::from_f64(100.0).unwrap();
+    n100 * (x2 - n001 * x1.powi(2)).abs().sqrt() + n001 * (x1 + n10).abs()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::{f32, f64};
 
     #[test]
     fn test_bukin_n6_optimum() {
-        assert!((bukin_n6(&[-10_f32, 1_f32])).abs() < f32::EPSILON);
-        assert!((bukin_n6(&[-10_f64, 1_f64])).abs() < f64::EPSILON);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_bukin_n6_param_length() {
-        bukin_n6(&[0.0_f32, -1.0_f32, 0.1_f32]);
+        assert_relative_eq!(bukin_n6(&[-10_f32, 1_f32]), 0.0, epsilon = f32::EPSILON);
+        assert_relative_eq!(bukin_n6(&[-10_f64, 1_f64]), 0.0, epsilon = f64::EPSILON);
     }
 }

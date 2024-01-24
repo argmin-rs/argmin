@@ -22,6 +22,8 @@
 
 use std::f64::consts::PI;
 
+use num::{Float, FromPrimitive};
+
 /// Cross-in-tray test function
 ///
 /// Defined as
@@ -36,27 +38,28 @@ use std::f64::consts::PI;
 ///  * `f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261`.
 ///  * `f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261`.
 ///  * `f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261`.
-pub fn cross_in_tray(param: &[f64]) -> f64 {
-    assert!(param.len() == 2);
-    let (x1, x2) = (param[0], param[1]);
-    // let pi = T::from_f64(PI).unwrap();
-    // T::from_f64(-0.0001).unwrap()
-    //     * ((x1.sin() * x2.sin()
-    //         * (T::from_f64(100.0).unwrap() - (x1.powi(2) + x2.powi(2)).sqrt() / pi)
-    //             .abs()
-    //             .exp())
-    //         .abs() + T::from_f64(1.0).unwrap())
-    //         .powf(T::from_f64(0.1).unwrap())
-    -0.0001
-        * ((x1.sin() * x2.sin() * (100.0 - (x1.powi(2) + x2.powi(2)).sqrt() / PI).abs().exp())
-            .abs()
-            + 1.0)
-            .powf(0.1)
+///
+/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+pub fn cross_in_tray<T>(param: &[T; 2]) -> T
+where
+    T: Float + Into<f64> + FromPrimitive,
+{
+    let x1: f64 = param[0].into();
+    let x2: f64 = param[1].into();
+    T::from_f64(
+        -0.0001
+            * ((x1.sin() * x2.sin() * (100.0 - (x1.powi(2) + x2.powi(2)).sqrt() / PI).abs().exp())
+                .abs()
+                + 1.0)
+                .powf(0.1),
+    )
+    .unwrap()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
     use std::f32;
 
     #[test]
@@ -64,24 +67,45 @@ mod tests {
         // This isnt exactly a great way to test this. The function can only be computed with the
         // use of f64; however, I only have the minimum points available in f32, which is why I use
         // the f32 EPSILONs.
-        assert!(
-            (cross_in_tray(&[1.34941_f64, 1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
+        assert_relative_eq!(
+            cross_in_tray(&[1.34941_f64, 1.34941_f64]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
         );
-        assert!(
-            (cross_in_tray(&[1.34941_f64, -1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
+        assert_relative_eq!(
+            cross_in_tray(&[1.34941_f64, -1.34941_f64]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
         );
-        assert!(
-            (cross_in_tray(&[-1.34941_f64, 1.34941_f64]) + 2.062611870).abs() < f32::EPSILON.into()
+        assert_relative_eq!(
+            cross_in_tray(&[-1.34941_f64, 1.34941_f64]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
         );
-        assert!(
-            (cross_in_tray(&[-1.34941_f64, -1.34941_f64]) + 2.062611870).abs()
-                < f32::EPSILON.into()
+        assert_relative_eq!(
+            cross_in_tray(&[-1.34941_f64, -1.34941_f64]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
         );
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_cross_in_tray_param_length() {
-        cross_in_tray(&[0.0, -1.0, 0.1]);
+        assert_relative_eq!(
+            cross_in_tray(&[1.34941_f32, 1.34941_f32]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
+        );
+        assert_relative_eq!(
+            cross_in_tray(&[1.34941_f32, -1.34941_f32]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
+        );
+        assert_relative_eq!(
+            cross_in_tray(&[-1.34941_f32, 1.34941_f32]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
+        );
+        assert_relative_eq!(
+            cross_in_tray(&[-1.34941_f32, -1.34941_f32]),
+            -2.062611870,
+            epsilon = f32::EPSILON.into()
+        );
     }
 }

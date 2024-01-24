@@ -96,12 +96,25 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_rosenbrock_optimum() {
-        assert!(rosenbrock(&[1.0_f32, 1.0_f32], 1.0, 100.0).abs() < std::f32::EPSILON);
-        assert!(rosenbrock(&[1.0, 1.0], 1.0, 100.0).abs() < std::f64::EPSILON);
-        assert!(rosenbrock(&[1.0, 1.0, 1.0], 1.0, 100.0).abs() < std::f64::EPSILON);
+        assert_relative_eq!(
+            rosenbrock(&[1.0_f32, 1.0_f32], 1.0, 100.0),
+            0.0,
+            epsilon = std::f32::EPSILON
+        );
+        assert_relative_eq!(
+            rosenbrock(&[1.0, 1.0], 1.0, 100.0),
+            0.0,
+            epsilon = std::f64::EPSILON
+        );
+        assert_relative_eq!(
+            rosenbrock(&[1.0, 1.0, 1.0], 1.0, 100.0),
+            0.0,
+            epsilon = std::f64::EPSILON
+        );
     }
 
     #[test]
@@ -109,7 +122,7 @@ mod tests {
         let derivative =
             rosenbrock_derivative(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 1.0, 100.0);
         for elem in derivative {
-            assert!(elem.abs() < std::f64::EPSILON);
+            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
         }
     }
 
@@ -127,7 +140,7 @@ mod tests {
         for i in 0..n {
             assert_eq!(hessian[i].len(), n);
             for j in 0..n {
-                assert!((hessian[i][j] - res[i][j]).abs() < std::f64::EPSILON);
+                assert_relative_eq!(hessian[i][j], res[i][j], epsilon = std::f64::EPSILON);
             }
         }
     }
