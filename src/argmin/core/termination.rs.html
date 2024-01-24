@@ -161,7 +161,7 @@
     /// assert!(TerminationStatus::Terminated(TerminationReason::MaxItersReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::TargetCostReached).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverConverged).terminated());
-    /// assert!(TerminationStatus::Terminated(TerminationReason::KeyboardInterrupt).terminated());
+    /// assert!(TerminationStatus::Terminated(TerminationReason::Interrupt).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::Timeout).terminated());
     /// assert!(TerminationStatus::Terminated(TerminationReason::SolverExit(&quot;Exit reason&quot;.to_string())).terminated());
     /// ```
@@ -187,8 +187,8 @@
     </span>MaxItersReached,
     <span class="doccomment">/// Reached target cost function value
     </span>TargetCostReached,
-    <span class="doccomment">/// Algorithm manually interrupted with Ctrl+C
-    </span>KeyboardInterrupt,
+    <span class="doccomment">/// Algorithm manually interrupted with SIGINT (Ctrl+C), SIGTERM or SIGHUP
+    </span>Interrupt,
     <span class="doccomment">/// Converged
     </span>SolverConverged,
     <span class="doccomment">/// Timeout reached
@@ -214,8 +214,8 @@
     ///     &quot;Target cost value reached&quot;
     /// );
     /// assert_eq!(
-    ///     TerminationReason::KeyboardInterrupt.text(),
-    ///     &quot;Keyboard interrupt&quot;
+    ///     TerminationReason::Interrupt.text(),
+    ///     &quot;Interrupt&quot;
     /// );
     /// assert_eq!(
     ///     TerminationReason::SolverConverged.text(),
@@ -234,7 +234,7 @@
         <span class="kw">match </span><span class="self">self </span>{
             TerminationReason::MaxItersReached =&gt; <span class="string">&quot;Maximum number of iterations reached&quot;</span>,
             TerminationReason::TargetCostReached =&gt; <span class="string">&quot;Target cost value reached&quot;</span>,
-            TerminationReason::KeyboardInterrupt =&gt; <span class="string">&quot;Keyboard interrupt&quot;</span>,
+            TerminationReason::Interrupt =&gt; <span class="string">&quot;Interrupt&quot;</span>,
             TerminationReason::SolverConverged =&gt; <span class="string">&quot;Solver converged&quot;</span>,
             TerminationReason::Timeout =&gt; <span class="string">&quot;Timeout reached&quot;</span>,
             TerminationReason::SolverExit(reason) =&gt; reason.as_ref(),

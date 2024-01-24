@@ -1061,7 +1061,7 @@
 
         <span class="kw">if </span>interrupt.load(Ordering::SeqCst) {
             <span class="comment">// Solver execution has been interrupted manually
-            </span>state = state.terminate_with(TerminationReason::KeyboardInterrupt);
+            </span>state = state.terminate_with(TerminationReason::Interrupt);
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.observers.is_empty() {
