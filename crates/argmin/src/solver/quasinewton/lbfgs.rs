@@ -434,12 +434,8 @@ where
 
         self.linesearch.search_direction(d);
 
-        // Run solver
-        let OptimizationResult {
-            problem: mut line_problem,
-            state: mut linesearch_state,
-            ..
-        } = Executor::new(line_problem, self.linesearch.clone())
+        // Run line search
+        let linesearch_result = Executor::new(line_problem, self.linesearch.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -447,7 +443,24 @@ where
                     .cost(cur_cost)
             })
             .ctrlc(false)
-            .run()?;
+            .run();
+
+        let OptimizationResult {
+            problem: mut line_problem,
+            state: mut linesearch_state,
+            ..
+        } = match linesearch_result {
+            Ok(res) => res,
+            Err(e) => {
+                return Ok((
+                    state.terminate_with(TerminationReason::SolverExit(format!(
+                        "Line search terminated with: '{}'",
+                        e,
+                    ))),
+                    Some(kv!("gamma" => gamma;)),
+                ))
+            }
+        };
 
         let mut xk1 = linesearch_state.take_param().unwrap();
         let next_cost = linesearch_state.get_cost();
