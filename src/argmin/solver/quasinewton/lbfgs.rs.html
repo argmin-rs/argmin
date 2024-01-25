@@ -729,6 +729,19 @@
 <a href="#729" id="729">729</a>
 <a href="#730" id="730">730</a>
 <a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1165,12 +1178,8 @@
 
         <span class="self">self</span>.linesearch.search_direction(d);
 
-        <span class="comment">// Run solver
-        </span><span class="kw">let </span>OptimizationResult {
-            problem: <span class="kw-2">mut </span>line_problem,
-            state: <span class="kw-2">mut </span>linesearch_state,
-            ..
-        } = Executor::new(line_problem, <span class="self">self</span>.linesearch.clone())
+        <span class="comment">// Run line search
+        </span><span class="kw">let </span>linesearch_result = Executor::new(line_problem, <span class="self">self</span>.linesearch.clone())
             .configure(|config| {
                 config
                     .param(param.clone())
@@ -1178,7 +1187,24 @@
                     .cost(cur_cost)
             })
             .ctrlc(<span class="bool-val">false</span>)
-            .run()<span class="question-mark">?</span>;
+            .run();
+
+        <span class="kw">let </span>OptimizationResult {
+            problem: <span class="kw-2">mut </span>line_problem,
+            state: <span class="kw-2">mut </span>linesearch_state,
+            ..
+        } = <span class="kw">match </span>linesearch_result {
+            <span class="prelude-val">Ok</span>(res) =&gt; res,
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((
+                    state.terminate_with(TerminationReason::SolverExit(<span class="macro">format!</span>(
+                        <span class="string">&quot;Line search terminated with: &#39;{}&#39;&quot;</span>,
+                        e,
+                    ))),
+                    <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;gamma&quot; </span>=&gt; gamma;)),
+                ))
+            }
+        };
 
         <span class="kw">let </span><span class="kw-2">mut </span>xk1 = linesearch_state.take_param().unwrap();
         <span class="kw">let </span>next_cost = linesearch_state.get_cost();
