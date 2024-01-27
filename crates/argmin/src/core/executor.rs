@@ -180,7 +180,8 @@ where
                 let kv = kv.unwrap_or(kv![]);
 
                 // Observe after init
-                self.observers.observe_init(self.solver.name(), &state, &kv)?;
+                self.observers
+                    .observe_init(self.solver.name(), &state, &kv)?;
             }
 
             state.func_counts(&self.problem);
