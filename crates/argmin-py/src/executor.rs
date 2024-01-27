@@ -42,11 +42,11 @@ impl Executor {
     fn configure(&mut self, kwargs: Option<&PyDict>) -> PyResult<()> {
         if let Some(kwargs) = kwargs {
             let param = kwargs
-                .get_item("param")
+                .get_item("param")?
                 .map(|x| x.extract::<&PyArray1>())
                 .map_or(Ok(None), |r| r.map(Some))?;
             let max_iters = kwargs
-                .get_item("max_iters")
+                .get_item("max_iters")?
                 .map(|x| x.extract())
                 .map_or(Ok(None), |r| r.map(Some))?;
 
