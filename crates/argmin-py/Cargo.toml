@@ -19,10 +19,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0.70"
-argmin_testfunctions = "0.1.1"
+argmin_testfunctions = { version = "0.1.1", path = "../argmin-testfunctions" }
 argmin = {path="../argmin", default-features=false, features=[]}
-argmin-math = {path="../argmin-math", features=["ndarray_latest-serde"]}
-ndarray-linalg = { version = "0.16", features = ["netlib"] }
+argmin-math = {path="../argmin-math", features=["ndarray_latest"]}
 ndarray = { version = "0.15", features = ["serde-1"] }
+ndarray-linalg = { version = "0.16", features = ["intel-mkl-static"] }
 numpy = "0.18.0"
 pyo3 = {version="0.18.1", features=["extension-module", "anyhow"]}
