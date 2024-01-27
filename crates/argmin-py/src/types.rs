@@ -12,4 +12,5 @@ pub type Array1 = ndarray::Array1<Scalar>;
 pub type Array2 = ndarray::Array2<Scalar>;
 pub type PyArray1 = numpy::PyArray1<Scalar>;
 
-pub type IterState = argmin::core::IterState<Array1, Array1, (), ndarray::Array2<Scalar>, (), Scalar>;
+pub type IterState =
+    argmin::core::IterState<Array1, Array1, (), ndarray::Array2<Scalar>, (), Scalar>;
