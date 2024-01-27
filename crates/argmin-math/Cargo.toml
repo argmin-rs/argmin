@@ -1,0 +1,88 @@
+[package]
+name = "argmin-math"
+version = "0.3.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "argmin math abstractions"
+documentation = "https://docs.rs/argmin-math/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+[dependencies]
+# nalgebra
+nalgebra_0_32 = { package = "nalgebra", version = "0.32", optional = true }
+nalgebra_0_31 = { package = "nalgebra", version = "0.31", optional = true }
+nalgebra_0_30 = { package = "nalgebra", version = "0.30", optional = true }
+nalgebra_0_29 = { package = "nalgebra", version = "0.29", optional = true }
+
+# ndarray
+## v0.15
+ndarray_0_15 = { package = "ndarray", version = "0.15", optional = true }
+ndarray-linalg_0_16 = { package = "ndarray-linalg", version = "0.16", optional = true }
+## v0.14
+ndarray_0_14 = { package = "ndarray", version = "0.14", optional = true }
+ndarray-linalg_0_13 = { package = "ndarray-linalg", version = "0.13", optional = true }
+## v0.13
+ndarray_0_13 = { package = "ndarray", version = "0.13", optional = true }
+ndarray-linalg_0_12 = { package = "ndarray-linalg", version = "0.12", optional = true }
+
+# general
+num-complex_0_4 = { package = "num-complex", version = "0.4", optional = true, default-features = false, features = ["std"] }
+num-complex_0_3 = { package = "num-complex", version = "0.3", optional = true, default-features = false, features = ["std"] }
+num-complex_0_2 = { package = "num-complex", version = "0.2", optional = true, default-features = false, features = ["std"] }
+num-traits = { version = "0.2" }
+num-integer = { version = "0.1" }
+rand = { version = "0.8.3" }
+anyhow = { version = "1.0" }
+thiserror = { version = "1.0" }
+
+cfg-if = "1"
+
+[dev-dependencies]
+paste = "1"
+approx = "0.5.0"
+
+[features]
+default = ["primitives", "vec"]
+latest_all = ["primitives", "vec", "nalgebra_latest", "ndarray_latest"]
+
+# primitives
+primitives = ["num-complex_0_4"]
+
+# vec
+vec = ["primitives", "num-complex_0_4"]
+
+# nalgebra
+nalgebra_all = ["primitives"]
+nalgebra_latest = ["nalgebra_v0_32"]
+nalgebra_v0_32 = ["nalgebra_0_32", "num-complex_0_4", "nalgebra_all"]
+nalgebra_v0_31 = ["nalgebra_0_31", "num-complex_0_4", "nalgebra_all"]
+nalgebra_v0_30 = ["nalgebra_0_30", "num-complex_0_4", "nalgebra_all"]
+nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]
+
+# ndarray
+ndarray_all = ["primitives"]
+ndarray_latest = ["ndarray_v0_15"]
+
+## With `ndarray-linalg`
+ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
+ndarray_v0_14 = ["ndarray_0_14", "ndarray-linalg_0_13", "num-complex_0_3", "ndarray_all"]
+ndarray_v0_13 = ["ndarray_0_13", "ndarray-linalg_0_12", "num-complex_0_2", "ndarray_all"]
+
+## Without `ndarray-linalg`
+ndarray_latest-nolinalg = ["ndarray_v0_15-nolinalg"]
+ndarray_v0_15-nolinalg = ["ndarray_0_15", "num-complex_0_4", "ndarray_all"]
+ndarray_v0_14-nolinalg = ["ndarray_0_14", "num-complex_0_3", "ndarray_all"]
+ndarray_v0_13-nolinalg = ["ndarray_0_13", "num-complex_0_2", "ndarray_all"]
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+features = ["primitives", "vec", "ndarray_latest", "nalgebra_latest"]

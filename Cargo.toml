@@ -1,9 +1,9 @@
 [workspace]
+resolver = "2"
 
 members = [
-    "argmin",
-    "argmin-math",
-    "argmin-py",
+    "crates/*",
+    "examples/*",
 ]
 
 exclude = [

@@ -34,7 +34,7 @@ This method can be enabled with the `with_l1_regularization` method of `LBFGS` w
 let solver = LBFGS::new(linesearch, 7).with_l1_regularization(1.0)?;
 ```
 
-[@vbkaisetsu](https://github.com/vbkaisetsu) also provided an [example](https://github.com/argmin-rs/argmin/blob/main/argmin/examples/owl_qn.rs). 
+[@vbkaisetsu](https://github.com/vbkaisetsu) also provided an [example](https://github.com/argmin-rs/argmin/tree/argmin-v0.7.0/argmin/examples/owl_qn.rs). 
 
 A minor downside of this addition is that the number of trait bounds on the types used in L-BFGS increased.
 If you are using one of the default backends, this is unlikely to affect you though.

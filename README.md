@@ -17,9 +17,9 @@
   |
   <a href="https://argmin-rs.github.io/argmin/argmin/">Docs (main branch)</a>
   |
-  <a href="https://github.com/argmin-rs/argmin/tree/v0.5.0/examples">Examples (latest release)</a>
+  <a href="https://github.com/argmin-rs/argmin/tree/argmin-v0.9.0/argmin/examples">Examples (latest release)</a>
   |
-  <a href="https://github.com/argmin-rs/argmin/tree/main/argmin/examples">Examples (main branch)</a>
+  <a href="https://github.com/argmin-rs/argmin/tree/main/examples">Examples (main branch)</a>
 </p>
 
 <p align="center">
@@ -66,10 +66,10 @@
     src="https://img.shields.io/crates/l/argmin?style=flat-square"
     alt="License"
   />
-  <a href="https://gitter.im/argmin-rs/community"
+  <a href="https://discord.gg/fYB8AwxxMW"
     ><img
-      src="https://img.shields.io/gitter/room/argmin-rs/argmin?style=flat-square"
-      alt="Gitter chat"
+      src="https://img.shields.io/discord/1189119565335109683?style=flat-square&label=argmin%20Discord"
+      alt="argmin Discord"
   /></a>
 </p>
 

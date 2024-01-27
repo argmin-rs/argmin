@@ -20,7 +20,7 @@ These changes have accumulated in `argmin` version 0.6.0 and a new crate called 
 This blog post is an attempt to summarize what has happened; however this is by no means exhaustive. 
 
 These changes had quite a substantial impact on the API and as such are very likely to affect you as a user.
-For users of the optimization algorithms, adapting your code to the new version should be a fairly easy task with an occasional look at the documentation or the current [examples](https://github.com/argmin-rs/argmin/tree/main/argmin/examples) in the Github repository.
+For users of the optimization algorithms, adapting your code to the new version should be a fairly easy task with an occasional look at the documentation or the current [examples](https://github.com/argmin-rs/argmin/tree/argmin-v0.6.0/argmin/examples) in the Github repository.
 If you are using argmin to implement your own algorithms, the changes you will have to make are more severe. 
 I suggest having a look at the source code of argmin to get a sense of how you may have to adapt your own code.
 

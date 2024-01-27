@@ -1,0 +1,23 @@
+[package]
+name = "argmin_testfunctions"
+version = "0.1.1"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "Test functions for optimization algorithms"
+documentation = "https://docs.rs/argmin_testfunctions/"
+homepage = "http://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["test", "function", "optimization"]
+categories = ["science"]
+
+[dependencies]
+num = "0.4"
+
+[dev-dependencies]
+approx = "0.5"
+paste = "1.0"
+
+[badges]
+maintenance = { status = "actively-developed" }

@@ -85,7 +85,7 @@ impl<F> Landweber<F> {
     }
 }
 
-impl<O, F, P, G> Solver<O, IterState<P, G, (), (), F>> for Landweber<F>
+impl<O, F, P, G> Solver<O, IterState<P, G, (), (), (), F>> for Landweber<F>
 where
     // The Landweber solver requires `O` to implement `Gradient`.
     // `P` and `G` indicate the types of the parameter vector and gradient,
@@ -111,8 +111,8 @@ where
         // vector, gradient, Hessian and cost function value of the current,
         // previous and best iteration as well as current iteration number, and
         // many more.
-        mut state: IterState<P, G, (), (), F>,
-    ) -> Result<(IterState<P, G, (), (), F>, Option<KV>), Error> {
+        mut state: IterState<P, G, (), (), (), F>,
+    ) -> Result<(IterState<P, G, (), (), (), F>, Option<KV>), Error> {
         // First we obtain the current parameter vector from the `state` struct (`x_k`).
         // Landweber requires an initial parameter vector. Return an error if this was
         // not provided by the user.

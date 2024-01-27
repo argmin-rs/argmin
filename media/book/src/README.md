@@ -16,7 +16,7 @@ argmin is designed to simplify the implementation of optimization algorithms and
 
 > **IMPORTANT NOTE**
 >
-> This book covers version 0.7 of argmin! Parts of this book may not apply to versions below 0.7.
+> This book covers version 0.9 of argmin! Parts of this book may not apply to versions below 0.9.
 
 
 ## The argmin ecosystem
@@ -36,7 +36,7 @@ argmin comes with a number of line searches (Backtracking, More-Thuente, Hager-Z
 
 For a complete and up-to-date list of all algorithms please visit the [API documentation](https://docs.rs/argmin/latest/argmin/).
 
-> Examples for each algorithm can be found on [Github](https://github.com/argmin-rs/argmin/tree/main/argmin/examples). Make sure to choose the tag matching the argmin version you are using.
+> Examples for each algorithm can be found on [Github](https://github.com/argmin-rs/argmin/tree/main/examples). Make sure to choose the tag matching the argmin version you are using.
 
 ## Documentation
 
@@ -48,6 +48,10 @@ The [argmin-math documentation](https://docs.rs/argmin/latest/argmin-math/) outl
 For details on how to use `finitediff` for finite differentiation, please refer to the corresponding [API documentation](https://docs.rs/argmin/latest/finitediff/).
 
 The documentation of `modcholesky` can be found [here](https://docs.rs/argmin/latest/modcholesky).
+
+## Discord server
+
+Feel free to join the [argmin Discord](https://discord.gg/fYB8AwxxMW)!
 
 ## License
 

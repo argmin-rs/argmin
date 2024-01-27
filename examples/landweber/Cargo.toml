@@ -1,0 +1,12 @@
+[package]
+name = "example-landweber"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }

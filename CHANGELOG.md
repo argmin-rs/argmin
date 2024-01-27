@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## argmin-math [argmin-math unreleased]
 
+## argmin [argmin v0.9.0] 2024-01-06
+
+### Added
+
+* Implemented ArgminInv for f32/f64 (1D) (@sdrap, #346)
+* Added a simple example of Nelder-Mead usage (@cjordan, #359)
+
+### Fixed
+
+* Clippy lints (@jjbayer, @stefan-k, #341, #376, #380)
+* Fixed wrong example link (@itrumper, #352)
+* Correct line search to search over gradient (@DevonMorris, #354)
+* SteepestDescent now correctly keeps track of prev_param (@DevonMorris, #362)
+* Added a missing feature for testing argmin-math in the docs (@stefan-k, #371)
+* Fixed a typo in argmin book (@imeckler, #373)
+* Fixed crate versions in book (@stefan-k, #375)
+
+### Changed
+
+* Updated gnuplot to 0.0.39 (@stefan-k, #364)
+* Switched to resolver = 2 for entire workspace (@stefan-k, #372)
+
 ## argmin [argmin v0.8.1] 2023-02-20
 
 ### Added
@@ -243,6 +265,7 @@ For older versions please see the Git history.
 
 [argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...HEAD
 [argmin-math unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...HEAD
+[argmin v0.9.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...argmin-v0.9.0
 [argmin v0.8.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...argmin-v0.8.1
 [argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0
 [argmin v0.7.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0

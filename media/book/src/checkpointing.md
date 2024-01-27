@@ -21,10 +21,9 @@ If the run crashes and a checkpoint is found on disk, then it will resume from t
 # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 # #[cfg(feature = "serde1")]
 # use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
-# #[cfg(feature = "slog-logger")]
-# use argmin::core::observers::SlogLogger;
+# use argmin_observer_slog::SlogLogger;
 # use argmin::solver::landweber::Landweber;
-# use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+# use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 #
 # #[derive(Default)]
 # struct Rosenbrock {}
@@ -38,7 +37,7 @@ If the run crashes and a checkpoint is found on disk, then it will resume from t
 #
 #     /// Apply the cost function to a parameter `p`
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-#         Ok(rosenbrock_2d(p, 1.0, 100.0))
+#         Ok(rosenbrock(p, 1.0, 100.0))
 #     }
 # }
 #
@@ -51,7 +50,7 @@ If the run crashes and a checkpoint is found on disk, then it will resume from t
 #
 #     /// Compute the gradient at parameter `p`.
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+#         Ok(rosenbrock_derivative(p, 1.0, 100.0).to_vec())
 #     }
 # }
 #

@@ -1,0 +1,14 @@
+[package]
+name = "example-lbfgs"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["ndarray_latest-nolinalg"], path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
+finitediff = { version = "0.1.4", features = ["ndarray"] }
+ndarray = "0.15.6"

@@ -26,6 +26,11 @@ targets = [
     # the actual valid features supported by the target architecture.
     #{ triple = "wasm32-unknown-unknown", features = ["atomics"] },
 ]
+exclude = [
+    # Excluded because it is only used as a dev-dependency for testing
+    # TODO: Remove the exclude as soon as the fix for https://github.com/EmbarkStudios/krates/issues/60 is available in the cargo-deny-action
+    "intel-mkl-src", # TODO: Delete as 
+]
 
 # This section is considered when running `cargo deny check advisories`
 # More documentation for the advisories section can be found here:
@@ -82,11 +87,13 @@ allow = [
     "BSD-3-Clause",
     "Unicode-DFS-2016",
     "MPL-2.0",
-    # "ISC",
+    "ISC",
     # "OpenSSL",
     "Zlib",
     # "CC0-1.0",
     "BSL-1.0",
+    "OFL-1.1",
+    "LicenseRef-UFL-1.0",
 ]
 # List of explicitly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
@@ -152,7 +159,7 @@ license-files = [
 # published to private registries.
 # To see how to mark a crate as unpublished (to the official registry),
 # visit https://doc.rust-lang.org/cargo/reference/manifest.html#the-publish-field.
-ignore = false
+ignore = true
 # One or more private registries that you might publish crates to, if a crate
 # is only published to private registries, and ignore is true, the crate will
 # not have its license(s) checked

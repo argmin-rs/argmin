@@ -1,0 +1,27 @@
+[package]
+name = "ndarray_0_14"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dev-dependencies]
+argmin-math = { path = "../../", version = "*", default-features=false, features = [
+    "ndarray_v0_14",
+] }
+ndarray = { version = "0.14", default-features = false }
+ndarray-linalg = { version = "0.13", features = ["intel-mkl-static"] }
+num-complex = { version = "0.3", default-features = false, features = ["std"] }
+num-traits = { version = "0.2" }
+num-integer = { version = "0.1" }
+# Higher versions break intel-mkl-tool: https://github.com/rust-math/intel-mkl-src/issues/68#issue-1065394662
+anyhow = { version = "<=1.0.48" }
+paste = "1"
+approx = "0.5.0"
+rand = "*" # Should unify with whatever is currently used in argmin itself
+
+[features]
+
+# To make it explicit that this package is not part of the overall argmin workspace for the purpose of dependency unification
+[workspace]

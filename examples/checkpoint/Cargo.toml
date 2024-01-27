@@ -1,0 +1,13 @@
+[package]
+name = "example-checkpoint"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../crates/argmin", features = ["serde1"] }
+argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-math" }
+argmin-checkpointing-file = { version = "*", path = "../../crates/argmin-checkpointing-file" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }

@@ -23,7 +23,7 @@ The following example shows how to use the `SteepestDescent` solver to solve a p
 use argmin::core::{State, Error, Executor, CostFunction, Gradient};
 use argmin::solver::gradientdescent::SteepestDescent;
 use argmin::solver::linesearch::MoreThuenteLineSearch;
-# use argmin_testfunctions::{rosenbrock_2d, rosenbrock_2d_derivative};
+# use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 
 struct MyProblem {}
 
@@ -37,7 +37,7 @@ impl CostFunction for MyProblem {
 #
 #     /// Apply the cost function to a parameter `p`
 #     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-#         Ok(rosenbrock_2d(p, 1.0, 100.0))
+#         Ok(rosenbrock(p, 1.0, 100.0))
 #     }
 }
 
@@ -51,7 +51,7 @@ impl Gradient for MyProblem {
 #
 #     /// Compute the gradient at parameter `p`.
 #     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-#         Ok(rosenbrock_2d_derivative(p, 1.0, 100.0))
+#         Ok(rosenbrock_derivative(p, 1.0, 100.0).to_vec())
 #     }
 }
 #
@@ -134,3 +134,6 @@ let function_evaluation_counts = res.state().get_func_counts();
 # }
 ```
 
+Optionally, `Executor` allows one to terminate a run after a given timeout, which can be set with the `timeout` method of `Executor`. 
+The check whether the overall runtime exceeds the timeout is performed after every iteration, therefore the actual runtime can be longer than the set timeout.
+In case of timeout, the run terminates with `TerminationReason::Timeout`.

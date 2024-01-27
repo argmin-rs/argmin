@@ -1,0 +1,12 @@
+[package]
+name = "example-gaussnewton_nalgebra"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["nalgebra_latest"], path = "../../crates/argmin-math" }
+argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
+nalgebra = "0.32.3"
