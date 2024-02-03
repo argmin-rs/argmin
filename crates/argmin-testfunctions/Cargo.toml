@@ -19,6 +19,7 @@ num = "0.4"
 approx = "0.5"
 finitediff = "0.1.4"
 paste = "1.0"
+proptest = "1.4.0"
 
 [badges]
 maintenance = { status = "actively-developed" }
