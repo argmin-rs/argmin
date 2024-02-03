@@ -17,6 +17,7 @@ num = "0.4"
 
 [dev-dependencies]
 approx = "0.5"
+finitediff = "0.1.4"
 paste = "1.0"
 
 [badges]

@@ -148,6 +148,7 @@ where
 mod tests {
     use super::*;
     use approx::assert_relative_eq;
+    use finitediff::FiniteDiff;
 
     #[test]
     fn test_rosenbrock_optimum() {
@@ -178,7 +179,36 @@ mod tests {
     }
 
     #[test]
-    fn test_rosenbrock_hessian_2() {
+    fn test_rosenbrock_derivative_const_optimum() {
+        let derivative =
+            rosenbrock_derivative_const(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 1.0, 100.0);
+        for elem in derivative {
+            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_derivative_finitediff() {
+        let param = [-0.3, 1.0, 0.1, 0.3, 0.2, -0.3, 0.2, 0.7];
+        let derivative = rosenbrock_derivative(&param, 1.0, 100.0);
+        let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x, 1.0, 100.0));
+        for i in 0..derivative.len() {
+            assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-4);
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_derivative_const_finitediff() {
+        let param = [-0.3, 1.0, 0.1, 0.3, 0.2, -0.3, 0.2, 0.7];
+        let derivative = rosenbrock_derivative_const(&param, 1.0, 100.0);
+        let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x, 1.0, 100.0));
+        for i in 0..derivative.len() {
+            assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-4);
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_hessian() {
         // Same testcase as in scipy
         let hessian = rosenbrock_hessian(&[0.0, 0.1, 0.2, 0.3], 1.0, 100.0);
         let res = vec![
@@ -192,6 +222,55 @@ mod tests {
             assert_eq!(hessian[i].len(), n);
             for j in 0..n {
                 assert_relative_eq!(hessian[i][j], res[i][j], epsilon = std::f64::EPSILON);
+            }
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_hessian_const() {
+        // Same testcase as in scipy
+        let hessian = rosenbrock_hessian_const(&[0.0, 0.1, 0.2, 0.3], 1.0, 100.0);
+        let res = vec![
+            vec![-38.0, 0.0, 0.0, 0.0],
+            vec![0.0, 134.0, -40.0, 0.0],
+            vec![0.0, -40.0, 130.0, -80.0],
+            vec![0.0, 0.0, -80.0, 200.0],
+        ];
+        let n = hessian.len();
+        for i in 0..n {
+            assert_eq!(hessian[i].len(), n);
+            for j in 0..n {
+                assert_relative_eq!(hessian[i][j], res[i][j], epsilon = std::f64::EPSILON);
+            }
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_hessian_finitediff() {
+        let param = [1.2_f64, 0.1, -1.0, 0.1, -0.3, 1.5, 0.9, 1.1];
+        let hessian = rosenbrock_hessian(&param, 1.0, 100.0);
+        let hessian_fd =
+            Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x, 1.0, 100.0));
+        let n = hessian.len();
+        for i in 0..n {
+            assert_eq!(hessian[i].len(), n);
+            for j in 0..n {
+                assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-4);
+            }
+        }
+    }
+
+    #[test]
+    fn test_rosenbrock_hessian_const_finitediff() {
+        let param = [1.2_f64, 0.1, -1.0, 0.1, -0.3, 1.5, 0.9, 1.1];
+        let hessian = rosenbrock_hessian_const(&param, 1.0, 100.0);
+        let hessian_fd =
+            Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x, 1.0, 100.0));
+        let n = hessian.len();
+        for i in 0..n {
+            assert_eq!(hessian[i].len(), n);
+            for j in 0..n {
+                assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-4);
             }
         }
     }
