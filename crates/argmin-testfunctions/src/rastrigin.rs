@@ -186,16 +186,32 @@ mod tests {
             epsilon = f64::EPSILON
         );
 
-        let derivative = rastrigin_derivative(&[0.0_f64, 0.0_f64]);
-        let derivative_a = rastrigin_a_derivative(&[0.0_f64, 0.0_f64], 10.0);
+        let derivative = rastrigin_derivative(&[1.0_f64, -1.0_f64]);
+        let derivative_a = rastrigin_a_derivative(&[1.0_f64, -1.0_f64], 10.0);
         for i in 0..derivative.len() {
             assert_relative_eq!(derivative[i], derivative_a[i], epsilon = f64::EPSILON);
         }
 
-        let derivative = rastrigin_derivative_const(&[0.0_f64, 0.0_f64]);
-        let derivative_a = rastrigin_a_derivative_const(&[0.0_f64, 0.0_f64], 10.0);
+        let derivative = rastrigin_derivative_const(&[1.0_f64, -1.0_f64]);
+        let derivative_a = rastrigin_a_derivative_const(&[1.0_f64, -1.0_f64], 10.0);
         for i in 0..derivative.len() {
             assert_relative_eq!(derivative[i], derivative_a[i], epsilon = f64::EPSILON);
+        }
+
+        let hessian = rastrigin_hessian(&[1.0_f64, -1.0_f64]);
+        let hessian_a = rastrigin_a_hessian(&[1.0_f64, -1.0_f64], 10.0);
+        for i in 0..hessian.len() {
+            for j in 0..hessian.len() {
+                assert_relative_eq!(hessian[i][j], hessian_a[i][j], epsilon = f64::EPSILON);
+            }
+        }
+
+        let hessian = rastrigin_hessian_const(&[1.0_f64, -1.0_f64]);
+        let hessian_a: [[_; 2]; 2] = rastrigin_a_hessian_const(&[1.0_f64, -1.0_f64], 10.0);
+        for i in 0..hessian.len() {
+            for j in 0..hessian.len() {
+                assert_relative_eq!(hessian[i][j], hessian_a[i][j], epsilon = f64::EPSILON);
+            }
         }
     }
 
