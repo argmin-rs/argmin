@@ -383,7 +383,7 @@
 }
 
 <span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
-</span><span class="kw">pub fn </span>rosenbrock_hessian&lt;T&gt;(x: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
+</span><span class="kw">pub fn </span>rosenbrock_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + AddAssign,
 {
@@ -392,12 +392,12 @@
     <span class="kw">let </span>n4 = T::from_f64(<span class="number">4.0</span>).unwrap();
     <span class="kw">let </span>n12 = T::from_f64(<span class="number">12.0</span>).unwrap();
 
-    <span class="kw">let </span>n = x.len();
+    <span class="kw">let </span>n = param.len();
     <span class="kw">let </span><span class="kw-2">mut </span>hessian = <span class="macro">vec!</span>[<span class="macro">vec!</span>[n0; n]; n];
 
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n - <span class="number">1 </span>{
-        <span class="kw">let </span>xi = x[i];
-        <span class="kw">let </span>xi1 = x[i + <span class="number">1</span>];
+        <span class="kw">let </span>xi = param[i];
+        <span class="kw">let </span>xi1 = param[i + <span class="number">1</span>];
 
         hessian[i][i] += n12 * b * xi.powi(<span class="number">2</span>) - n4 * b * xi1 + n2 * a;
         hessian[i + <span class="number">1</span>][i + <span class="number">1</span>] = n2 * b;
