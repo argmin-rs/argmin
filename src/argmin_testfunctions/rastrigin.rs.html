@@ -302,6 +302,22 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -490,16 +506,32 @@
             epsilon = f64::EPSILON
         );
 
-        <span class="kw">let </span>derivative = rastrigin_derivative(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>]);
-        <span class="kw">let </span>derivative_a = rastrigin_a_derivative(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>], <span class="number">10.0</span>);
+        <span class="kw">let </span>derivative = rastrigin_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>]);
+        <span class="kw">let </span>derivative_a = rastrigin_a_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>], <span class="number">10.0</span>);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
             <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_a[i], epsilon = f64::EPSILON);
         }
 
-        <span class="kw">let </span>derivative = rastrigin_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>]);
-        <span class="kw">let </span>derivative_a = rastrigin_a_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>], <span class="number">10.0</span>);
+        <span class="kw">let </span>derivative = rastrigin_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>]);
+        <span class="kw">let </span>derivative_a = rastrigin_a_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>], <span class="number">10.0</span>);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
             <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_a[i], epsilon = f64::EPSILON);
+        }
+
+        <span class="kw">let </span>hessian = rastrigin_hessian(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>]);
+        <span class="kw">let </span>hessian_a = rastrigin_a_hessian(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>], <span class="number">10.0</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+            <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+                <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_a[i][j], epsilon = f64::EPSILON);
+            }
+        }
+
+        <span class="kw">let </span>hessian = rastrigin_hessian_const(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>]);
+        <span class="kw">let </span>hessian_a: [[<span class="kw">_</span>; <span class="number">2</span>]; <span class="number">2</span>] = rastrigin_a_hessian_const(<span class="kw-2">&amp;</span>[<span class="number">1.0_f64</span>, -<span class="number">1.0_f64</span>], <span class="number">10.0</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+            <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+                <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_a[i][j], epsilon = f64::EPSILON);
+            }
         }
     }
 
