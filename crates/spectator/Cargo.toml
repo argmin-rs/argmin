@@ -25,6 +25,10 @@ egui_dock = { version = "0.10", optional = true }
 egui_extras = { version = "0.25", optional = true }
 egui_plot = { version = "0.25", optional = true }
 itertools = { version = "0.12", optional = true }
+# Note: Fix for an error on nightly. `nix` is not a direct dependency,
+# but an indirect dependency of eframe. By enabling the "user" feature
+# the library is compiled correctly.
+nix = { version = "0.26.4", features = ["user"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0", features = ["derive"] }
 time = { version = "0.3", features = ["serde"] }
