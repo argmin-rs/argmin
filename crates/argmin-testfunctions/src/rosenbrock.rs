@@ -69,7 +69,7 @@ where
 }
 
 /// Hessian of the multidimensional Rosenbrock test function
-pub fn rosenbrock_hessian<T>(x: &[T], a: T, b: T) -> Vec<Vec<T>>
+pub fn rosenbrock_hessian<T>(param: &[T], a: T, b: T) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + AddAssign,
 {
@@ -78,12 +78,12 @@ where
     let n4 = T::from_f64(4.0).unwrap();
     let n12 = T::from_f64(12.0).unwrap();
 
-    let n = x.len();
+    let n = param.len();
     let mut hessian = vec![vec![n0; n]; n];
 
     for i in 0..n - 1 {
-        let xi = x[i];
-        let xi1 = x[i + 1];
+        let xi = param[i];
+        let xi1 = param[i + 1];
 
         hessian[i][i] += n12 * b * xi.powi(2) - n4 * b * xi1 + n2 * a;
         hessian[i + 1][i + 1] = n2 * b;
