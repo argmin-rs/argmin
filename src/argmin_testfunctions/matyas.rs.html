@@ -106,6 +106,11 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -184,6 +189,11 @@
     </span><span class="kw">fn </span>test_matyas_optimum() {
         <span class="macro">assert_relative_eq!</span>(matyas(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">0_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
         <span class="macro">assert_relative_eq!</span>(matyas(<span class="kw-2">&amp;</span>[<span class="number">0_f64</span>, <span class="number">0_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
+
+        <span class="kw">let </span>deriv = matyas_derivative(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.0</span>]);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
+            <span class="macro">assert_relative_eq!</span>(deriv[i], <span class="number">0.0</span>, epsilon = f64::EPSILON);
+        }
     }
 
     <span class="macro">proptest! </span>{

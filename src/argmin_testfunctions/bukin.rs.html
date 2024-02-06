@@ -209,7 +209,7 @@
     <span class="kw">let </span>n0_01 = T::from_f64(<span class="number">0.01</span>).unwrap();
     <span class="kw">let </span>n10 = T::from_f64(<span class="number">10.0</span>).unwrap();
     <span class="kw">let </span>n50 = T::from_f64(<span class="number">50.0</span>).unwrap();
-    <span class="kw">let </span>eps = T::from_f64(std::f64::EPSILON).unwrap();
+    <span class="kw">let </span>eps = T::epsilon();
 
     <span class="kw">let </span>denom = (x2 - n0_01 * x1.powi(<span class="number">2</span>)).abs().powi(<span class="number">3</span>).sqrt();
     <span class="kw">let </span>tmp = x2 - n0_01 * x1.powi(<span class="number">2</span>);
@@ -239,7 +239,7 @@
     <span class="kw">let </span>n0_0001 = T::from_f64(<span class="number">0.0001</span>).unwrap();
     <span class="kw">let </span>n0_5 = T::from_f64(<span class="number">0.5</span>).unwrap();
     <span class="kw">let </span>n25 = T::from_f64(<span class="number">25.0</span>).unwrap();
-    <span class="kw">let </span>eps = T::from_f64(std::f64::EPSILON * <span class="number">1e-4</span>).unwrap();
+    <span class="kw">let </span>eps = T::epsilon() * T::from_f64(<span class="number">1e-4</span>).unwrap();
 
     <span class="kw">let </span>tmp = x2 - n0_01 * x1.powi(<span class="number">2</span>);
     <span class="kw">let </span>denom = tmp.abs().powi(<span class="number">7</span>).sqrt();
