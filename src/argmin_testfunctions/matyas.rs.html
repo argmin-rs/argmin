@@ -50,6 +50,62 @@
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -90,16 +146,72 @@
     n026 * (x1.powi(<span class="number">2</span>) + x2.powi(<span class="number">2</span>)) - n048 * x1 * x2
 }
 
+<span class="doccomment">/// Derivative of Matyas test function
+</span><span class="kw">pub fn </span>matyas_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [T; <span class="number">2</span>]
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
+
+    <span class="kw">let </span>n0_52 = T::from_f64(<span class="number">0.52</span>).unwrap();
+    <span class="kw">let </span>n0_48 = T::from_f64(<span class="number">0.48</span>).unwrap();
+
+    [n0_52 * x1 - n0_48 * x2, n0_52 * x2 - n0_48 * x1]
+}
+
+<span class="doccomment">/// Hessian of Matyas test function
+///
+/// Returns [[0.52, -0.48], [-0.48, 0.52]] for any input.
+</span><span class="kw">pub fn </span>matyas_hessian&lt;T&gt;(_param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>n0_52 = T::from_f64(<span class="number">0.52</span>).unwrap();
+    <span class="kw">let </span>n0_48 = T::from_f64(<span class="number">0.48</span>).unwrap();
+
+    [[n0_52, -n0_48], [-n0_48, n0_52]]
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>finitediff::FiniteDiff;
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
     <span class="kw">use </span>std::{f32, f64};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_matyas_optimum() {
         <span class="macro">assert_relative_eq!</span>(matyas(<span class="kw-2">&amp;</span>[<span class="number">0_f32</span>, <span class="number">0_f32</span>]), <span class="number">0.0</span>, epsilon = f32::EPSILON);
         <span class="macro">assert_relative_eq!</span>(matyas(<span class="kw-2">&amp;</span>[<span class="number">0_f64</span>, <span class="number">0_f64</span>]), <span class="number">0.0</span>, epsilon = f64::EPSILON);
+    }
+
+    <span class="macro">proptest! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_matyas_derivative(a <span class="kw">in </span>-<span class="number">10.0</span>..<span class="number">10.0</span>, b <span class="kw">in </span>-<span class="number">10.0</span>..<span class="number">10.0</span>) {
+            <span class="kw">let </span>param = [a, b];
+            <span class="kw">let </span>derivative = matyas_derivative(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| matyas(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
+                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-5</span>);
+            }
+        }
+    }
+
+    <span class="macro">proptest! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_matyas_hessian(a <span class="kw">in </span>-<span class="number">10.0</span>..<span class="number">10.0</span>, b <span class="kw">in </span>-<span class="number">10.0</span>..<span class="number">10.0</span>) {
+            <span class="kw">let </span>param = [a, b];
+            <span class="kw">let </span>hessian = matyas_hessian(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>hessian_fd = [[<span class="number">0.52</span>, -<span class="number">0.48</span>], [-<span class="number">0.48</span>, <span class="number">0.52</span>]];
+            <span class="kw">let </span>n = hessian.len();
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+                <span class="macro">assert_eq!</span>(hessian[i].len(), n);
+                <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
+                    <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = f64::EPSILON);
+                }
+            }
+        }
     }
 }
 </code></pre></div></section></main></body></html>
