@@ -76,6 +76,11 @@ mod tests {
     fn test_matyas_optimum() {
         assert_relative_eq!(matyas(&[0_f32, 0_f32]), 0.0, epsilon = f32::EPSILON);
         assert_relative_eq!(matyas(&[0_f64, 0_f64]), 0.0, epsilon = f64::EPSILON);
+
+        let deriv = matyas_derivative(&[0.0, 0.0]);
+        for i in 0..2 {
+            assert_relative_eq!(deriv[i], 0.0, epsilon = f64::EPSILON);
+        }
     }
 
     proptest! {

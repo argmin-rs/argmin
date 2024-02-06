@@ -48,7 +48,7 @@ where
     let n0_01 = T::from_f64(0.01).unwrap();
     let n10 = T::from_f64(10.0).unwrap();
     let n50 = T::from_f64(50.0).unwrap();
-    let eps = T::from_f64(std::f64::EPSILON).unwrap();
+    let eps = T::epsilon();
 
     let denom = (x2 - n0_01 * x1.powi(2)).abs().powi(3).sqrt();
     let tmp = x2 - n0_01 * x1.powi(2);
@@ -78,7 +78,7 @@ where
     let n0_0001 = T::from_f64(0.0001).unwrap();
     let n0_5 = T::from_f64(0.5).unwrap();
     let n25 = T::from_f64(25.0).unwrap();
-    let eps = T::from_f64(std::f64::EPSILON * 1e-4).unwrap();
+    let eps = T::epsilon() * T::from_f64(1e-4).unwrap();
 
     let tmp = x2 - n0_01 * x1.powi(2);
     let denom = tmp.abs().powi(7).sqrt();
