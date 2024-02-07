@@ -97,6 +97,12 @@ where
 }
 
 /// Hessian of Eggholder test function
+///
+/// This function can return NaN elements under the following conditions:
+///
+/// * |x1 - x2 - 47| <= EPS && x1 != 0
+/// * |x2 - x1 + 47| <= EPS && x1 != 0
+/// * |x1/2 + x2 + 47| <= EPS && |x2 + 47| != 0
 pub fn eggholder_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
