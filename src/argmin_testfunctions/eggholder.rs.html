@@ -253,6 +253,12 @@
 <a href="#253" id="253">253</a>
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -352,6 +358,12 @@
 }
 
 <span class="doccomment">/// Hessian of Eggholder test function
+///
+/// This function can return NaN elements under the following conditions:
+///
+/// * |x1 - x2 - 47| &lt;= EPS &amp;&amp; x1 != 0
+/// * |x2 - x1 + 47| &lt;= EPS &amp;&amp; x1 != 0
+/// * |x1/2 + x2 + 47| &lt;= EPS &amp;&amp; |x2 + 47| != 0
 </span><span class="kw">pub fn </span>eggholder_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
 <span class="kw">where
     </span>T: Float + FromPrimitive,
