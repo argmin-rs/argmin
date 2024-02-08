@@ -55,6 +55,81 @@
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -78,7 +153,7 @@
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = (x_1 + x_2).sin() + (x_1 - x_2)^2 - 1.5*x_1 + 2.5*x_2 + 1`
+/// `f(x_1, x_2) = sin(x_1 + x_2) + (x_1 - x_2)^2 - 1.5*x_1 + 2.5*x_2 + 1`
 ///
 /// where `x_1 \in [-1.5, 4]` and `x_2 \in [-3, 4]`.
 ///
@@ -93,10 +168,46 @@
         + T::from_f64(<span class="number">1.0</span>).unwrap()
 }
 
+<span class="doccomment">/// Derivative of McCorminck test function
+</span><span class="kw">pub fn </span>mccorminck_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [T; <span class="number">2</span>]
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
+
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+    <span class="kw">let </span>n3 = T::from_f64(<span class="number">3.0</span>).unwrap();
+    <span class="kw">let </span>n5 = T::from_f64(<span class="number">5.0</span>).unwrap();
+
+    [
+        (x1 + x2).cos() + n2 * (x1 - x2) - n3 / n2,
+        (x1 + x2).cos() - n2 * (x1 - x2) + n5 / n2,
+    ]
+}
+
+<span class="doccomment">/// Hessian of McCorminck test function
+</span><span class="kw">pub fn </span>mccorminck_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
+<span class="kw">where
+    </span>T: Float + FromPrimitive,
+{
+    <span class="kw">let </span>[x1, x2] = <span class="kw-2">*</span>param;
+
+    <span class="kw">let </span>n2 = T::from_f64(<span class="number">2.0</span>).unwrap();
+
+    <span class="kw">let </span>a = (x1 + x2).sin();
+
+    <span class="kw">let </span>diag = n2 - a;
+    <span class="kw">let </span>offdiag = -n2 - a;
+
+    [[diag, offdiag], [offdiag, diag]]
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>approx::assert_relative_eq;
+    <span class="kw">use </span>finitediff::FiniteDiff;
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_mccorminck_optimum() {
@@ -110,6 +221,45 @@
             -<span class="number">1.9132229544882274</span>,
             epsilon = std::f32::EPSILON.into()
         );
+
+        <span class="kw">let </span>deriv = mccorminck_derivative(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f64</span>, -<span class="number">1.54719_f64</span>]);
+        <span class="macro">println!</span>(<span class="string">&quot;1: {deriv:?}&quot;</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
+            <span class="macro">assert_relative_eq!</span>(deriv[i], <span class="number">0.0</span>, epsilon = <span class="number">1e-4</span>);
+        }
+    }
+
+    <span class="macro">proptest! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_mccorminck_derivative_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
+            <span class="kw">let </span>param = [a, b];
+            <span class="kw">let </span>derivative = mccorminck_derivative(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| mccorminck(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
+                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-6</span>);
+            }
+        }
+    }
+
+    <span class="macro">proptest! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_mccorminck_hessian_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
+            <span class="kw">let </span>param = [a, b];
+            <span class="kw">let </span>hessian = mccorminck_hessian(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>hessian_fd =
+                Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| mccorminck_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
+            <span class="kw">let </span>n = hessian.len();
+            <span class="macro">println!</span>(<span class="string">&quot;1: {hessian:?} at {a}/{b}&quot;</span>);
+            <span class="macro">println!</span>(<span class="string">&quot;2: {hessian_fd:?} at {a}/{b}&quot;</span>);
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+                <span class="macro">assert_eq!</span>(hessian[i].len(), n);
+                <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
+                    <span class="kw">if </span>hessian_fd[i][j].is_finite() {
+                        <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">1e-6</span>);
+                    }
+                }
+            }
+        }
     }
 }
 </code></pre></div></section></main></body></html>
