@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/gaussnewton/gaussnewton_linesearch.rs`."><title>gaussnewton_linesearch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/gaussnewton/gaussnewton_linesearch.rs`."><title>gaussnewton_linesearch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -478,7 +479,7 @@
     Operator, OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminDot, ArgminInv, ArgminL2Norm, ArgminMul, ArgminTranspose};
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// # Gauss-Newton method with line search
@@ -496,7 +497,7 @@
 /// Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
 /// Springer. ISBN 0-387-30303-0.
 </span><span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>GaussNewtonLS&lt;L, F&gt; {
     <span class="doccomment">/// linesearch
     </span>linesearch: L,
@@ -540,7 +541,7 @@
         <span class="kw">if </span>tol &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;Gauss-Newton-Linesearch: tol must be positive.&quot;
+                <span class="string">"Gauss-Newton-Linesearch: tol must be positive."
             </span>));
         }
         <span class="self">self</span>.tol = tol;
@@ -564,7 +565,7 @@
     F: ArgminFloat,
     R: Clone,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Gauss-Newton method with line search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Gauss-Newton method with line search"</span>;
 
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -574,8 +575,8 @@
         <span class="kw">let </span>param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
-                <span class="string">&quot;`GaussNewtonLS` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+                <span class="string">"`GaussNewtonLS` requires an initial parameter vector. "</span>,
+                <span class="string">"Please provide an initial guess via `Executor`s `configure` method."
             </span>)
         ))<span class="question-mark">?</span>;
         <span class="kw">let </span>residuals = problem.apply(<span class="kw-2">&amp;</span>param)<span class="question-mark">?</span>;
@@ -595,7 +596,7 @@
         } = Executor::new(
             LineSearchProblem::new(problem.take_problem().ok_or_else(<span class="macro">argmin_error_closure!</span>(
                 PotentialBug,
-                <span class="string">&quot;`GaussNewtonLS`: Failed to take `problem` for line search&quot;
+                <span class="string">"`GaussNewtonLS`: Failed to take `problem` for line search"
             </span>))<span class="question-mark">?</span>),
             <span class="self">self</span>.linesearch.clone(),
         )
@@ -611,7 +612,7 @@
                 .take_problem()
                 .ok_or_else(<span class="macro">argmin_error_closure!</span>(
                     PotentialBug,
-                    <span class="string">&quot;`GaussNewtonLS`: Failed to take `problem` from line search&quot;
+                    <span class="string">"`GaussNewtonLS`: Failed to take `problem` from line search"
                 </span>))<span class="question-mark">?
                 </span>.problem,
         );
@@ -624,7 +625,7 @@
                         .take_param()
                         .ok_or_else(<span class="macro">argmin_error_closure!</span>(
                             PotentialBug,
-                            <span class="string">&quot;`GaussNewtonLS`: Failed to take `param` from line search state&quot;
+                            <span class="string">"`GaussNewtonLS`: Failed to take `param` from line search state"
                         </span>))<span class="question-mark">?</span>,
                 )
                 .cost(linesearch_state.get_cost()),
@@ -642,7 +643,7 @@
 
 <span class="attr">#[doc(hidden)]
 #[derive(Clone, Default)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">struct </span>LineSearchProblem&lt;O, F&gt; {
     problem: O,
     _phantom: std::marker::PhantomData&lt;F&gt;,
@@ -692,11 +693,11 @@
 
     </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::core::ArgminError;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"_ndarrayl"</span>)]
     </span><span class="kw">use </span><span class="kw">crate</span>::core::{IterState, State};
     <span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
     <span class="kw">use crate</span>::{assert_error, test_trait_impl};
-    <span class="attr">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"_ndarrayl"</span>)]
     </span><span class="kw">use </span>approx::assert_relative_eq;
 
     <span class="macro">test_trait_impl!</span>(
@@ -736,7 +737,7 @@
         <span class="macro">assert_error!</span>(
             error,
             ArgminError,
-            <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton-Linesearch: tol must be positive.\&quot;&quot;
+            <span class="string">"Invalid parameter: \"Gauss-Newton-Linesearch: tol must be positive.\""
         </span>);
     }
 
@@ -747,11 +748,11 @@
         <span class="macro">assert_error!</span>(
             error,
             ArgminError,
-            <span class="string">&quot;Invalid parameter: \&quot;Gauss-Newton-Linesearch: tol must be positive.\&quot;&quot;
+            <span class="string">"Invalid parameter: \"Gauss-Newton-Linesearch: tol must be positive.\""
         </span>);
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"_ndarrayl"</span>)]
     #[test]
     </span><span class="kw">fn </span>test_line_search_sub_problem() {
         <span class="kw">use </span>ndarray::{Array, Array1, Array2};
@@ -799,7 +800,7 @@
         <span class="macro">assert_relative_eq!</span>(res[<span class="number">1</span>], <span class="number">2.0 </span>* <span class="number">0.5 </span>+ <span class="number">4.0 </span>* <span class="number">2.0</span>, epsilon = f64::EPSILON);
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"_ndarrayl"</span>)]
     #[test]
     </span><span class="kw">fn </span>test_next_iter_param_not_initialized() {
         <span class="kw">use </span>ndarray::{Array, Array1, Array2};
@@ -836,13 +837,13 @@
             res,
             ArgminError,
             <span class="macro">concat!</span>(
-                <span class="string">&quot;Not initialized: \&quot;`GaussNewtonLS` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+                <span class="string">"Not initialized: \"`GaussNewtonLS` requires an initial parameter vector. "</span>,
+                <span class="string">"Please provide an initial guess via `Executor`s `configure` method.\""
             </span>)
         );
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;_ndarrayl&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"_ndarrayl"</span>)]
     #[test]
     </span><span class="kw">fn </span>test_next_iter_regression() {
         <span class="kw">use </span>ndarray::{Array, Array1, Array2};

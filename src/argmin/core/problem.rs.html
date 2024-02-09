@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/problem.rs`."><title>problem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/problem.rs`."><title>problem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1062,7 +1063,7 @@
 // copied, modified, or distributed except according to those terms.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::core::{ArgminFloat, Error, SendAlias, SyncAlias};
-<span class="attr">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"rayon"</span>)]
 </span><span class="kw">use </span>rayon::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
 
@@ -1076,7 +1077,7 @@
     <span class="doccomment">/// Problem defined by user
     </span><span class="kw">pub </span>problem: <span class="prelude-ty">Option</span>&lt;O&gt;,
     <span class="doccomment">/// Keeps track of how often methods of `problem` have been called.
-    </span><span class="kw">pub </span>counts: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, u64&gt;,
+    </span><span class="kw">pub </span>counts: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u64&gt;,
 }
 
 <span class="kw">impl</span>&lt;O&gt; Problem&lt;O&gt; {
@@ -1113,8 +1114,8 @@
     /// # use argmin::core::{test_utils::TestProblem, Problem, CostFunction};
     /// # let mut problem = Problem::new(TestProblem::new());
     /// # let param = vec![1.0f64, 0.0];
-    /// let cost = problem.problem(&quot;cost_count&quot;, |problem| problem.cost(&amp;param));
-    /// # assert_eq!(problem.counts[&quot;cost_count&quot;], 1)
+    /// let cost = problem.problem("cost_count", |problem| problem.cost(&amp;param));
+    /// # assert_eq!(problem.counts["cost_count"], 1)
     /// ```
     ///
     /// This is typically used when designing a trait which optimization problems need to implement
@@ -1131,12 +1132,12 @@
     /// #
     /// # pub struct Problem&lt;O&gt; {
     /// #     pub problem: Option&lt;O&gt;,
-    /// #     pub counts: HashMap&lt;&amp;&#39;static str, u64&gt;,
+    /// #     pub counts: HashMap&lt;&amp;'static str, u64&gt;,
     /// # }
     /// # impl&lt;O&gt; Problem&lt;O&gt; {
     /// #     pub fn problem&lt;T, F: FnOnce(&amp;O) -&gt; Result&lt;T, Error&gt;&gt;(
     /// #         &amp;mut self,
-    /// #         counts_string: &amp;&#39;static str,
+    /// #         counts_string: &amp;'static str,
     /// #         func: F,
     /// #     ) -&gt; Result&lt;T, Error&gt; {
     /// #         let count = self.counts.entry(counts_string).or_insert(0);
@@ -1154,7 +1155,7 @@
     ///
     /// impl&lt;O: Anneal&gt; Problem&lt;O&gt; {
     ///     pub fn anneal(&amp;mut self, param: &amp;O::Param, extent: O::Float) -&gt; Result&lt;O::Output, Error&gt; {
-    ///         self.problem(&quot;anneal_count&quot;, |problem| problem.anneal(param, extent))
+    ///         self.problem("anneal_count", |problem| problem.anneal(param, extent))
     ///     }
     /// }
     ///
@@ -1173,7 +1174,7 @@
     /// # let mut problem = Problem { problem: Some(TestProblem {}), counts: HashMap::new() };
     /// # let param = ();
     /// let new_param = problem.anneal(&amp;param, 1.0f64);
-    /// # assert_eq!(problem.counts[&quot;anneal_count&quot;], 1)
+    /// # assert_eq!(problem.counts["anneal_count"], 1)
     /// ```
     ///
     /// Note that this will unfortunately only work inside the `argmin` crate itself due to the fact
@@ -1182,7 +1183,7 @@
     /// example.
     </span><span class="kw">pub fn </span>problem&lt;T, F: FnOnce(<span class="kw-2">&amp;</span>O) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
         func: F,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
         <span class="kw">let </span>count = <span class="self">self</span>.counts.entry(counts_string).or_insert(<span class="number">0</span>);
@@ -1198,7 +1199,7 @@
     /// Per convention, `counts_string` is chosen as `&lt;something&gt;_count`.
     </span><span class="kw">pub fn </span>bulk_problem&lt;T, F: FnOnce(<span class="kw-2">&amp;</span>O) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        counts_string: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
         num_param_vecs: usize,
         func: F,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
@@ -1244,7 +1245,7 @@
     /// let mut problem1 = Problem::new(UserDefinedProblem {});
     ///
     /// // Simulate function evaluation counts in `problem1`
-    /// problem1.counts.insert(&quot;cost_count&quot;, 2);
+    /// problem1.counts.insert("cost_count", 2);
     ///
     /// // Take the internally stored problem such that `None` remains in its place.
     /// let _ = problem1.take_problem();
@@ -1253,8 +1254,8 @@
     /// let mut problem2 = Problem::new(UserDefinedProblem {});
     ///
     /// // Simulate function evaluation counts in `problem2`
-    /// problem2.counts.insert(&quot;cost_count&quot;, 1);
-    /// problem2.counts.insert(&quot;gradient_count&quot;, 4);
+    /// problem2.counts.insert("cost_count", 1);
+    /// problem2.counts.insert("gradient_count", 4);
     ///
     /// // `problem1` consumes `problem2` by moving its internally stored user defined problem and
     /// // by merging the function evaluation counts
@@ -1264,8 +1265,8 @@
     /// assert_eq!(problem1.problem.unwrap(), UserDefinedProblem {});
     ///
     /// // The function evaluation counts have been merged
-    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);
-    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);
+    /// assert_eq!(problem1.counts["cost_count"], 3);
+    /// assert_eq!(problem1.counts["gradient_count"], 4);
     /// ```
     </span><span class="kw">pub fn </span>consume_problem(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>other: Problem&lt;O&gt;) {
         <span class="self">self</span>.problem = <span class="prelude-val">Some</span>(other.take_problem().unwrap());
@@ -1290,7 +1291,7 @@
     /// let mut problem1 = Problem::new(UserDefinedProblem1 {});
     ///
     /// // Simulate function evaluation counts in `problem1`.
-    /// problem1.counts.insert(&quot;cost_count&quot;, 2);
+    /// problem1.counts.insert("cost_count", 2);
     ///
     /// // Take the internally stored problem such that `None` remains in its place.
     /// let _ = problem1.take_problem();
@@ -1299,8 +1300,8 @@
     /// let mut problem2 = Problem::new(UserDefinedProblem2 {});
     ///
     /// // Simulate function evaluation counts in `problem2`
-    /// problem2.counts.insert(&quot;cost_count&quot;, 1);
-    /// problem2.counts.insert(&quot;gradient_count&quot;, 4);
+    /// problem2.counts.insert("cost_count", 1);
+    /// problem2.counts.insert("gradient_count", 4);
     ///
     /// // `problem1` consumes `problem2` by merging the function evaluation counts.
     /// problem1.consume_func_counts(problem2);
@@ -1309,8 +1310,8 @@
     /// assert!(problem1.problem.is_none());
     ///
     /// // The function evaluation counts have been merged.
-    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 3);
-    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 4);
+    /// assert_eq!(problem1.counts["cost_count"], 3);
+    /// assert_eq!(problem1.counts["gradient_count"], 4);
     /// ```
     </span><span class="kw">pub fn </span>consume_func_counts&lt;O2&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Problem&lt;O2&gt;) {
         <span class="kw">for </span>(k, v) <span class="kw">in </span>other.counts.iter() {
@@ -1332,17 +1333,17 @@
     /// let mut problem = Problem::new(UserDefinedProblem {});
     ///
     /// // Simulate function evaluation counts in `problem1`.
-    /// problem.counts.insert(&quot;cost_count&quot;, 2);
-    /// problem.counts.insert(&quot;gradient_count&quot;, 4);
+    /// problem.counts.insert("cost_count", 2);
+    /// problem.counts.insert("gradient_count", 4);
     ///
-    /// assert_eq!(problem.counts[&quot;cost_count&quot;], 2);
-    /// assert_eq!(problem.counts[&quot;gradient_count&quot;], 4);
+    /// assert_eq!(problem.counts["cost_count"], 2);
+    /// assert_eq!(problem.counts["gradient_count"], 4);
     ///
     /// // Set function evaluation counts to 0
     /// problem.reset();
     ///
-    /// assert_eq!(problem.counts[&quot;cost_count&quot;], 0);
-    /// assert_eq!(problem.counts[&quot;gradient_count&quot;], 0);
+    /// assert_eq!(problem.counts["cost_count"], 0);
+    /// assert_eq!(problem.counts["gradient_count"], 0);
     /// ```
     </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>(<span class="kw">_</span>, v) <span class="kw">in </span><span class="self">self</span>.counts.iter_mut() {
@@ -1571,7 +1572,7 @@
     </span><span class="kw">fn </span>c(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>::Float&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
             NotImplemented,
-            <span class="string">&quot;Method `c` of LinearProgram trait not implemented!&quot;
+            <span class="string">"Method `c` of LinearProgram trait not implemented!"
         </span>))
     }
 
@@ -1579,7 +1580,7 @@
     </span><span class="kw">fn </span>b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>::Float&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
             NotImplemented,
-            <span class="string">&quot;Method `b` of LinearProgram trait not implemented!&quot;
+            <span class="string">"Method `b` of LinearProgram trait not implemented!"
         </span>))
     }
 
@@ -1588,7 +1589,7 @@
     </span><span class="kw">fn </span>A(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;<span class="self">Self</span>::Float&gt;&gt;, Error&gt; {
         <span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
             NotImplemented,
-            <span class="string">&quot;Method `A` of LinearProgram trait not implemented!&quot;
+            <span class="string">"Method `A` of LinearProgram trait not implemented!"
         </span>))
     }
 }
@@ -1621,11 +1622,11 @@
     ///
     /// let res = problem1.apply(&amp;param);
     ///
-    /// assert_eq!(problem1.counts[&quot;operator_count&quot;], 1);
+    /// assert_eq!(problem1.counts["operator_count"], 1);
     /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
     /// ```
     </span><span class="kw">pub fn </span>apply(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Output, Error&gt; {
-        <span class="self">self</span>.problem(<span class="string">&quot;operator_count&quot;</span>, |problem| problem.apply(param))
+        <span class="self">self</span>.problem(<span class="string">"operator_count"</span>, |problem| problem.apply(param))
     }
 
     <span class="doccomment">/// Calls `bulk_apply` defined in the `Operator` trait and keeps track of the number of
@@ -1656,7 +1657,7 @@
     ///
     /// let res = problem1.bulk_apply(&amp;params);
     ///
-    /// assert_eq!(problem1.counts[&quot;operator_count&quot;], 2);
+    /// assert_eq!(problem1.counts["operator_count"], 2);
     /// # let res = res.unwrap();
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
@@ -1667,7 +1668,7 @@
         O::Output: SendAlias,
         O: SyncAlias,
     {
-        <span class="self">self</span>.bulk_problem(<span class="string">&quot;operator_count&quot;</span>, params.len(), |problem| {
+        <span class="self">self</span>.bulk_problem(<span class="string">"operator_count"</span>, params.len(), |problem| {
             problem.bulk_apply(params)
         })
     }
@@ -1702,11 +1703,11 @@
     ///
     /// let res = problem1.cost(&amp;param);
     ///
-    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 1);
+    /// assert_eq!(problem1.counts["cost_count"], 1);
     /// # assert_eq!(res.unwrap(), 4.0f64);
     /// ```
     </span><span class="kw">pub fn </span>cost(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Output, Error&gt; {
-        <span class="self">self</span>.problem(<span class="string">&quot;cost_count&quot;</span>, |problem| problem.cost(param))
+        <span class="self">self</span>.problem(<span class="string">"cost_count"</span>, |problem| problem.cost(param))
     }
 
     <span class="doccomment">/// Calls `bulk_cost` defined in the `CostFunction` trait and keeps track of the number of
@@ -1737,7 +1738,7 @@
     ///
     /// let res = problem1.bulk_cost(&amp;params);
     ///
-    /// assert_eq!(problem1.counts[&quot;cost_count&quot;], 2);
+    /// assert_eq!(problem1.counts["cost_count"], 2);
     /// # let res = res.unwrap();
     /// # assert_eq!(res[0], 4.0f64);
     /// # assert_eq!(res[1], 4.0f64);
@@ -1748,7 +1749,7 @@
         O::Output: SendAlias,
         O: SyncAlias,
     {
-        <span class="self">self</span>.bulk_problem(<span class="string">&quot;cost_count&quot;</span>, params.len(), |problem| {
+        <span class="self">self</span>.bulk_problem(<span class="string">"cost_count"</span>, params.len(), |problem| {
             problem.bulk_cost(params)
         })
     }
@@ -1783,11 +1784,11 @@
     ///
     /// let res = problem1.gradient(&amp;param);
     ///
-    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 1);
+    /// assert_eq!(problem1.counts["gradient_count"], 1);
     /// # assert_eq!(res.unwrap(), vec![1.0f64, 1.0f64]);
     /// ```
     </span><span class="kw">pub fn </span>gradient(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Gradient, Error&gt; {
-        <span class="self">self</span>.problem(<span class="string">&quot;gradient_count&quot;</span>, |problem| problem.gradient(param))
+        <span class="self">self</span>.problem(<span class="string">"gradient_count"</span>, |problem| problem.gradient(param))
     }
 
     <span class="doccomment">/// Calls `bulk_gradient` defined in the `Gradient` trait and keeps track of the number of
@@ -1818,7 +1819,7 @@
     ///
     /// let res = problem1.bulk_gradient(&amp;params);
     ///
-    /// assert_eq!(problem1.counts[&quot;gradient_count&quot;], 2);
+    /// assert_eq!(problem1.counts["gradient_count"], 2);
     /// # let res = res.unwrap();
     /// # assert_eq!(res[0], vec![1.0f64, 1.0f64]);
     /// # assert_eq!(res[1], vec![1.0f64, 1.0f64]);
@@ -1829,7 +1830,7 @@
         O::Gradient: SendAlias,
         O: SyncAlias,
     {
-        <span class="self">self</span>.bulk_problem(<span class="string">&quot;gradient_count&quot;</span>, params.len(), |problem| {
+        <span class="self">self</span>.bulk_problem(<span class="string">"gradient_count"</span>, params.len(), |problem| {
             problem.bulk_gradient(params)
         })
     }
@@ -1863,11 +1864,11 @@
     ///
     /// let res = problem1.hessian(&amp;param);
     ///
-    /// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 1);
+    /// assert_eq!(problem1.counts["hessian_count"], 1);
     /// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
     </span><span class="kw">pub fn </span>hessian(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Hessian, Error&gt; {
-        <span class="self">self</span>.problem(<span class="string">&quot;hessian_count&quot;</span>, |problem| problem.hessian(param))
+        <span class="self">self</span>.problem(<span class="string">"hessian_count"</span>, |problem| problem.hessian(param))
     }
 
     <span class="doccomment">/// Calls `bulk_hessian` defined in the `Hessian` trait and keeps track of the number of
@@ -1898,7 +1899,7 @@
     ///
     /// let res = problem1.bulk_hessian(&amp;params);
     ///
-    /// assert_eq!(problem1.counts[&quot;hessian_count&quot;], 2);
+    /// assert_eq!(problem1.counts["hessian_count"], 2);
     /// # let res = res.unwrap();
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
@@ -1909,7 +1910,7 @@
         O::Hessian: SendAlias,
         O: SyncAlias,
     {
-        <span class="self">self</span>.bulk_problem(<span class="string">&quot;hessian_count&quot;</span>, params.len(), |problem| {
+        <span class="self">self</span>.bulk_problem(<span class="string">"hessian_count"</span>, params.len(), |problem| {
             problem.bulk_hessian(params)
         })
     }
@@ -1944,11 +1945,11 @@
     ///
     /// let res = problem1.jacobian(&amp;param);
     ///
-    /// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 1);
+    /// assert_eq!(problem1.counts["jacobian_count"], 1);
     /// # assert_eq!(res.unwrap(), vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// ```
     </span><span class="kw">pub fn </span>jacobian(<span class="kw-2">&amp;mut </span><span class="self">self</span>, param: <span class="kw-2">&amp;</span>O::Param) -&gt; <span class="prelude-ty">Result</span>&lt;O::Jacobian, Error&gt; {
-        <span class="self">self</span>.problem(<span class="string">&quot;jacobian_count&quot;</span>, |problem| problem.jacobian(param))
+        <span class="self">self</span>.problem(<span class="string">"jacobian_count"</span>, |problem| problem.jacobian(param))
     }
 
     <span class="doccomment">/// Calls `bulk_jacobian` defined in the `Jacobian` trait and keeps track of the number of
@@ -1977,7 +1978,7 @@
     ///
     /// let res = problem1.bulk_jacobian(&amp;params);
     ///
-    /// assert_eq!(problem1.counts[&quot;jacobian_count&quot;], 2);
+    /// assert_eq!(problem1.counts["jacobian_count"], 2);
     /// # let res = res.unwrap();
     /// # assert_eq!(res[0], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
     /// # assert_eq!(res[1], vec![vec![1.0f64, 0.0f64], vec![0.0f64, 1.0f64]]);
@@ -1988,7 +1989,7 @@
         O::Jacobian: SendAlias,
         O: SyncAlias,
     {
-        <span class="self">self</span>.bulk_problem(<span class="string">&quot;jacobian_count&quot;</span>, params.len(), |problem| {
+        <span class="self">self</span>.bulk_problem(<span class="string">"jacobian_count"</span>, params.len(), |problem| {
             problem.bulk_jacobian(params)
         })
     }

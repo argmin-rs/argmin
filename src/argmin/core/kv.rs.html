@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/kv.rs`."><title>kv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/kv.rs`."><title>kv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -458,7 +459,7 @@
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::fmt::{Debug, Display};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// Types available for use in [`KV`](KV).
@@ -489,14 +490,14 @@
 /// let x: KvValue = true.into();
 /// assert_eq!(x, KvValue::Bool(true));
 ///
-/// let x: KvValue = &quot;a str&quot;.into();
-/// assert_eq!(x, KvValue::Str(&quot;a str&quot;.to_string()));
+/// let x: KvValue = "a str".into();
+/// assert_eq!(x, KvValue::Str("a str".to_string()));
 ///
-/// let x: KvValue = &quot;a String&quot;.to_string().into();
-/// assert_eq!(x, KvValue::Str(&quot;a String&quot;.to_string()));
+/// let x: KvValue = "a String".to_string().into();
+/// assert_eq!(x, KvValue::Str("a String".to_string()));
 /// ```
 </span><span class="attr">#[derive(Clone, PartialEq, Debug)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub enum </span>KvValue {
     <span class="doccomment">/// Floating point values
     </span>Float(f64),
@@ -517,19 +518,19 @@
     ///
     /// ```
     /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Float(1.0).kind(), &quot;Float&quot;);
-    /// assert_eq!(KvValue::Int(1).kind(), &quot;Int&quot;);
-    /// assert_eq!(KvValue::Uint(1).kind(), &quot;Uint&quot;);
-    /// assert_eq!(KvValue::Bool(true).kind(), &quot;Bool&quot;);
-    /// assert_eq!(KvValue::Str(&quot;string&quot;.to_string()).kind(), &quot;Str&quot;);
+    /// assert_eq!(KvValue::Float(1.0).kind(), "Float");
+    /// assert_eq!(KvValue::Int(1).kind(), "Int");
+    /// assert_eq!(KvValue::Uint(1).kind(), "Uint");
+    /// assert_eq!(KvValue::Bool(true).kind(), "Bool");
+    /// assert_eq!(KvValue::Str("string".to_string()).kind(), "Str");
     /// ```
-    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Float(<span class="kw">_</span>) =&gt; <span class="string">&quot;Float&quot;</span>,
-            KvValue::Int(<span class="kw">_</span>) =&gt; <span class="string">&quot;Int&quot;</span>,
-            KvValue::Uint(<span class="kw">_</span>) =&gt; <span class="string">&quot;Uint&quot;</span>,
-            KvValue::Bool(<span class="kw">_</span>) =&gt; <span class="string">&quot;Bool&quot;</span>,
-            KvValue::Str(<span class="kw">_</span>) =&gt; <span class="string">&quot;Str&quot;</span>,
+            KvValue::Float(<span class="kw">_</span>) =&gt; <span class="string">"Float"</span>,
+            KvValue::Int(<span class="kw">_</span>) =&gt; <span class="string">"Int"</span>,
+            KvValue::Uint(<span class="kw">_</span>) =&gt; <span class="string">"Uint"</span>,
+            KvValue::Bool(<span class="kw">_</span>) =&gt; <span class="string">"Bool"</span>,
+            KvValue::Str(<span class="kw">_</span>) =&gt; <span class="string">"Str"</span>,
         }
     }
 
@@ -550,7 +551,7 @@
     /// assert_eq!(KvValue::Int(1).get_float(), Some(1.0));
     /// assert_eq!(KvValue::Uint(1).get_float(), Some(1.0));
     /// assert_eq!(KvValue::Bool(true).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Str(&quot;not a number&quot;.to_string()).get_float(), None);
+    /// assert_eq!(KvValue::Str("not a number".to_string()).get_float(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
         <span class="kw">match </span><span class="self">self </span>{
@@ -575,7 +576,7 @@
     /// assert_eq!(KvValue::Float(1.0).get_int(), None);
     /// assert_eq!(KvValue::Uint(1).get_int(), None);
     /// assert_eq!(KvValue::Bool(true).get_int(), None);
-    /// assert_eq!(KvValue::Str(&quot;not an int&quot;.to_string()).get_int(), None);
+    /// assert_eq!(KvValue::Str("not an int".to_string()).get_int(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
         <span class="kw">if let </span>KvValue::Int(x) = <span class="kw-2">*</span><span class="self">self </span>{
@@ -597,7 +598,7 @@
     /// assert_eq!(KvValue::Int(1).get_uint(), None);
     /// assert_eq!(KvValue::Float(1.0).get_uint(), None);
     /// assert_eq!(KvValue::Bool(true).get_uint(), None);
-    /// assert_eq!(KvValue::Str(&quot;not an uint&quot;.to_string()).get_uint(), None);
+    /// assert_eq!(KvValue::Str("not an uint".to_string()).get_uint(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_uint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
         <span class="kw">if let </span>KvValue::Uint(x) = <span class="kw-2">*</span><span class="self">self </span>{
@@ -619,7 +620,7 @@
     /// assert_eq!(KvValue::Float(1.0).get_bool(), None);
     /// assert_eq!(KvValue::Int(1).get_bool(), None);
     /// assert_eq!(KvValue::Uint(1).get_bool(), None);
-    /// assert_eq!(KvValue::Str(&quot;not a bool&quot;.to_string()).get_bool(), None);
+    /// assert_eq!(KvValue::Str("not a bool".to_string()).get_bool(), None);
     /// ```
     </span><span class="kw">pub fn </span>get_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
         <span class="kw">if let </span>KvValue::Bool(x) = <span class="kw-2">*</span><span class="self">self </span>{
@@ -637,7 +638,7 @@
     ///
     /// ```
     /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Str(&quot;a string&quot;.to_string()).get_string(), Some(&quot;a string&quot;.to_string()));
+    /// assert_eq!(KvValue::Str("a string".to_string()).get_string(), Some("a string".to_string()));
     /// assert_eq!(KvValue::Float(1.0).get_string(), None);
     /// assert_eq!(KvValue::Int(1).get_string(), None);
     /// assert_eq!(KvValue::Uint(1).get_string(), None);
@@ -657,19 +658,19 @@
     ///
     /// ```
     /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Str(&quot;a string&quot;.to_string()).as_string(), &quot;a string&quot;.to_string());
-    /// assert_eq!(KvValue::Float(1.0).as_string(), &quot;1&quot;.to_string());
-    /// assert_eq!(KvValue::Int(1).as_string(), &quot;1&quot;.to_string());
-    /// assert_eq!(KvValue::Uint(1).as_string(), &quot;1&quot;.to_string());
-    /// assert_eq!(KvValue::Bool(true).as_string(), &quot;true&quot;.to_string());
+    /// assert_eq!(KvValue::Str("a string".to_string()).as_string(), "a string".to_string());
+    /// assert_eq!(KvValue::Float(1.0).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Int(1).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Uint(1).as_string(), "1".to_string());
+    /// assert_eq!(KvValue::Bool(true).as_string(), "true".to_string());
     /// ```
     </span><span class="kw">pub fn </span>as_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             KvValue::Str(x) =&gt; x.clone(),
-            KvValue::Float(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
-            KvValue::Bool(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
-            KvValue::Int(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
-            KvValue::Uint(x) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{x}&quot;</span>),
+            KvValue::Float(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+            KvValue::Bool(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+            KvValue::Int(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+            KvValue::Uint(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
         }
     }
 }
@@ -722,8 +723,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; KvValue {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>KvValue {
+    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; KvValue {
         KvValue::Str(x.to_string())
     }
 }
@@ -731,11 +732,11 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>KvValue {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KvValue::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KvValue::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KvValue::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
-            KvValue::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{x}&quot;</span>)<span class="question-mark">?</span>,
+            KvValue::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+            KvValue::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+            KvValue::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+            KvValue::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+            KvValue::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
         };
         <span class="prelude-val">Ok</span>(())
     }
@@ -743,7 +744,7 @@
 
 <span class="doccomment">/// A simple key-value storage
 ///
-/// Keeps pairs of `(&amp;&#39;static str, KvValue)` and is used to pass key-value pairs to
+/// Keeps pairs of `(&amp;'static str, KvValue)` and is used to pass key-value pairs to
 /// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
 /// Typically constructed using the [`kv!`](`crate::kv`) macro.
 ///
@@ -753,17 +754,17 @@
 /// use argmin::kv;
 ///
 /// let kv = kv!(
-///     &quot;key1&quot; =&gt; &quot;value1&quot;;
-///     &quot;key2&quot; =&gt; &quot;value2&quot;;
-///     &quot;key3&quot; =&gt; 1234;
+///     "key1" =&gt; "value1";
+///     "key2" =&gt; "value2";
+///     "key3" =&gt; 1234;
 /// );
 /// # assert_eq!(kv.kv.len(), 3);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);
+/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
+/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
+/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
 </span><span class="attr">#[derive(Clone, Default, PartialEq)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>KV {
     <span class="doccomment">/// The actual key value storage
     </span><span class="kw">pub </span>kv: HashMap&lt;String, KvValue&gt;,
@@ -771,15 +772,15 @@
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>KV {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">writeln!</span>(f, <span class="string">&quot;{self}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">"{self}"</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 <span class="kw">impl </span>Display <span class="kw">for </span>KV {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">writeln!</span>(f, <span class="string">&quot;KV&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">"KV"</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>(key, val) <span class="kw">in </span><span class="self">self</span>.kv.iter() {
-            <span class="macro">writeln!</span>(f, <span class="string">&quot;   {key}: {val}&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">writeln!</span>(f, <span class="string">"   {key}: {val}"</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -807,11 +808,11 @@
     /// ```
     /// # use argmin::core::{KV, KvValue};
     /// let mut kv = KV::new();
-    /// kv.insert(&quot;key1&quot;, KvValue::Str(&quot;value&quot;.to_string()));
-    /// kv.insert(&quot;key2&quot;, KvValue::Int(1234));
+    /// kv.insert("key1", KvValue::Str("value".to_string()));
+    /// kv.insert("key2", KvValue::Int(1234));
     /// # assert_eq!(kv.kv.len(), 2);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value&quot;);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;1234&quot;);
+    /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
+    /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
     /// ```
     </span><span class="kw">pub fn </span>insert&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: T, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.kv.insert(key.as_ref().into(), val);
@@ -827,10 +828,10 @@
     /// ```
     /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KvValue::Float(12.0));
+    /// kv1.insert("key1", KvValue::Float(12.0));
     ///
-    /// assert_eq!(kv1.get(&quot;key1&quot;), Some(&amp;KvValue::Float(12.0)));
-    /// assert_eq!(kv1.get(&quot;non_existing&quot;), None);
+    /// assert_eq!(kv1.get("key1"), Some(&amp;KvValue::Float(12.0)));
+    /// assert_eq!(kv1.get("non_existing"), None);
     /// ```
     </span><span class="kw">pub fn </span>get&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
         <span class="self">self</span>.kv.get(key.as_ref())
@@ -843,11 +844,11 @@
     /// ```
     /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KvValue::Str(&quot;value1&quot;.to_string()));
+    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
     ///
-    /// assert_eq!(kv1.keys(), vec![(&quot;key1&quot;.to_string(), &quot;Str&quot;)]);
+    /// assert_eq!(kv1.keys(), vec![("key1".to_string(), "Str")]);
     /// ```
-    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt; {
+    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str)&gt; {
         <span class="self">self</span>.kv.iter().map(|(k, v)| (k.clone(), v.kind())).collect()
     }
 
@@ -858,19 +859,19 @@
     /// ```
     /// # use argmin::core::{KV, KvValue};
     /// let mut kv1 = KV::new();
-    /// kv1.insert(&quot;key1&quot;, KvValue::Str(&quot;value1&quot;.to_string()));
+    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
     /// # assert_eq!(kv1.kv.len(), 1);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv1.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
+    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
     ///
     /// let mut kv2 = KV::new();
-    /// kv2.insert(&quot;key2&quot;, KvValue::Str(&quot;value2&quot;.to_string()));
+    /// kv2.insert("key2", KvValue::Str("value2".to_string()));
     /// # assert_eq!(kv2.kv.len(), 1);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv2.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
+    /// # assert_eq!(format!("{}", kv2.get("key2").unwrap()), "value2");
     ///
     /// let kv1 = kv1.merge(kv2);
     /// # assert_eq!(kv1.kv.len(), 2);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv1.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
-    /// # assert_eq!(format!(&quot;{}&quot;, kv1.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
+    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
+    /// # assert_eq!(format!("{}", kv1.get("key2").unwrap()), "value2");
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, other: KV) -&gt; <span class="self">Self </span>{
@@ -879,8 +880,8 @@
     </span>}
 }
 
-<span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>c = KV::new();
         <span class="kw">for </span>i <span class="kw">in </span>iter {
             c.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
@@ -889,8 +890,8 @@
     }
 }
 
-<span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, KvValue)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+<span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
         <span class="kw">for </span>i <span class="kw">in </span>iter {
             <span class="self">self</span>.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
         }

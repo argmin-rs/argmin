@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/neldermead/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/neldermead/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -893,7 +894,7 @@
     TerminationStatus, KV,
 };
 <span class="kw">use </span>argmin_math::{ArgminAdd, ArgminMul, ArgminSub};
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt;
 
@@ -929,7 +930,7 @@
 ///
 /// &lt;http://www.scholarpedia.org/article/Nelder-Mead_algorithm#Simplex_transformation_algorithm&gt;
 </span><span class="attr">#[derive(Clone)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>NelderMead&lt;P, F&gt; {
     <span class="doccomment">/// alpha
     </span>alpha: F,
@@ -993,7 +994,7 @@
         <span class="kw">if </span>tol &lt; <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;`Nelder-Mead`: sd_tolerance must be &gt;= 0.&quot;
+                <span class="string">"`Nelder-Mead`: sd_tolerance must be &gt;= 0."
             </span>));
         }
         <span class="self">self</span>.sd_tolerance = tol;
@@ -1020,7 +1021,7 @@
         <span class="kw">if </span>alpha &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;`Nelder-Mead`: alpha must be &gt; 0.&quot;
+                <span class="string">"`Nelder-Mead`: alpha must be &gt; 0."
             </span>));
         }
         <span class="self">self</span>.alpha = alpha;
@@ -1047,7 +1048,7 @@
         <span class="kw">if </span>gamma &lt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;`Nelder-Mead`: gamma must be &gt; 1.&quot;
+                <span class="string">"`Nelder-Mead`: gamma must be &gt; 1."
             </span>));
         }
         <span class="self">self</span>.gamma = gamma;
@@ -1074,7 +1075,7 @@
         <span class="kw">if </span>rho &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || rho &gt; <span class="macro">float!</span>(<span class="number">0.5</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;`Nelder-Mead`: rho must be in (0, 0.5].&quot;
+                <span class="string">"`Nelder-Mead`: rho must be in (0, 0.5]."
             </span>));
         }
         <span class="self">self</span>.rho = rho;
@@ -1101,7 +1102,7 @@
         <span class="kw">if </span>sigma &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || sigma &gt; <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;`Nelder-Mead`: sigma must be in (0, 1].&quot;
+                <span class="string">"`Nelder-Mead`: sigma must be in (0, 1]."
             </span>));
         }
         <span class="self">self</span>.sigma = sigma;
@@ -1177,11 +1178,11 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Action {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            Action::Reflection =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Reflection&quot;</span>),
-            Action::Expansion =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expansion&quot;</span>),
-            Action::ContractionOutside =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ContractionOutside&quot;</span>),
-            Action::ContractionInside =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ContractionInside&quot;</span>),
-            Action::Shrink =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Shrink&quot;</span>),
+            Action::Reflection =&gt; <span class="macro">write!</span>(f, <span class="string">"Reflection"</span>),
+            Action::Expansion =&gt; <span class="macro">write!</span>(f, <span class="string">"Expansion"</span>),
+            Action::ContractionOutside =&gt; <span class="macro">write!</span>(f, <span class="string">"ContractionOutside"</span>),
+            Action::ContractionInside =&gt; <span class="macro">write!</span>(f, <span class="string">"ContractionInside"</span>),
+            Action::Shrink =&gt; <span class="macro">write!</span>(f, <span class="string">"Shrink"</span>),
         }
     }
 }
@@ -1192,7 +1193,7 @@
     P: Clone + ArgminSub&lt;P, P&gt; + ArgminAdd&lt;P, P&gt; + ArgminMul&lt;F, P&gt;,
     F: ArgminFloat + std::iter::Sum&lt;F&gt;,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Nelder-Mead method&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Nelder-Mead method"</span>;
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -1271,7 +1272,7 @@
         } <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 PotentialBug,
-                <span class="string">&quot;`NelderMead`: Reached unreachable point.&quot;
+                <span class="string">"`NelderMead`: Reached unreachable point."
             </span>));
         };
 
@@ -1279,7 +1280,7 @@
 
         <span class="prelude-val">Ok</span>((
             state.param(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">0</span>.clone()).cost(<span class="self">self</span>.params[<span class="number">0</span>].<span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">&quot;action&quot; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{action}&quot;</span>);)),
+            <span class="prelude-val">Some</span>(<span class="macro">kv!</span>(<span class="string">"action" </span>=&gt; <span class="macro">format!</span>(<span class="string">"{action}"</span>);)),
         ))
     }
 
@@ -1367,8 +1368,8 @@
                 res,
                 ArgminError,
                 <span class="macro">concat!</span>(
-                    <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;sd_tolerance must be &gt;= 0.\&quot;&quot;
+                    <span class="string">"Invalid parameter: \"`Nelder-Mead`: "</span>,
+                    <span class="string">"sd_tolerance must be &gt;= 0.\""
                 </span>)
             );
         }
@@ -1396,8 +1397,8 @@
                 res,
                 ArgminError,
                 <span class="macro">concat!</span>(
-                    <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;alpha must be &gt; 0.\&quot;&quot;
+                    <span class="string">"Invalid parameter: \"`Nelder-Mead`: "</span>,
+                    <span class="string">"alpha must be &gt; 0.\""
                 </span>)
             );
         }
@@ -1425,8 +1426,8 @@
                 res,
                 ArgminError,
                 <span class="macro">concat!</span>(
-                    <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;rho must be in (0, 0.5].\&quot;&quot;
+                    <span class="string">"Invalid parameter: \"`Nelder-Mead`: "</span>,
+                    <span class="string">"rho must be in (0, 0.5].\""
                 </span>)
             );
         }
@@ -1454,8 +1455,8 @@
                 res,
                 ArgminError,
                 <span class="macro">concat!</span>(
-                    <span class="string">&quot;Invalid parameter: \&quot;`Nelder-Mead`: &quot;</span>,
-                    <span class="string">&quot;sigma must be in (0, 1].\&quot;&quot;
+                    <span class="string">"Invalid parameter: \"`Nelder-Mead`: "</span>,
+                    <span class="string">"sigma must be in (0, 1].\""
                 </span>)
             );
         }
@@ -1598,8 +1599,8 @@
         <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
-            <span class="string">&quot;Reflection&quot;
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, kv.unwrap().get(<span class="string">"action"</span>).unwrap()),
+            <span class="string">"Reflection"
         </span>);
 
         <span class="kw">let </span>param = state.get_param().unwrap();
@@ -1628,7 +1629,7 @@
         <span class="kw">let </span>params: Vec&lt;Vec&lt;f64&gt;&gt; = <span class="macro">vec!</span>[
             <span class="macro">vec!</span>[-<span class="number">2.0</span>, <span class="number">0.0</span>],
             <span class="macro">vec!</span>[-<span class="number">1.0</span>, <span class="number">1.0</span>],
-            <span class="comment">// make sure that the last to vectors don&#39;t evaluate to the same cost function value
+            <span class="comment">// make sure that the last to vectors don't evaluate to the same cost function value
             // which may cause strangeness in the sorting.
             // Check this again if this test starts failing randomly...
             </span><span class="macro">vec!</span>[-<span class="number">1.0</span>, -<span class="number">1.0 </span>- f64::EPSILON],
@@ -1641,8 +1642,8 @@
         <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
-            <span class="string">&quot;Expansion&quot;
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, kv.unwrap().get(<span class="string">"action"</span>).unwrap()),
+            <span class="string">"Expansion"
         </span>);
 
         <span class="kw">let </span>param = state.get_param().unwrap();
@@ -1677,8 +1678,8 @@
         <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
-            <span class="string">&quot;ContractionOutside&quot;
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, kv.unwrap().get(<span class="string">"action"</span>).unwrap()),
+            <span class="string">"ContractionOutside"
         </span>);
 
         <span class="kw">let </span>param = state.get_param().unwrap();
@@ -1713,8 +1714,8 @@
         <span class="kw">let </span>(state, kv) = nm.next_iter(<span class="kw-2">&amp;mut </span>problem, state).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, kv.unwrap().get(<span class="string">&quot;action&quot;</span>).unwrap()),
-            <span class="string">&quot;ContractionInside&quot;
+            <span class="macro">format!</span>(<span class="string">"{}"</span>, kv.unwrap().get(<span class="string">"action"</span>).unwrap()),
+            <span class="string">"ContractionInside"
         </span>);
 
         <span class="kw">let </span>param = state.get_param().unwrap();

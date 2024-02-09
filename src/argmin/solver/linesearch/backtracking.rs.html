@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/linesearch/backtracking.rs`."><title>backtracking.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/solver/linesearch/backtracking.rs`."><title>backtracking.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -723,7 +724,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::solver::linesearch::condition::<span class="kw-2">*</span>;
 <span class="kw">use </span>argmin_math::ArgminScaledAdd;
-<span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
 </span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// # Backtracking line search
@@ -742,7 +743,7 @@
 ///
 /// Wikipedia: &lt;https://en.wikipedia.org/wiki/Backtracking_line_search&gt;
 </span><span class="attr">#[derive(Clone, Eq, PartialEq, Debug)]
-#[cfg_attr(feature = <span class="string">&quot;serde1&quot;</span>, derive(Serialize, Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
 </span><span class="kw">pub struct </span>BacktrackingLineSearch&lt;P, G, L, F&gt; {
     <span class="doccomment">/// initial parameter vector
     </span>init_param: <span class="prelude-ty">Option</span>&lt;P&gt;,
@@ -808,7 +809,7 @@
         <span class="kw">if </span>rho &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) || rho &gt;= <span class="macro">float!</span>(<span class="number">1.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).&quot;
+                <span class="string">"BacktrackingLineSearch: Contraction factor rho must be in (0, 1)."
             </span>));
         }
         <span class="self">self</span>.rho = rho;
@@ -830,7 +831,7 @@
         <span class="kw">if </span>alpha &lt;= <span class="macro">float!</span>(<span class="number">0.0</span>) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 InvalidParameter,
-                <span class="string">&quot;LineSearch: Initial alpha must be &gt; 0.&quot;
+                <span class="string">"LineSearch: Initial alpha must be &gt; 0."
             </span>));
         }
         <span class="self">self</span>.alpha = alpha;
@@ -860,7 +861,7 @@
             .as_ref()
             .ok_or_else(<span class="macro">argmin_error_closure!</span>(
                 PotentialBug,
-                <span class="string">&quot;`BacktrackingLineSearch`: Initial parameter vector not set.&quot;
+                <span class="string">"`BacktrackingLineSearch`: Initial parameter vector not set."
             </span>))<span class="question-mark">?
             </span>.scaled_add(
                 <span class="kw-2">&amp;</span><span class="self">self</span>.alpha,
@@ -868,7 +869,7 @@
                     .as_ref()
                     .ok_or_else(<span class="macro">argmin_error_closure!</span>(
                         PotentialBug,
-                        <span class="string">&quot;`BacktrackingLineSearch`: Search direction not set.&quot;
+                        <span class="string">"`BacktrackingLineSearch`: Search direction not set."
                     </span>))<span class="question-mark">?</span>,
             );
 
@@ -895,7 +896,7 @@
     L: LineSearchCondition&lt;G, G, F&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Backtracking line search&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Backtracking line search"</span>;
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -905,15 +906,15 @@
         <span class="kw">if </span><span class="self">self</span>.search_direction.is_none() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">argmin_error!</span>(
                 NotInitialized,
-                <span class="string">&quot;BacktrackingLineSearch: search_direction must be set.&quot;
+                <span class="string">"BacktrackingLineSearch: search_direction must be set."
             </span>));
         }
 
         <span class="kw">let </span>init_param = state.take_param().ok_or_else(<span class="macro">argmin_error_closure!</span>(
             NotInitialized,
             <span class="macro">concat!</span>(
-                <span class="string">&quot;`BacktrackingLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.&quot;
+                <span class="string">"`BacktrackingLineSearch` requires an initial parameter vector. "</span>,
+                <span class="string">"Please provide an initial guess via `Executor`s `configure` method."
             </span>)
         ))<span class="question-mark">?</span>;
 
@@ -1021,7 +1022,7 @@
         <span class="macro">assert_error!</span>(
             ls.rho(<span class="number">1.0f64</span>),
             ArgminError,
-            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;
+            <span class="string">"Invalid parameter: \"BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\""
         </span>);
 
         <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
@@ -1032,7 +1033,7 @@
         <span class="macro">assert_error!</span>(
             ls.rho(<span class="number">0.0f64</span>),
             ArgminError,
-            <span class="string">&quot;Invalid parameter: \&quot;BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\&quot;&quot;
+            <span class="string">"Invalid parameter: \"BacktrackingLineSearch: Contraction factor rho must be in (0, 1).\""
         </span>);
 
         <span class="kw">let </span>c: f64 = <span class="number">0.01</span>;
@@ -1073,7 +1074,7 @@
         <span class="macro">assert_error!</span>(
             ls.initial_step_length(<span class="number">0.0f64</span>),
             ArgminError,
-            <span class="string">&quot;Invalid parameter: \&quot;LineSearch: Initial alpha must be &gt; 0.\&quot;&quot;
+            <span class="string">"Invalid parameter: \"LineSearch: Initial alpha must be &gt; 0.\""
         </span>);
     }
 
@@ -1087,8 +1088,8 @@
             res,
             ArgminError,
             <span class="macro">concat!</span>(
-                <span class="string">&quot;Not initialized: \&quot;`BacktrackingLineSearch` requires an initial parameter vector. &quot;</span>,
-                <span class="string">&quot;Please provide an initial guess via `Executor`s `configure` method.\&quot;&quot;
+                <span class="string">"Not initialized: \"`BacktrackingLineSearch` requires an initial parameter vector. "</span>,
+                <span class="string">"Please provide an initial guess via `Executor`s `configure` method.\""
             </span>)
         );
     }
@@ -1179,7 +1180,7 @@
                 IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+            <span class="string">"Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         </span>);
 
         ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
@@ -1226,7 +1227,7 @@
                 IterState::new().param(ls.init_param.clone().unwrap())
             ),
             ArgminError,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+            <span class="string">"Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         </span>);
 
         ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
@@ -1346,7 +1347,7 @@
                 .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
                 .run(),
             ArgminError,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+            <span class="string">"Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         </span>);
 
         ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
@@ -1364,8 +1365,8 @@
         <span class="macro">assert_relative_eq!</span>(data.get_cost(), <span class="number">0.6</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
         <span class="macro">assert_eq!</span>(data.iter, <span class="number">0</span>);
         <span class="kw">let </span>func_counts = data.get_func_counts();
-        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">"cost_count"</span>], <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">"gradient_count"</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
             data.termination_status,
             TerminationStatus::Terminated(TerminationReason::SolverConverged)
@@ -1395,7 +1396,7 @@
                 .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(<span class="number">10</span>))
                 .run(),
             ArgminError,
-            <span class="string">&quot;Not initialized: \&quot;BacktrackingLineSearch: search_direction must be set.\&quot;&quot;
+            <span class="string">"Not initialized: \"BacktrackingLineSearch: search_direction must be set.\""
         </span>);
 
         ls.search_direction(<span class="macro">vec!</span>[<span class="number">2.0f64</span>, <span class="number">0.0</span>]);
@@ -1413,8 +1414,8 @@
         <span class="macro">assert_relative_eq!</span>(data.get_cost(), <span class="number">0.44f64</span>.powi(<span class="number">2</span>), epsilon = f64::EPSILON);
         <span class="macro">assert_eq!</span>(data.iter, <span class="number">1</span>);
         <span class="kw">let </span>func_counts = data.get_func_counts();
-        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;cost_count&quot;</span>], <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(func_counts[<span class="string">&quot;gradient_count&quot;</span>], <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">"cost_count"</span>], <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(func_counts[<span class="string">"gradient_count"</span>], <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
             data.termination_status,
             TerminationStatus::Terminated(TerminationReason::SolverConverged)

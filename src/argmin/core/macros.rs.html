@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -227,14 +228,14 @@
 /// use argmin::kv;
 ///
 /// let kv = kv!(
-///     &quot;key1&quot; =&gt; &quot;value1&quot;;
-///     &quot;key2&quot; =&gt; &quot;value2&quot;;
-///     &quot;key3&quot; =&gt; 1234;
+///     "key1" =&gt; "value1";
+///     "key2" =&gt; "value2";
+///     "key3" =&gt; 1234;
 /// );
 /// # assert_eq!(kv.kv.len(), 3);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key1&quot;).unwrap()), &quot;value1&quot;);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key2&quot;).unwrap()), &quot;value2&quot;);
-/// # assert_eq!(format!(&quot;{}&quot;, kv.get(&quot;key3&quot;).unwrap()), &quot;1234&quot;);
+/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
+/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
+/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>kv {
@@ -300,18 +301,18 @@
     (<span class="macro-nonterminal">$method_name</span>:tt, <span class="macro-nonterminal">$input</span>:ty, <span class="macro-nonterminal">$output</span>:ty) =&gt; {
         <span class="macro">paste::item! </span>{
             <span class="attr">#[doc = <span class="macro">concat!</span>(
-                <span class="string">&quot;Compute `&quot;</span>,
+                <span class="string">"Compute `"</span>,
                 <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
-                <span class="string">&quot;` in bulk. &quot;</span>,
-                <span class="string">&quot;If the `rayon` feature is enabled, multiple calls to `&quot;</span>,
+                <span class="string">"` in bulk. "</span>,
+                <span class="string">"If the `rayon` feature is enabled, multiple calls to `"</span>,
                 <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
-                <span class="string">&quot;` will be run in parallel using `rayon`, otherwise they will execute &quot;</span>,
-                <span class="string">&quot;sequentially. If the `rayon` feature is enabled, parallelization can still be &quot;</span>,
-                <span class="string">&quot;turned off by overwriting `parallelize` to return `false`. This can be useful &quot;</span>,
-                <span class="string">&quot;in cases where it is preferable to parallelize only certain parts. &quot;</span>,
-                <span class="string">&quot;Note that even if `parallelize` is set to false, the parameter vectors and the &quot;</span>,
-                <span class="string">&quot;problem are still required to be `Send` and `Sync`. Those bounds are linked to &quot;</span>,
-                <span class="string">&quot;the `rayon` feature. This method can be overwritten.&quot;</span>,
+                <span class="string">"` will be run in parallel using `rayon`, otherwise they will execute "</span>,
+                <span class="string">"sequentially. If the `rayon` feature is enabled, parallelization can still be "</span>,
+                <span class="string">"turned off by overwriting `parallelize` to return `false`. This can be useful "</span>,
+                <span class="string">"in cases where it is preferable to parallelize only certain parts. "</span>,
+                <span class="string">"Note that even if `parallelize` is set to false, the parameter vectors and the "</span>,
+                <span class="string">"problem are still required to be `Send` and `Sync`. Those bounds are linked to "</span>,
+                <span class="string">"the `rayon` feature. This method can be overwritten."</span>,
             )]
             </span><span class="kw">fn </span>[&lt;bulk_ <span class="macro-nonterminal">$method_name</span>&gt;]&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[P]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="macro-nonterminal">$output</span>&gt;, Error&gt;
             <span class="kw">where
@@ -319,7 +320,7 @@
                 <span class="macro-nonterminal">$output</span>: SendAlias,
                 <span class="self">Self</span>: SyncAlias,
             {
-                <span class="attr">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"rayon"</span>)]
                 </span>{
                     <span class="kw">if </span><span class="self">self</span>.parallelize() {
                         params.par_iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
@@ -327,7 +328,7 @@
                         params.iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
                     }
                 }
-                <span class="attr">#[cfg(not(feature = <span class="string">&quot;rayon&quot;</span>))]
+                <span class="attr">#[cfg(not(feature = <span class="string">"rayon"</span>))]
                 </span>{
                     params.iter().map(|p| <span class="self">self</span>.<span class="macro-nonterminal">$method_name</span>(p.borrow())).collect()
                 }
@@ -335,17 +336,17 @@
         }
 
         <span class="attr">#[doc = <span class="macro">concat!</span>(
-                    <span class="string">&quot;Indicates whether to parallelize calls to `&quot;</span>,
+                    <span class="string">"Indicates whether to parallelize calls to `"</span>,
                     <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
-                    <span class="string">&quot;` when using `bulk_&quot;</span>,
+                    <span class="string">"` when using `bulk_"</span>,
                     <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
-                    <span class="string">&quot;`. By default returns true, but can be set manually to `false` if needed. &quot;</span>,
-                    <span class="string">&quot;This allows users to turn off parallelization for certain traits &quot;</span>,
-                    <span class="string">&quot;implemented on their problem. &quot;</span>,
-                    <span class="string">&quot;Note that parallelization requires the `rayon` feature to be enabled, &quot;</span>,
-                    <span class="string">&quot;otherwise calls to `&quot;</span>,
+                    <span class="string">"`. By default returns true, but can be set manually to `false` if needed. "</span>,
+                    <span class="string">"This allows users to turn off parallelization for certain traits "</span>,
+                    <span class="string">"implemented on their problem. "</span>,
+                    <span class="string">"Note that parallelization requires the `rayon` feature to be enabled, "</span>,
+                    <span class="string">"otherwise calls to `"</span>,
                     <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
-                    <span class="string">&quot;` will be executed sequentially independent of how `parallelize` is set.&quot;
+                    <span class="string">"` will be executed sequentially independent of how `parallelize` is set."
                 </span>)]
         </span><span class="kw">fn </span>parallelize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
             <span class="bool-val">true

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-observer-spectator/src/observer.rs`."><title>observer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_observer_spectator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-observer-spectator/src/observer.rs`."><title>observer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_observer_spectator" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -429,7 +430,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::sender::sender;
 
-<span class="kw">const </span>DEFAULT_HOST: <span class="kw-2">&amp;</span>str = <span class="string">&quot;127.0.0.1&quot;</span>;
+<span class="kw">const </span>DEFAULT_HOST: <span class="kw-2">&amp;</span>str = <span class="string">"127.0.0.1"</span>;
 
 <span class="doccomment">/// Builder for the Spectator observer
 ///
@@ -441,14 +442,14 @@
 /// let spectator = SpectatorBuilder::new()
 ///     // Optional: Name the optimization run
 ///     // Default: random UUID.
-///     .with_name(&quot;optimization_run_1&quot;)
+///     .with_name("optimization_run_1")
 ///     // Optional, defaults to 127.0.0.1
-///     .with_host(&quot;127.0.0.1&quot;)
+///     .with_host("127.0.0.1")
 ///     // Optional, defaults to 5498
 ///     .with_port(5498)
 ///     // Choose which metrics should automatically be selected.
 ///     // If omitted, all metrics will be selected.
-///     .select(&amp;[&quot;cost&quot;, &quot;best_cost&quot;])
+///     .select(&amp;["cost", "best_cost"])
 ///     // Build Spectator observer
 ///     .build();
 /// ```
@@ -486,8 +487,8 @@
     ///
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
-    /// let builder = SpectatorBuilder::new().with_name(&quot;optimization_run_1&quot;);
-    /// # assert_eq!(builder.name().clone(), &quot;optimization_run_1&quot;.to_string());
+    /// let builder = SpectatorBuilder::new().with_name("optimization_run_1");
+    /// # assert_eq!(builder.name().clone(), "optimization_run_1".to_string());
     /// ```
     </span><span class="kw">pub fn </span>with_name&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, name: T) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = name.as_ref().to_string();
@@ -502,8 +503,8 @@
     ///
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
-    /// let builder = SpectatorBuilder::new().with_host(&quot;192.168.0.1&quot;);
-    /// # assert_eq!(builder.host().clone(), &quot;192.168.0.1&quot;.to_string());
+    /// let builder = SpectatorBuilder::new().with_host("192.168.0.1");
+    /// # assert_eq!(builder.host().clone(), "192.168.0.1".to_string());
     /// ```
     </span><span class="kw">pub fn </span>with_host&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, host: T) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.host = host.as_ref().to_string();
@@ -557,8 +558,8 @@
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
     /// # use std::collections::HashSet;
-    /// let builder = SpectatorBuilder::new().select(&amp;[&quot;cost&quot;, &quot;best_cost&quot;]);
-    /// # assert_eq!(builder.selected(), &amp;HashSet::from([&quot;cost&quot;.to_string(), &quot;best_cost&quot;.to_string()]));
+    /// let builder = SpectatorBuilder::new().select(&amp;["cost", "best_cost"]);
+    /// # assert_eq!(builder.selected(), &amp;HashSet::from(["cost".to_string(), "best_cost".to_string()]));
     /// ```
     </span><span class="kw">pub fn </span>select&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, metrics: <span class="kw-2">&amp;</span>[T]) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.selected = metrics.iter().map(|s| s.as_ref().to_string()).collect();
@@ -571,9 +572,9 @@
     ///
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
-    /// # let builder = SpectatorBuilder::new().with_name(&quot;test&quot;);
+    /// # let builder = SpectatorBuilder::new().with_name("test");
     /// let name = builder.name();
-    /// # assert_eq!(name, &amp;&quot;test&quot;.to_string());
+    /// # assert_eq!(name, &amp;"test".to_string());
     /// ```
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
         <span class="kw-2">&amp;</span><span class="self">self</span>.name
@@ -587,7 +588,7 @@
     /// # use argmin_observer_spectator::SpectatorBuilder;
     /// # let builder = SpectatorBuilder::new();
     /// let host = builder.host();
-    /// # assert_eq!(host, &amp;&quot;127.0.0.1&quot;.to_string());
+    /// # assert_eq!(host, &amp;"127.0.0.1".to_string());
     /// ```
     </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
         <span class="kw-2">&amp;</span><span class="self">self</span>.host
@@ -628,9 +629,9 @@
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
     /// # use std::collections::HashSet;
-    /// # let builder = SpectatorBuilder::new().select(&amp;[&quot;cost&quot;, &quot;best_cost&quot;]);
+    /// # let builder = SpectatorBuilder::new().select(&amp;["cost", "best_cost"]);
     /// let selected = builder.selected();
-    /// # assert_eq!(selected, &amp;HashSet::from([&quot;cost&quot;.to_string(), &quot;best_cost&quot;.to_string()]));
+    /// # assert_eq!(selected, &amp;HashSet::from(["cost".to_string(), "best_cost".to_string()]));
     /// ```
     </span><span class="kw">pub fn </span>selected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashSet&lt;String&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.selected
@@ -676,7 +677,7 @@
     </span><span class="kw">fn </span>send_msg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, message: Message) {
         <span class="kw">if </span><span class="self">self</span>.sending {
             <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.tx.blocking_send(message) {
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Can&#39;t send to Spectator: {e}. Will stop trying.&quot;</span>);
+                <span class="macro">eprintln!</span>(<span class="string">"Can't send to Spectator: {e}. Will stop trying."</span>);
                 <span class="self">self</span>.sending = <span class="bool-val">false</span>;
             }
         }
@@ -688,9 +689,9 @@
     ///
     /// ```
     /// # use argmin_observer_spectator::SpectatorBuilder;
-    /// # let spectator = SpectatorBuilder::new().with_name(&quot;flup&quot;).build();
+    /// # let spectator = SpectatorBuilder::new().with_name("flup").build();
     /// let name = spectator.name();
-    /// # assert_eq!(name, &amp;&quot;flup&quot;.to_string());
+    /// # assert_eq!(name, &amp;"flup".to_string());
     /// ```
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
         <span class="kw-2">&amp;</span><span class="self">self</span>.name
@@ -733,9 +734,9 @@
     </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>kv = kv.clone();
         <span class="kw">let </span>iter = state.get_iter();
-        kv.insert(<span class="string">&quot;best_cost&quot;</span>, state.get_best_cost().into());
-        kv.insert(<span class="string">&quot;cost&quot;</span>, state.get_cost().into());
-        kv.insert(<span class="string">&quot;iter&quot;</span>, iter.into());
+        kv.insert(<span class="string">"best_cost"</span>, state.get_best_cost().into());
+        kv.insert(<span class="string">"cost"</span>, state.get_cost().into());
+        kv.insert(<span class="string">"iter"</span>, iter.into());
 
         <span class="kw">let </span>message_samples = Message::Samples {
             name: <span class="self">self</span>.name.clone(),
@@ -806,11 +807,11 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>Spectator {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// This allows the observer to finish sending message to spectator, while making sure that
-        // it doesn&#39;t get stuck when the solver terminates unexpectedly.
+        // it doesn't get stuck when the solver terminates unexpectedly.
         </span><span class="kw">let </span>message = Message::Termination {
             name: <span class="self">self</span>.name.clone(),
             termination_status: TerminationStatus::Terminated(TerminationReason::SolverExit(
-                <span class="string">&quot;Aborted&quot;</span>.into(),
+                <span class="string">"Aborted"</span>.into(),
             )),
         };
         <span class="self">self</span>.send_msg(message);

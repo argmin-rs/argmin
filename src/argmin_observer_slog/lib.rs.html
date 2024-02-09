@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-observer-slog/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_observer_slog" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-observer-slog/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_observer_slog" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -268,9 +269,9 @@
     /// ```
     /// use argmin_observer_slog::SlogLogger;
     ///
-    /// let file_logger = SlogLogger::file(&quot;logfile.log&quot;, true);
+    /// let file_logger = SlogLogger::file("logfile.log", true);
     /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
     </span><span class="kw">pub fn </span>file&lt;N: AsRef&lt;str&gt;&gt;(file: N, truncate: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
         SlogLogger::file_internal(file, OverflowStrategy::Block, truncate)
     }
@@ -288,9 +289,9 @@
     /// ```
     /// use argmin_observer_slog::SlogLogger;
     ///
-    /// let file_logger = SlogLogger::file_noblock(&quot;logfile.log&quot;, true);
+    /// let file_logger = SlogLogger::file_noblock("logfile.log", true);
     /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
     </span><span class="kw">pub fn </span>file_noblock&lt;N: AsRef&lt;str&gt;&gt;(file: N, truncate: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
         SlogLogger::file_internal(file, OverflowStrategy::Drop, truncate)
     }
@@ -298,7 +299,7 @@
     <span class="doccomment">/// Create file logger with a given `OverflowStrategy`.
     ///
     /// Only available if the `serde1` feature is enabled.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
     </span><span class="kw">fn </span>file_internal&lt;N: AsRef&lt;str&gt;&gt;(
         file: N,
         overflow_strategy: OverflowStrategy,
@@ -321,9 +322,9 @@
     }
 }
 
-<span class="kw">struct </span>SlogKV&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>KV);
+<span class="kw">struct </span>SlogKV&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>KV);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; slog::KV <span class="kw">for </span>SlogKV&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; slog::KV <span class="kw">for </span>SlogKV&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
         <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.kv.iter() {
             serializer.emit_str(Key::from(idx.<span class="number">0</span>.to_string()), <span class="kw-2">&amp;</span>idx.<span class="number">1</span>.to_string())<span class="question-mark">?</span>;
@@ -334,7 +335,7 @@
 
 <span class="kw">struct </span>LogState&lt;I&gt;(I);
 
-<span class="kw">impl</span>&lt;I&gt; slog::KV <span class="kw">for </span>LogState&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>I&gt;
+<span class="kw">impl</span>&lt;I&gt; slog::KV <span class="kw">for </span>LogState&lt;<span class="kw-2">&amp;</span><span class="lifetime">'_ </span>I&gt;
 <span class="kw">where
     </span>I: State,
 {
@@ -342,9 +343,9 @@
         <span class="kw">for </span>(k, <span class="kw-2">&amp;</span>v) <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.get_func_counts().iter() {
             serializer.emit_u64(Key::from(k.clone()), v)<span class="question-mark">?</span>;
         }
-        serializer.emit_str(Key::from(<span class="string">&quot;best_cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_best_cost().to_string())<span class="question-mark">?</span>;
-        serializer.emit_str(Key::from(<span class="string">&quot;cost&quot;</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_cost().to_string())<span class="question-mark">?</span>;
-        serializer.emit_u64(Key::from(<span class="string">&quot;iter&quot;</span>), <span class="self">self</span>.<span class="number">0</span>.get_iter())<span class="question-mark">?</span>;
+        serializer.emit_str(Key::from(<span class="string">"best_cost"</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_best_cost().to_string())<span class="question-mark">?</span>;
+        serializer.emit_str(Key::from(<span class="string">"cost"</span>), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.get_cost().to_string())<span class="question-mark">?</span>;
+        serializer.emit_u64(Key::from(<span class="string">"iter"</span>), <span class="self">self</span>.<span class="number">0</span>.get_iter())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -355,13 +356,13 @@
 {
     <span class="doccomment">/// Log basic information about the optimization after initialization.
     </span><span class="kw">fn </span>observe_init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>str, _state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">&quot;{}&quot;</span>, msg; SlogKV(kv));
+        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">"{}"</span>, msg; SlogKV(kv));
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Logs information about the progress of the optimization after every iteration.
     </span><span class="kw">fn </span>observe_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>I, kv: <span class="kw-2">&amp;</span>KV) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">&quot;&quot;</span>; LogState(state), SlogKV(kv));
+        <span class="macro">info!</span>(<span class="self">self</span>.logger, <span class="string">""</span>; LogState(state), SlogKV(kv));
         <span class="prelude-val">Ok</span>(())
     }
 }

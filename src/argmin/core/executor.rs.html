@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/executor.rs`."><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/executor.rs`."><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -937,7 +938,7 @@
         <span class="kw">let </span>interrupt = Arc::new(AtomicBool::new(<span class="bool-val">false</span>));
 
         <span class="kw">if </span><span class="self">self</span>.ctrlc {
-            <span class="attr">#[cfg(feature = <span class="string">&quot;ctrlc&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"ctrlc"</span>)]
             </span>{
                 <span class="comment">// Set up the Ctrl-C handler
                 </span><span class="kw">let </span>interp = interrupt.clone();
@@ -981,7 +982,7 @@
         <span class="kw">while </span>!interrupt.load(Ordering::SeqCst) {
             <span class="comment">// check first if it has already terminated
             // This should probably be solved better.
-            // First, check if it isn&#39;t already terminated. If it isn&#39;t, evaluate the
+            // First, check if it isn't already terminated. If it isn't, evaluate the
             // stopping criteria. If `self.terminate()` is called without the checking
             // whether it has terminated already, then it may overwrite a termination set
             // within `next_iter()`!
@@ -1027,7 +1028,7 @@
                 <span class="kw">if </span><span class="self">self</span>.timer {
                     <span class="kw">let </span>duration = duration.unwrap();
                     <span class="kw">let </span>tmp = <span class="macro">kv!</span>(
-                        <span class="string">&quot;time&quot; </span>=&gt; duration.as_secs_f64();
+                        <span class="string">"time" </span>=&gt; duration.as_secs_f64();
                     );
                     log = log.merge(tmp);
                 }
@@ -1096,7 +1097,7 @@
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>add_observer&lt;OBS: Observe&lt;I&gt; + <span class="lifetime">&#39;static</span>&gt;(
+    </span><span class="kw">pub fn </span>add_observer&lt;OBS: Observe&lt;I&gt; + <span class="lifetime">'static</span>&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
         observer: OBS,
         mode: ObserverMode,
@@ -1111,7 +1112,7 @@
     ///
     /// ```
     /// # use argmin::core::{Error, Executor};
-    /// # #[cfg(feature = &quot;serde1&quot;)]
+    /// # #[cfg(feature = "serde1")]
     /// # use argmin::core::checkpointing::CheckpointingFrequency;
     /// # use argmin_checkpointing_file::FileCheckpoint;
     /// # use argmin::core::test_utils::{TestSolver, TestProblem};
@@ -1120,18 +1121,18 @@
     /// # let solver = TestSolver::new();
     /// # let problem = TestProblem::new();
     /// #
-    /// # #[cfg(feature = &quot;serde1&quot;)]
+    /// # #[cfg(feature = "serde1")]
     /// let checkpoint = FileCheckpoint::new(
     ///     // Directory where checkpoints are saved to
-    ///     &quot;.checkpoints&quot;,
+    ///     ".checkpoints",
     ///     // Filename of checkpoint
-    ///     &quot;rosenbrock_optim&quot;,
+    ///     "rosenbrock_optim",
     ///     // How often checkpoints should be saved
     ///     CheckpointingFrequency::Every(20)
     /// );
     ///
     /// // Create instance of `Executor` with `problem` and `solver`
-    /// # #[cfg(feature = &quot;serde1&quot;)]
+    /// # #[cfg(feature = "serde1")]
     /// let executor = Executor::new(problem, solver)
     ///     // Add checkpointing
     ///     .checkpointing(checkpoint);
@@ -1139,7 +1140,7 @@
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>checkpointing&lt;C: <span class="lifetime">&#39;static </span>+ Checkpoint&lt;S, I&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, checkpoint: C) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>checkpointing&lt;C: <span class="lifetime">'static </span>+ Checkpoint&lt;S, I&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, checkpoint: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.checkpoint = <span class="prelude-val">Some</span>(Box::new(checkpoint));
         <span class="self">self
     </span>}
@@ -1401,10 +1402,10 @@
             .is_sign_negative());
     }
 
-    <span class="doccomment">/// The solver&#39;s `init` should not be called when started from a checkpoint.
+    <span class="doccomment">/// The solver's `init` should not be called when started from a checkpoint.
     /// See https://github.com/argmin-rs/argmin/issues/199.
     </span><span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;serde1&quot;</span>)]
+    #[cfg(feature = <span class="string">"serde1"</span>)]
     </span><span class="kw">fn </span>test_checkpointing_solver_initialization() {
         <span class="kw">use </span>std::cell::RefCell;
 
@@ -1470,7 +1471,7 @@
             P: Clone,
             F: ArgminFloat,
         {
-            <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;OptimizationAlgorithm&quot;</span>;
+            <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"OptimizationAlgorithm"</span>;
 
             <span class="comment">// Only resets internal_state to 1
             </span><span class="kw">fn </span>init(
@@ -1546,7 +1547,7 @@
         </span><span class="macro">assert_eq!</span>(solver.internal_state, <span class="number">11</span>);
 
         <span class="comment">// Delete old checkpointing file
-        </span><span class="kw">let _ </span>= std::fs::remove_file(<span class="string">&quot;.checkpoints/init_test.arg&quot;</span>);
+        </span><span class="kw">let _ </span>= std::fs::remove_file(<span class="string">".checkpoints/init_test.arg"</span>);
     }
 
     <span class="attr">#[test]

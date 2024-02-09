@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-checkpointing-file/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_checkpointing_file" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-checkpointing-file/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_checkpointing_file" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -231,14 +232,14 @@
     ///
     /// let checkpoint = FileCheckpoint::default();
     /// # assert_eq!(checkpoint.frequency, CheckpointingFrequency::default());
-    /// # assert_eq!(checkpoint.directory, PathBuf::from(&quot;.checkpoints&quot;));
-    /// # assert_eq!(checkpoint.filename, PathBuf::from(&quot;checkpoint.arg&quot;));
+    /// # assert_eq!(checkpoint.directory, PathBuf::from(".checkpoints"));
+    /// # assert_eq!(checkpoint.filename, PathBuf::from("checkpoint.arg"));
     /// ```
     </span><span class="kw">fn </span>default() -&gt; FileCheckpoint {
         FileCheckpoint {
             frequency: CheckpointingFrequency::default(),
-            directory: PathBuf::from(<span class="string">&quot;.checkpoints&quot;</span>),
-            filename: PathBuf::from(<span class="string">&quot;checkpoint.arg&quot;</span>),
+            directory: PathBuf::from(<span class="string">".checkpoints"</span>),
+            filename: PathBuf::from(<span class="string">"checkpoint.arg"</span>),
         }
     }
 }
@@ -252,21 +253,21 @@
     /// use argmin_checkpointing_file::{FileCheckpoint, CheckpointingFrequency};
     /// # use std::path::PathBuf;
     ///
-    /// let directory = &quot;checkpoints&quot;;
-    /// let filename = &quot;optimization&quot;;
+    /// let directory = "checkpoints";
+    /// let filename = "optimization";
     ///
     /// // When passed to an `Executor`, this will save a checkpoint in the file
     /// // `checkpoints/optimization.arg` in every iteration.
     /// let checkpoint = FileCheckpoint::new(directory, filename, CheckpointingFrequency::Always);
     /// # assert_eq!(checkpoint.frequency, CheckpointingFrequency::Always);
-    /// # assert_eq!(checkpoint.directory, PathBuf::from(&quot;checkpoints&quot;));
-    /// # assert_eq!(checkpoint.filename, PathBuf::from(&quot;optimization.arg&quot;));
+    /// # assert_eq!(checkpoint.directory, PathBuf::from("checkpoints"));
+    /// # assert_eq!(checkpoint.filename, PathBuf::from("optimization.arg"));
     /// ```
     </span><span class="kw">pub fn </span>new&lt;N: AsRef&lt;str&gt;&gt;(directory: N, name: N, frequency: CheckpointingFrequency) -&gt; <span class="self">Self </span>{
         FileCheckpoint {
             frequency,
             directory: PathBuf::from(directory.as_ref()),
-            filename: PathBuf::from(<span class="macro">format!</span>(<span class="string">&quot;{}.arg&quot;</span>, name.as_ref())),
+            filename: PathBuf::from(<span class="macro">format!</span>(<span class="string">"{}.arg"</span>, name.as_ref())),
         }
     }
 }
@@ -289,17 +290,17 @@
     ///
     /// # use std::fs::File;
     /// # use std::io::BufReader;
-    /// # let checkpoint = FileCheckpoint::new(&quot;.checkpoints&quot;, &quot;save_test&quot; , CheckpointingFrequency::Always);
+    /// # let checkpoint = FileCheckpoint::new(".checkpoints", "save_test" , CheckpointingFrequency::Always);
     /// # let solver: u64 = 12;
     /// # let state: u64 = 21;
-    /// # let _ = std::fs::remove_file(&quot;.checkpoints/save_test.arg&quot;);
+    /// # let _ = std::fs::remove_file(".checkpoints/save_test.arg");
     /// checkpoint.save(&amp;solver, &amp;state);
     /// # let (f_solver, f_state): (u64, u64) = bincode::deserialize_from(
-    /// #     BufReader::new(File::open(&quot;.checkpoints/save_test.arg&quot;).unwrap())
+    /// #     BufReader::new(File::open(".checkpoints/save_test.arg").unwrap())
     /// # ).unwrap();
     /// # assert_eq!(solver, f_solver);
     /// # assert_eq!(state, f_state);
-    /// # let _ = std::fs::remove_file(&quot;.checkpoints/save_test.arg&quot;);
+    /// # let _ = std::fs::remove_file(".checkpoints/save_test.arg");
     /// ```
     </span><span class="kw">fn </span>save(<span class="kw-2">&amp;</span><span class="self">self</span>, solver: <span class="kw-2">&amp;</span>S, state: <span class="kw-2">&amp;</span>I) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
         <span class="kw">if </span>!<span class="self">self</span>.directory.exists() {
@@ -326,22 +327,22 @@
     /// # use std::fs::File;
     /// # use std::io::BufWriter;
     /// # fn main() -&gt; Result&lt;(), Error&gt; {
-    /// # std::fs::DirBuilder::new().recursive(true).create(&quot;.checkpoints&quot;).unwrap();
-    /// # let f = BufWriter::new(File::create(&quot;.checkpoints/load_test.arg&quot;)?);
+    /// # std::fs::DirBuilder::new().recursive(true).create(".checkpoints").unwrap();
+    /// # let f = BufWriter::new(File::create(".checkpoints/load_test.arg")?);
     /// # let f_solver: u64 = 12;
     /// # let f_state: u64 = 21;
     /// # bincode::serialize_into(f, &amp;(f_solver, f_state))?;
-    /// # let checkpoint = FileCheckpoint::new(&quot;.checkpoints&quot;, &quot;load_test&quot; , CheckpointingFrequency::Always);
+    /// # let checkpoint = FileCheckpoint::new(".checkpoints", "load_test" , CheckpointingFrequency::Always);
     /// let (solver, state) = checkpoint.load()?.unwrap();
     /// # // Let the compiler know which types to expect.
     /// # let blah1: u64 = solver;
     /// # let blah2: u64 = state;
     /// # assert_eq!(solver, f_solver);
     /// # assert_eq!(state, f_state);
-    /// # let _ = std::fs::remove_file(&quot;.checkpoints/load_test.arg&quot;);
+    /// # let _ = std::fs::remove_file(".checkpoints/load_test.arg");
     /// #
     /// # // Return none if File does not exist
-    /// # let checkpoint = FileCheckpoint::new(&quot;.checkpoints&quot;, &quot;certainly_does_not_exist&quot; , CheckpointingFrequency::Always);
+    /// # let checkpoint = FileCheckpoint::new(".checkpoints", "certainly_does_not_exist" , CheckpointingFrequency::Always);
     /// # let loaded: Option&lt;(u64, u64)&gt; = checkpoint.load()?;
     /// # assert!(loaded.is_none());
     /// # Ok(())
@@ -377,7 +378,7 @@
         <span class="kw">let </span>solver = TestSolver::new();
         <span class="kw">let </span>state: IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt; =
             IterState::new().param(<span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">0.0</span>]);
-        <span class="kw">let </span>check = FileCheckpoint::new(<span class="string">&quot;checkpoints&quot;</span>, <span class="string">&quot;solver&quot;</span>, CheckpointingFrequency::Always);
+        <span class="kw">let </span>check = FileCheckpoint::new(<span class="string">"checkpoints"</span>, <span class="string">"solver"</span>, CheckpointingFrequency::Always);
         check.save_cond(<span class="kw-2">&amp;</span>solver, <span class="kw-2">&amp;</span>state, <span class="number">20</span>).unwrap();
 
         <span class="kw">let </span>_loaded: <span class="prelude-ty">Option</span>&lt;(TestSolver, IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;)&gt; =
