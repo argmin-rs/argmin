@@ -155,7 +155,12 @@ mod tests {
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-2);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = f64::EPSILON,
+                        max_relative = 1e-3
+                    );
                 }
             }
         }
