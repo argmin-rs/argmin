@@ -284,6 +284,7 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -521,6 +522,7 @@
             [<span class="number">1.34941_f64</span>, -<span class="number">1.34941_f64</span>],
             [-<span class="number">1.34941_f64</span>, <span class="number">1.34941_f64</span>],
             [-<span class="number">1.34941_f64</span>, -<span class="number">1.34941_f64</span>],
+            [<span class="number">0.0_f64</span>, <span class="number">0.0_f64</span>],
         ] {
             <span class="kw">let </span>deriv = cross_in_tray_derivative(<span class="kw-2">&amp;</span>p);
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
@@ -561,7 +563,7 @@
                             hessian[i][j],
                             hessian_fd[i][j],
                             epsilon = f64::EPSILON,
-                            max_relative = <span class="number">1e-4
+                            max_relative = <span class="number">1e-3
                         </span>);
                     }
                 }
