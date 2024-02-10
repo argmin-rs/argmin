@@ -502,7 +502,9 @@ where
     G: Clone + ArgminDot<G, F>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Hager-Zhang line search";
+    fn name(&self) -> &str {
+        "Hager-Zhang line search"
+    }
 
     fn init(
         &mut self,

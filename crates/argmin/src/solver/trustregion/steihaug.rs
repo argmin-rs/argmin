@@ -189,7 +189,9 @@ where
     H: ArgminDot<P, P>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Steihaug";
+    fn name(&self) -> &str {
+        "Steihaug"
+    }
 
     fn init(
         &mut self,

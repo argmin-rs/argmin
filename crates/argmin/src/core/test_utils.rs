@@ -327,7 +327,9 @@ impl TestSolver {
 }
 
 impl<O> Solver<O, IterState<Vec<f64>, (), (), (), (), f64>> for TestSolver {
-    const NAME: &'static str = "TestSolver";
+    fn name(&self) -> &str {
+        "TestSolver"
+    }
 
     fn next_iter(
         &mut self,

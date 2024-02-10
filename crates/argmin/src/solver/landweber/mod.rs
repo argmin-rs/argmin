@@ -69,7 +69,9 @@ where
     P: Clone + ArgminScaledSub<G, F, P>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Landweber";
+    fn name(&self) -> &str {
+        "Landweber"
+    }
 
     fn next_iter(
         &mut self,

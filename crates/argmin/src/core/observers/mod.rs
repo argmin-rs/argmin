@@ -149,7 +149,7 @@ use std::sync::{Arc, Mutex};
 ///     }
 /// }
 /// ```
-pub trait Observe<I> {
+pub trait Observe<I>: Send {
     /// Called once after initialization of the solver.
     ///
     /// Has access to the name of the solver via `name`, the initial `state` and to a key-value
