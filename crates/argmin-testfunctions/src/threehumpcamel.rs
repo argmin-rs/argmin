@@ -38,10 +38,46 @@ where
         + x2.powi(2)
 }
 
+/// Derivative of Three-hump camel test function
+pub fn threehumpcamel_derivative<T>(param: &[T; 2]) -> [T; 2]
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, x2] = *param;
+
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n4_2 = T::from_f64(4.2).unwrap();
+
+    [x1.powi(5) - n4_2 * x1.powi(3) + n4 * x1 + x2, n2 * x2 + x1]
+}
+
+/// Hessian of Three-hump camel test function
+pub fn threehumpcamel_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
+where
+    T: Float + FromPrimitive,
+{
+    let [x1, _] = *param;
+
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n5 = T::from_f64(5.0).unwrap();
+    let n12_6 = T::from_f64(12.6).unwrap();
+
+    let a = n5 * x1.powi(4) - n12_6 * x1.powi(2) + n4;
+    let b = n2;
+    let offdiag = n1;
+
+    [[a, offdiag], [offdiag, b]]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use approx::assert_relative_eq;
+    use finitediff::FiniteDiff;
+    use proptest::prelude::*;
     use std::{f32, f64};
 
     #[test]
@@ -56,5 +92,53 @@ mod tests {
             0.0,
             epsilon = f64::EPSILON
         );
+
+        let deriv = threehumpcamel_derivative(&[0.0, 0.0]);
+        for i in 0..2 {
+            assert_relative_eq!(deriv[i], 0.0, epsilon = f64::EPSILON);
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_threehumpcamel_derivative(a in -5.0..5.0, b in -5.0..5.0) {
+            let param = [a, b];
+            let derivative = threehumpcamel_derivative(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| threehumpcamel(&[x[0], x[1]]));
+            for i in 0..derivative.len() {
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = f64::EPSILON,
+                    max_relative = 1e-3
+                );
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_threehumpcamel_hessian_finitediff(a in -5.0..5.0, b in -5.0..5.0) {
+            let param = [a, b];
+            let hessian = threehumpcamel_hessian(&param);
+            let hessian_fd =
+                Vec::from(param).central_hessian(&|x| threehumpcamel_derivative(&[x[0], x[1]]).to_vec());
+            let n = hessian.len();
+            println!("1: {hessian:?} at {a}/{b}");
+            println!("2: {hessian_fd:?} at {a}/{b}");
+            for i in 0..n {
+                assert_eq!(hessian[i].len(), n);
+                for j in 0..n {
+                    if hessian_fd[i][j].is_finite() {
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = f64::EPSILON,
+                            max_relative = 1e-5
+                        );
+                    }
+                }
+            }
+        }
     }
 }
