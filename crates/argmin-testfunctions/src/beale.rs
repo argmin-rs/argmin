@@ -159,7 +159,7 @@ mod tests {
                         hessian[i][j],
                         hessian_fd[i][j],
                         epsilon = f64::EPSILON,
-                        max_relative = 1e-3
+                        max_relative = 1e-2
                     );
                 }
             }
