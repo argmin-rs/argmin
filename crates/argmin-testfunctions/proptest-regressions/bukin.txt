@@ -1,0 +1,13 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 0288bd8f88b0e7654e2962b5c7db069f54855b1f3343d7293112d1c2f412ee45 # shrinks to a = -10.064139470736675, b = 1.0184175182814807
+cc aeb945508ccffec27e56b7ec4043f759efb75b080e679751cdb843b7446dd964 # shrinks to a = -12.026591860150429, b = -0.41891412898840275
+cc 060b8e09cd3c7011681dd7f2df8aef4146302e83461bcaf53a93baf99e649633 # shrinks to a = -10.00677888905203, b = 1.001528001553812
+cc f7aa396a25f3c91f663455a26ed2feee5b8e186c9428e3da469037a48868a9cf # shrinks to a = -10.057093257548267, b = 1.011445246373522
+cc ec35bb4f34a049abb89b9b1244667e9fa9bd8ecf3ced35c3424e90ada6738252 # shrinks to a = -13.044641382099616, b = 1.702049540249661
+cc 1568c42838e56a3c13d472c7ba4c54cadeebae5ef529481499f80ef35b096591 # shrinks to a = -8.620906301983453, b = 0.7432319376605466
+cc 23e22b9c297b6babb66e19e98f1fe81d86a99eb35c367b88af2a4ef9b7cea479 # shrinks to a = -9.999291062664303, b = 0.9998564605614094
