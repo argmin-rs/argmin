@@ -16,13 +16,15 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@nightly
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2024-02-09
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
 
       - name: Generate code coverage
-        run: cargo +nightly llvm-cov --doctests --features "argmin/_full_dev,argmin-math/latest_all" --workspace --lcov --output-path lcov.info
+        run: cargo +nightly-2024-02-09 llvm-cov --doctests --features "argmin/_full_dev,argmin-math/latest_all" --workspace --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
