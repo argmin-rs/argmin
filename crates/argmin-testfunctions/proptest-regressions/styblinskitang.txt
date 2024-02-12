@@ -1,0 +1,13 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f1fc47a2cb5c1a3981f0fb6169ba0893338fd4b0a557b5094bef024262b364a2 # shrinks to a = 0.0, b = 0.0, c = 0.0, d = 0.0, e = 0.0, f = 0.0, g = 0.0, h = 0.0
+cc bef26fc3291772f8be260ca7980ce59d950c8e6acddb27337b9e5635a9aa596d # shrinks to a = 0.0, b = 0.15828374081426325, c = 0.0, d = 0.0, e = 0.0, f = 0.0, g = 0.0, h = 2.0361545639117984
+cc 060bef3bc509226f1d4ec6adc15d5a9ac813e58d1f95bc6dbfc1cea25a3fe266 # shrinks to a = -2.904269849174077, b = -0.8872800974821016, c = 0.0, d = 0.0, e = 0.0, f = 0.0, g = 0.0, h = 0.0
+cc 2f8e591c371315aef9b48f8dbd1036924002d079c8c1d1573118d6705fc8f8f9 # shrinks to a = 0.0, b = 0.0, c = 0.6794406030259201, d = 0.1570274666051444, e = 0.17183561213428541, f = -1.3452705124590607, g = -3.3126414174782335, h = -2.638251088820541
+cc ed35c217cd19b28ac57879ce8cd1fe5c9a647e21a75411d9b99eff910df72c0f # shrinks to a = 0.0, b = 0.0, c = 1.632551958529382, d = 0.0, e = 0.0, f = 0.0, g = 0.0, h = 0.0
+cc b54b2fb24234073e9df6cf5a173d798596c1b07ad093885739ae279a909284e4 # shrinks to a = 0.0, b = 0.0, c = 0.0, d = 0.0, e = 0.0, f = 1.6329042655280075, g = 0.0, h = 0.0
+cc e68cf028ee981036475a61166571e664f0b526e43bb5cb648a95bcd90aad15ad # shrinks to a = 0.0, b = 0.0, c = 0.0, d = 0.0, e = 1.633000829711466, f = 0.0, g = 0.0, h = 0.0
