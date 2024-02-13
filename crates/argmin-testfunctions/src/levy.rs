@@ -54,15 +54,186 @@ where
     let n10 = T::from_f64(10.0).unwrap();
     let pi = T::from_f64(PI).unwrap();
 
-    let w = |x: T| n1 - (x - n1) / n4;
+    let w = |x: T| n1 + (x - n1) / n4;
 
     (pi * w(param[0])).sin().powi(2)
         + param[1..(plen - 1)]
             .iter()
             .map(|x| w(*x))
-            .map(|wi: T| (wi - n1).powi(2) * (n1 + n10 * (pi * wi + n1)))
+            .map(|wi: T| (wi - n1).powi(2) * (n1 + n10 * (pi * wi + n1).sin().powi(2)))
             .sum()
         + (w(param[plen - 1]) - n1).powi(2) * (n1 + (n2 * pi * w(param[plen - 1])).sin().powi(2))
+}
+
+/// Derivative of Levy test function
+pub fn levy_derivative<T>(param: &[T]) -> Vec<T>
+where
+    T: Float + FromPrimitive + Sum,
+{
+    let d = param.len();
+    assert!(d >= 2);
+
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n5 = T::from_f64(5.0).unwrap();
+    let n8 = T::from_f64(8.0).unwrap();
+    let n10 = T::from_f64(10.0).unwrap();
+    let n16 = T::from_f64(16.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+
+    param
+        .iter()
+        .enumerate()
+        .map(|(i, x)| (i, x, pi * ((*x - n1) / n4 + n1)))
+        .map(|(i, &x, wp)| {
+            if i == 0 {
+                pi / n2 * wp.cos() * wp.sin()
+            } else if i == d - 1 {
+                ((n2 * wp).sin().powi(2) + n1) * (x - n1) / n8
+                    + pi / n16 * (n2 * wp).cos() * (n2 * wp).sin() * (x - n1).powi(2)
+            } else {
+                (n10 * (wp + n1).sin().powi(2) + n1) * (x - n1) / n8
+                    + n5 / n16 * pi * (wp + n1).cos() * (wp + n1).sin() * (x - n1).powi(2)
+            }
+        })
+        .collect()
+}
+
+/// Derivative of Levy test function
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn levy_derivative_const<const N: usize, T>(param: &[T; N]) -> [T; N]
+where
+    T: Float + FromPrimitive + Sum,
+{
+    assert!(N >= 2);
+
+    let n1 = T::from_f64(1.0).unwrap();
+    let n0 = T::from_f64(0.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n5 = T::from_f64(5.0).unwrap();
+    let n8 = T::from_f64(8.0).unwrap();
+    let n10 = T::from_f64(10.0).unwrap();
+    let n16 = T::from_f64(16.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+
+    let mut out = [n0; N];
+
+    param
+        .iter()
+        .zip(out.iter_mut())
+        .enumerate()
+        .map(|(i, (x, o))| (i, x, pi * ((*x - n1) / n4 + n1), o))
+        .map(|(i, &x, wp, o)| {
+            *o = if i == 0 {
+                pi / n2 * wp.cos() * wp.sin()
+            } else if i == N - 1 {
+                ((n2 * wp).sin().powi(2) + n1) * (x - n1) / n8
+                    + pi / n16 * (n2 * wp).cos() * (n2 * wp).sin() * (x - n1).powi(2)
+            } else {
+                (n10 * (wp + n1).sin().powi(2) + n1) * (x - n1) / n8
+                    + n5 / n16 * pi * (wp + n1).cos() * (wp + n1).sin() * (x - n1).powi(2)
+            }
+        })
+        .count();
+    out
+}
+
+/// Hessian of Levy test function
+pub fn levy_hessian<T>(param: &[T]) -> Vec<Vec<T>>
+where
+    T: Float + FromPrimitive + Sum,
+{
+    let d = param.len();
+    assert!(d >= 2);
+
+    let x = param;
+
+    let n0 = T::from_f64(0.0).unwrap();
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n5 = T::from_f64(5.0).unwrap();
+    let n6 = T::from_f64(6.0).unwrap();
+    let n8 = T::from_f64(8.0).unwrap();
+    let n10 = T::from_f64(10.0).unwrap();
+    let n32 = T::from_f64(32.0).unwrap();
+    let n64 = T::from_f64(64.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+    let pi2 = T::from_f64(PI.powi(2)).unwrap();
+
+    let mut out = vec![vec![n0; d]; d];
+
+    for i in 0..d {
+        let xin1 = x[i] - n1;
+        let wp = pi * (xin1 / n4 + n1);
+        out[i][i] = if i == 0 {
+            pi2 / n8 * (wp.cos().powi(2) - wp.sin().powi(2))
+        } else if i == d - 1 {
+            -(n4 * pi * xin1 * (pi * x[i]).sin() + (pi2 * xin1.powi(2) - n2) * (pi * x[i]).cos()
+                - n6)
+                / n32
+        } else {
+            let wp1cos = (wp + n1).cos();
+            let wp1sin = (wp + n1).sin();
+            n5 / n4 * pi * wp1cos * wp1sin * xin1
+                + n5 / n64 * pi2 * xin1.powi(2) * (wp1cos.powi(2) - wp1sin.powi(2))
+                + (n10 * wp1sin.powi(2) + n1) / n8
+        }
+    }
+
+    out
+}
+
+/// Hessian of Levy test function
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn levy_hessian_const<const N: usize, T>(param: &[T; N]) -> [[T; N]; N]
+where
+    T: Float + FromPrimitive + Sum,
+{
+    assert!(N >= 2);
+
+    let x = param;
+
+    let n0 = T::from_f64(0.0).unwrap();
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n5 = T::from_f64(5.0).unwrap();
+    let n6 = T::from_f64(6.0).unwrap();
+    let n8 = T::from_f64(8.0).unwrap();
+    let n10 = T::from_f64(10.0).unwrap();
+    let n32 = T::from_f64(32.0).unwrap();
+    let n64 = T::from_f64(64.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+    let pi2 = T::from_f64(PI.powi(2)).unwrap();
+
+    let mut out = [[n0; N]; N];
+
+    for i in 0..N {
+        let xin1 = x[i] - n1;
+        let wp = pi * (xin1 / n4 + n1);
+        out[i][i] = if i == 0 {
+            pi2 / n8 * (wp.cos().powi(2) - wp.sin().powi(2))
+        } else if i == N - 1 {
+            -(n4 * pi * xin1 * (pi * x[i]).sin() + (pi2 * xin1.powi(2) - n2) * (pi * x[i]).cos()
+                - n6)
+                / n32
+        } else {
+            let wp1cos = (wp + n1).cos();
+            let wp1sin = (wp + n1).sin();
+            n5 / n4 * pi * wp1cos * wp1sin * xin1
+                + n5 / n64 * pi2 * xin1.powi(2) * (wp1cos.powi(2) - wp1sin.powi(2))
+                + (n10 * wp1sin.powi(2) + n1) / n8
+        }
+    }
+
+    out
 }
 
 /// Levy test function No. 13
@@ -180,6 +351,16 @@ mod tests {
     fn test_levy_optimum() {
         assert_relative_eq!(levy(&[1_f32, 1_f32, 1_f32]), 0.0, epsilon = f32::EPSILON);
         assert_relative_eq!(levy(&[1_f64, 1_f64, 1_f64]), 0.0, epsilon = f64::EPSILON);
+
+        let deriv = levy_derivative(&[1_f64, 1_f64, 1_f64]);
+        for i in 0..2 {
+            assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-12, max_relative = 1e-12);
+        }
+
+        let deriv = levy_derivative_const(&[1_f64, 1_f64, 1_f64]);
+        for i in 0..2 {
+            assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-12, max_relative = 1e-12);
+        }
     }
 
     #[test]
@@ -228,6 +409,94 @@ mod tests {
             let n = hessian.len();
             // println!("1: {hessian:?} at {a}/{b}");
             // println!("2: {hessian_fd:?} at {a}/{b}");
+            for i in 0..n {
+                assert_eq!(hessian[i].len(), n);
+                for j in 0..n {
+                    if hessian[i][j].is_finite() {
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = f64::EPSILON,
+                            max_relative = 1e-3
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_derivative_finitediff(a in -10.0..10.0, b in -10.0..10.0, c in -10.0..10.0) {
+            let param = [a, b, c];
+            let derivative = levy_derivative(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| levy(&[x[0], x[1], x[2]]));
+            // println!("1: {derivative:?} at {param:?}");
+            // println!("2: {derivative_fd:?} at {param:?}");
+            for i in 0..derivative.len() {
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-6,
+                    max_relative = 1e-4,
+                );
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_derivative_const_finitediff(a in -10.0..10.0, b in -10.0..10.0, c in -10.0..10.0) {
+            let param = [a, b, c];
+            let derivative = levy_derivative_const(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| levy(&[x[0], x[1], x[2]]));
+            // println!("1: {derivative:?} at {param:?}");
+            // println!("2: {derivative_fd:?} at {param:?}");
+            for i in 0..derivative.len() {
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-6,
+                    max_relative = 1e-4,
+                );
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_hessian_finitediff(a in -10.0..10.0, b in -10.0..10.0, c in -10.0..10.0) {
+            let param = [a, b, c];
+            let hessian = levy_hessian(&param);
+            let hessian_fd = Vec::from(param).central_hessian(&|x| levy_derivative(&x).to_vec());
+            let n = hessian.len();
+            // println!("1: {hessian:?} at {param:?}");
+            // println!("2: {hessian_fd:?} at {param:?}");
+            for i in 0..n {
+                assert_eq!(hessian[i].len(), n);
+                for j in 0..n {
+                    if hessian[i][j].is_finite() {
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = f64::EPSILON,
+                            max_relative = 1e-3
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_hessian_const_finitediff(a in -10.0..10.0, b in -10.0..10.0, c in -10.0..10.0) {
+            let param = [a, b, c];
+            let hessian = levy_hessian_const(&param);
+            let hessian_fd = Vec::from(param).central_hessian(&|x| levy_derivative(&x).to_vec());
+            let n = hessian.len();
+            // println!("1: {hessian:?} at {param:?}");
+            // println!("2: {hessian_fd:?} at {param:?}");
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
