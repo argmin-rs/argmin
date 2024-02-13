@@ -91,10 +91,89 @@ where
         + (x2 - n1).powi(2) * (n1 + (n2 * pi * x2).sin().powi(2))
 }
 
+/// Derivative of Levy test function No. 13
+pub fn levy_n13_derivative<T>(param: &[T; 2]) -> [T; 2]
+where
+    T: Float + FromPrimitive + Sum,
+{
+    let [x1, x2] = *param;
+
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n3 = T::from_f64(3.0).unwrap();
+    let n4 = T::from_f64(4.0).unwrap();
+    let n6 = T::from_f64(6.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+
+    let x1t3 = n3 * pi * x1;
+    let x2t3 = n3 * pi * x2;
+    let x2t2 = n2 * pi * x2;
+    let x1t3s = x1t3.sin();
+    let x1t3c = x1t3.cos();
+    let x2t3s = x2t3.sin();
+    let x2t3c = x2t3.cos();
+    let x2t3s2 = x2t3s.powi(2);
+    let x2t2s = x2t2.sin();
+    let x2t2c = x2t2.cos();
+    let x2t2s2 = x2t2s.powi(2);
+
+    [
+        n6 * pi * x1t3c * x1t3s + n2 * (x2t3s2 + n1) * (x1 - n1),
+        n6 * pi * (x1 - n1).powi(2) * x2t3c * x2t3s
+            + n2 * (x2 - n1) * (x2t2s2 + n1)
+            + n4 * pi * (x2 - n1).powi(2) * x2t2c * x2t2s,
+    ]
+}
+
+/// Hessian of Levy test function No. 13
+pub fn levy_n13_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
+where
+    T: Float + FromPrimitive + Sum,
+{
+    let [x1, x2] = *param;
+
+    let n1 = T::from_f64(1.0).unwrap();
+    let n2 = T::from_f64(2.0).unwrap();
+    let n3 = T::from_f64(3.0).unwrap();
+    let n8 = T::from_f64(8.0).unwrap();
+    let n12 = T::from_f64(12.0).unwrap();
+    let n16 = T::from_f64(16.0).unwrap();
+    let n18 = T::from_f64(18.0).unwrap();
+    let pi = T::from_f64(PI).unwrap();
+    let pi2 = T::from_f64(PI.powi(2)).unwrap();
+
+    let x1t3 = n3 * pi * x1;
+    let x2t3 = n3 * pi * x2;
+    let x2t2 = n2 * pi * x2;
+    let x1t3s = x1t3.sin();
+    let x1t3c = x1t3.cos();
+    let x2t3s = x2t3.sin();
+    let x2t3c = x2t3.cos();
+    let x1t3s2 = x1t3s.powi(2);
+    let x1t3c2 = x1t3c.powi(2);
+    let x2t3s2 = x2t3s.powi(2);
+    let x2t3c2 = x2t3c.powi(2);
+    let x2t2s = x2t2.sin();
+    let x2t2c = x2t2.cos();
+    let x2t2s2 = x2t2s.powi(2);
+    let x2t2c2 = x2t2c.powi(2);
+
+    let a = n18 * pi2 * (-x1t3s2 + x1t3c2) + n2 * (x2t3s2 + n1);
+    let b = n18 * pi2 * (x1 - n1).powi(2) * (-x2t3s2 + x2t3c2)
+        + n2 * (x2t2s2 + n1)
+        + n8 * pi2 * (x2 - n1).powi(2) * (-x2t2s2 + x2t2c2)
+        + n16 * pi * (x2 - n1) * x2t2s * x2t2c;
+    let offdiag = n12 * pi * (x1 - n1) * x2t3c * x2t3s;
+
+    [[a, offdiag], [offdiag, b]]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use approx::assert_relative_eq;
+    use finitediff::FiniteDiff;
+    use proptest::prelude::*;
     use std::{f32, f64};
 
     #[test]
@@ -107,11 +186,61 @@ mod tests {
     fn test_levy_n13_optimum() {
         assert_relative_eq!(levy_n13(&[1_f32, 1_f32]), 0.0, epsilon = f32::EPSILON);
         assert_relative_eq!(levy_n13(&[1_f64, 1_f64]), 0.0, epsilon = f64::EPSILON);
+
+        let deriv = levy_n13_derivative(&[1_f64, 1_f64]);
+        for i in 0..2 {
+            assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-12, max_relative = 1e-12);
+        }
     }
 
     #[test]
     #[should_panic]
     fn test_levy_param_length() {
         levy(&[0.0_f32]);
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_n13_derivative_finitediff(a in -10.0..10.0, b in -10.0..10.0) {
+            let param = [a, b];
+            let derivative = levy_n13_derivative(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| levy_n13(&[x[0], x[1]]));
+            // println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
+            for i in 0..derivative.len() {
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = f64::EPSILON,
+                    max_relative = 1e-4,
+                );
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn test_levy_n13_hessian_finitediff(a in -10.0..10.0, b in -10.0..10.0) {
+            let param = [a, b];
+            let hessian = levy_n13_hessian(&param);
+            let hessian_fd =
+                Vec::from(param).central_hessian(&|x| levy_n13_derivative(&[x[0], x[1]]).to_vec());
+            let n = hessian.len();
+            // println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
+            for i in 0..n {
+                assert_eq!(hessian[i].len(), n);
+                for j in 0..n {
+                    if hessian[i][j].is_finite() {
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = f64::EPSILON,
+                            max_relative = 1e-3
+                        );
+                    }
+                }
+            }
+        }
     }
 }
