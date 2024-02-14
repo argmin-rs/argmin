@@ -16,17 +16,14 @@ use argmin::{
 use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 
-struct Rosenbrock {
-    a: f64,
-    b: f64,
-}
+struct Rosenbrock {}
 
 impl CostFunction for Rosenbrock {
     type Param = Vec<f64>;
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(p, self.a, self.b))
+        Ok(rosenbrock(p))
     }
 }
 
@@ -35,13 +32,13 @@ impl Gradient for Rosenbrock {
     type Gradient = Vec<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_derivative(p, self.a, self.b))
+        Ok(rosenbrock_derivative(p))
     }
 }
 
 fn run() -> Result<(), Error> {
     // Define cost function (must implement `CostFunction` and `Gradient`)
-    let cost = Rosenbrock { a: 1.0, b: 100.0 };
+    let cost = Rosenbrock {};
 
     // Define initial parameter vector
     // easy case

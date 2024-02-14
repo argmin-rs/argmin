@@ -365,7 +365,7 @@ pub trait Operator {
 ///
 ///     /// Compute Rosenbrock function
 ///     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-///         Ok(rosenbrock(param, 1.0, 100.0))
+///         Ok(rosenbrock(param))
 ///     }
 /// }
 /// ```

@@ -17,10 +17,6 @@ use std::sync::{Arc, Mutex};
 
 #[derive(Clone)]
 struct Rosenbrock {
-    /// Parameter a, usually 1.0
-    a: f64,
-    /// Parameter b, usually 100.0
-    b: f64,
     /// lower bound
     lower_bound: Vec<f64>,
     /// upper bound
@@ -33,10 +29,8 @@ struct Rosenbrock {
 
 impl Rosenbrock {
     /// Constructor
-    pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
+    pub fn new(lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
         Rosenbrock {
-            a,
-            b,
             lower_bound,
             upper_bound,
             rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
@@ -51,7 +45,7 @@ impl CostFunction for Rosenbrock {
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
         // Artificially slow down computation of cost function
         std::thread::sleep(std::time::Duration::from_millis(1));
-        Ok(rosenbrock(param, self.a, self.b))
+        Ok(rosenbrock(param))
     }
 }
 
@@ -85,7 +79,7 @@ fn run() -> Result<(), Error> {
             let lower_bound: Vec<f64> = vec![-50.0; 5];
             let upper_bound: Vec<f64> = vec![50.0; 5];
 
-            let cost = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
+            let cost = Rosenbrock::new(lower_bound, upper_bound);
 
             // Define initial parameter vector
             let init_param: Vec<f64> = vec![3.0; 5];
@@ -121,7 +115,7 @@ fn run() -> Result<(), Error> {
             let lower_bound: Vec<f64> = vec![-50.0; 5];
             let upper_bound: Vec<f64> = vec![50.0; 5];
 
-            let cost = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
+            let cost = Rosenbrock::new(lower_bound, upper_bound);
 
             // Define initial parameter vector
             let init_param: Vec<f64> = vec![3.0; 5];

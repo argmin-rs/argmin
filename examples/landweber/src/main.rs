@@ -19,7 +19,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Vec<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_derivative(p, 1.0, 100.0))
+        Ok(rosenbrock_derivative(p))
     }
 }
 

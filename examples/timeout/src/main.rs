@@ -19,18 +19,14 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
 struct Rosenbrock {
-    a: f64,
-    b: f64,
     lower_bound: Vec<f64>,
     upper_bound: Vec<f64>,
     rng: Arc<Mutex<Xoshiro256PlusPlus>>,
 }
 
 impl Rosenbrock {
-    pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
+    pub fn new(lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
         Rosenbrock {
-            a,
-            b,
             lower_bound,
             upper_bound,
             rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
@@ -43,7 +39,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(param, self.a, self.b))
+        Ok(rosenbrock(param))
     }
 }
 
@@ -69,7 +65,7 @@ impl Anneal for Rosenbrock {
 fn run() -> Result<(), Error> {
     let lower_bound: Vec<f64> = vec![-5.0, -5.0];
     let upper_bound: Vec<f64> = vec![5.0, 5.0];
-    let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
+    let operator = Rosenbrock::new(lower_bound, upper_bound);
     let init_param: Vec<f64> = vec![1.0, 1.2];
     let temp = 15.0;
     let solver = SimulatedAnnealing::new(temp)?.with_temp_func(SATempFunc::Boltzmann);

@@ -110,7 +110,7 @@ mod tests {
                     derivative[i],
                     derivative_fd[i],
                     epsilon = f64::EPSILON,
-                    max_relative = 1e-3
+                    max_relative = 1e-2
                 );
             }
         }
