@@ -28,10 +28,30 @@ use std::{iter::Sum, ops::AddAssign};
 ///
 /// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
 ///
-/// where `x_i \in (-\infty, \infty)`. The parameters a and b usually are: `a = 1` and `b = 100`.
+/// where `x_i \in (-\infty, \infty)`. The parameters a and b are: `a = 1` and `b = 100`.
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
-pub fn rosenbrock<T>(param: &[T], a: T, b: T) -> T
+pub fn rosenbrock<T>(param: &[T]) -> T
+where
+    T: Float + FromPrimitive + Sum,
+{
+    rosenbrock_ab(
+        param,
+        T::from_f64(1.0).unwrap(),
+        T::from_f64(100.0).unwrap(),
+    )
+}
+
+/// Multidimensional Rosenbrock test function
+///
+/// Defined as
+///
+/// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
+///
+/// where `x_i \in (-\infty, \infty)`. The parameters a and b can be chosen freely.
+///
+/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+pub fn rosenbrock_ab<T>(param: &[T], a: T, b: T) -> T
 where
     T: Float + FromPrimitive + Sum,
 {
@@ -41,9 +61,24 @@ where
         .map(|(&xi, &xi1)| (a - xi).powi(2) + b * (xi1 - xi.powi(2)).powi(2))
         .sum()
 }
+/// Derivative of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+pub fn rosenbrock_derivative<T>(param: &[T]) -> Vec<T>
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_derivative_ab(
+        param,
+        T::from_f64(1.0).unwrap(),
+        T::from_f64(100.0).unwrap(),
+    )
+}
 
 /// Derivative of the multidimensional Rosenbrock test function
-pub fn rosenbrock_derivative<T>(param: &[T], a: T, b: T) -> Vec<T>
+///
+/// The parameters `a` and `b` can be chosen freely.
+pub fn rosenbrock_derivative_ab<T>(param: &[T], a: T, b: T) -> Vec<T>
 where
     T: Float + FromPrimitive + AddAssign,
 {
@@ -69,7 +104,23 @@ where
 }
 
 /// Hessian of the multidimensional Rosenbrock test function
-pub fn rosenbrock_hessian<T>(param: &[T], a: T, b: T) -> Vec<Vec<T>>
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+pub fn rosenbrock_hessian<T>(param: &[T]) -> Vec<Vec<T>>
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_hessian_ab(
+        param,
+        T::from_f64(1.0).unwrap(),
+        T::from_f64(100.0).unwrap(),
+    )
+}
+
+/// Hessian of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+pub fn rosenbrock_hessian_ab<T>(param: &[T], a: T, b: T) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + AddAssign,
 {
@@ -95,9 +146,28 @@ where
 
 /// Derivative of the multidimensional Rosenbrock test function
 ///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
-pub fn rosenbrock_derivative_const<const N: usize, T>(param: &[T; N], a: T, b: T) -> [T; N]
+pub fn rosenbrock_derivative_const<const N: usize, T>(param: &[T; N]) -> [T; N]
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_derivative_const_ab(
+        param,
+        T::from_f64(1.0).unwrap(),
+        T::from_f64(100.0).unwrap(),
+    )
+}
+
+/// Derivative of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn rosenbrock_derivative_const_ab<const N: usize, T>(param: &[T; N], a: T, b: T) -> [T; N]
 where
     T: Float + FromPrimitive + AddAssign,
 {
@@ -121,7 +191,29 @@ where
 }
 
 /// Hessian of the multidimensional Rosenbrock test function
-pub fn rosenbrock_hessian_const<const N: usize, T>(x: &[T; N], a: T, b: T) -> [[T; N]; N]
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn rosenbrock_hessian_const<const N: usize, T>(param: &[T; N]) -> [[T; N]; N]
+where
+    T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_hessian_const_ab(
+        param,
+        T::from_f64(1.0).unwrap(),
+        T::from_f64(100.0).unwrap(),
+    )
+}
+
+/// Hessian of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+pub fn rosenbrock_hessian_const_ab<const N: usize, T>(x: &[T; N], a: T, b: T) -> [[T; N]; N]
 where
     T: Float + FromPrimitive + AddAssign,
 {
@@ -154,17 +246,13 @@ mod tests {
     #[test]
     fn test_rosenbrock_optimum() {
         assert_relative_eq!(
-            rosenbrock(&[1.0_f32, 1.0_f32], 1.0, 100.0),
+            rosenbrock(&[1.0_f32, 1.0_f32]),
             0.0,
             epsilon = std::f32::EPSILON
         );
+        assert_relative_eq!(rosenbrock(&[1.0, 1.0]), 0.0, epsilon = std::f64::EPSILON);
         assert_relative_eq!(
-            rosenbrock(&[1.0, 1.0], 1.0, 100.0),
-            0.0,
-            epsilon = std::f64::EPSILON
-        );
-        assert_relative_eq!(
-            rosenbrock(&[1.0, 1.0, 1.0], 1.0, 100.0),
+            rosenbrock(&[1.0, 1.0, 1.0]),
             0.0,
             epsilon = std::f64::EPSILON
         );
@@ -172,8 +260,7 @@ mod tests {
 
     #[test]
     fn test_rosenbrock_derivative_optimum() {
-        let derivative =
-            rosenbrock_derivative(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 1.0, 100.0);
+        let derivative = rosenbrock_derivative(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]);
         for elem in derivative {
             assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
         }
@@ -181,8 +268,7 @@ mod tests {
 
     #[test]
     fn test_rosenbrock_derivative_const_optimum() {
-        let derivative =
-            rosenbrock_derivative_const(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 1.0, 100.0);
+        let derivative = rosenbrock_derivative_const(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]);
         for elem in derivative {
             assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
         }
@@ -191,7 +277,7 @@ mod tests {
     #[test]
     fn test_rosenbrock_hessian() {
         // Same testcase as in scipy
-        let hessian = rosenbrock_hessian(&[0.0, 0.1, 0.2, 0.3], 1.0, 100.0);
+        let hessian = rosenbrock_hessian(&[0.0, 0.1, 0.2, 0.3]);
         let res = vec![
             vec![-38.0, 0.0, 0.0, 0.0],
             vec![0.0, 134.0, -40.0, 0.0],
@@ -210,7 +296,7 @@ mod tests {
     #[test]
     fn test_rosenbrock_hessian_const() {
         // Same testcase as in scipy
-        let hessian = rosenbrock_hessian_const(&[0.0, 0.1, 0.2, 0.3], 1.0, 100.0);
+        let hessian = rosenbrock_hessian_const(&[0.0, 0.1, 0.2, 0.3]);
         let res = vec![
             vec![-38.0, 0.0, 0.0, 0.0],
             vec![0.0, 134.0, -40.0, 0.0],
@@ -237,8 +323,8 @@ mod tests {
                                                  g in -1.0..1.0,
                                                  h in -1.0..1.0) {
             let param = [a, b, c, d, e, f, g, h];
-            let derivative = rosenbrock_derivative(&param, 1.0, 100.0);
-            let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x, 1.0, 100.0));
+            let derivative = rosenbrock_derivative(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x));
             for i in 0..derivative.len() {
                 assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-4);
             }
@@ -256,8 +342,8 @@ mod tests {
                                                        g in -1.0..1.0,
                                                        h in -1.0..1.0) {
             let param = [a, b, c, d, e, f, g, h];
-            let derivative = rosenbrock_derivative_const(&param, 1.0, 100.0);
-            let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x, 1.0, 100.0));
+            let derivative = rosenbrock_derivative_const(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| rosenbrock(&x));
             for i in 0..derivative.len() {
                 assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-4);
             }
@@ -275,9 +361,9 @@ mod tests {
                                               g in -1.0..1.0,
                                               h in -1.0..1.0) {
             let param = [a, b, c, d, e, f, g, h];
-            let hessian = rosenbrock_hessian(&param, 1.0, 100.0);
+            let hessian = rosenbrock_hessian(&param);
             let hessian_fd =
-                Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x, 1.0, 100.0));
+                Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x));
             let n = hessian.len();
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
@@ -299,9 +385,9 @@ mod tests {
                                                     g in -1.0..1.0,
                                                     h in -1.0..1.0) {
             let param = [a, b, c, d, e, f, g, h];
-            let hessian = rosenbrock_hessian_const(&param, 1.0, 100.0);
+            let hessian = rosenbrock_hessian_const(&param);
             let hessian_fd =
-                Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x, 1.0, 100.0));
+                Vec::from(param).forward_hessian(&|x| rosenbrock_derivative(&x));
             let n = hessian.len();
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);

@@ -16,10 +16,6 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
 struct Rosenbrock {
-    /// Parameter a, usually 1.0
-    a: f64,
-    /// Parameter b, usually 100.0
-    b: f64,
     /// lower bound
     lower_bound: Vec<f64>,
     /// upper bound
@@ -32,10 +28,8 @@ struct Rosenbrock {
 
 impl Rosenbrock {
     /// Constructor
-    pub fn new(a: f64, b: f64, lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
+    pub fn new(lower_bound: Vec<f64>, upper_bound: Vec<f64>) -> Self {
         Rosenbrock {
-            a,
-            b,
             lower_bound,
             upper_bound,
             rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
@@ -48,7 +42,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(param, self.a, self.b))
+        Ok(rosenbrock(param))
     }
 }
 
@@ -87,7 +81,7 @@ fn run() -> Result<(), Error> {
     let upper_bound: Vec<f64> = vec![5.0, 5.0];
 
     // Define cost function
-    let operator = Rosenbrock::new(1.0, 100.0, lower_bound, upper_bound);
+    let operator = Rosenbrock::new(lower_bound, upper_bound);
 
     // Define initial parameter vector
     let init_param: Vec<f64> = vec![1.0, 1.2];

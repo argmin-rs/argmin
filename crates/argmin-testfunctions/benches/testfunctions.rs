@@ -374,54 +374,48 @@ pub fn bm_rastrigin(c: &mut Criterion) {
 pub fn bm_rosenbrock(c: &mut Criterion) {
     let mut g = c.benchmark_group("rosenbrock");
     // Test function
-    g.bench_function("rosenbrock 02", |b| {
-        b.iter(|| rosenbrock(black_box(P2), black_box(1.0), black_box(100.0)))
-    });
-    g.bench_function("rosenbrock 10", |b| {
-        b.iter(|| rosenbrock(black_box(P10), black_box(1.0), black_box(100.0)))
-    });
-    g.bench_function("rosenbrock 20", |b| {
-        b.iter(|| rosenbrock(black_box(P20), black_box(1.0), black_box(100.0)))
-    });
+    g.bench_function("rosenbrock 02", |b| b.iter(|| rosenbrock(black_box(P2))));
+    g.bench_function("rosenbrock 10", |b| b.iter(|| rosenbrock(black_box(P10))));
+    g.bench_function("rosenbrock 20", |b| b.iter(|| rosenbrock(black_box(P20))));
     // Derivative
     g.bench_function("rosenbrock_derivative 02", |b| {
-        b.iter(|| rosenbrock_derivative(black_box(P2), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative(black_box(P2)))
     });
     g.bench_function("rosenbrock_derivative 10", |b| {
-        b.iter(|| rosenbrock_derivative(black_box(P10), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative(black_box(P10)))
     });
     g.bench_function("rosenbrock_derivative 20", |b| {
-        b.iter(|| rosenbrock_derivative(black_box(P20), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative(black_box(P20)))
     });
     // Derivative const
     g.bench_function("rosenbrock_derivative_const 02", |b| {
-        b.iter(|| rosenbrock_derivative_const(black_box(P2), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative_const(black_box(P2)))
     });
     g.bench_function("rosenbrock_derivative_const 10", |b| {
-        b.iter(|| rosenbrock_derivative_const(black_box(P10), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative_const(black_box(P10)))
     });
     g.bench_function("rosenbrock_derivative_const 20", |b| {
-        b.iter(|| rosenbrock_derivative_const(black_box(P20), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_derivative_const(black_box(P20)))
     });
     // Hessian
     g.bench_function("rosenbrock_hessian 02", |b| {
-        b.iter(|| rosenbrock_hessian(black_box(P2), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian(black_box(P2)))
     });
     g.bench_function("rosenbrock_hessian 10", |b| {
-        b.iter(|| rosenbrock_hessian(black_box(P10), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian(black_box(P10)))
     });
     g.bench_function("rosenbrock_hessian 20", |b| {
-        b.iter(|| rosenbrock_hessian(black_box(P20), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian(black_box(P20)))
     });
     // Hessian const
     g.bench_function("rosenbrock_hessian_const 02", |b| {
-        b.iter(|| rosenbrock_hessian_const(black_box(P2), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian_const(black_box(P2)))
     });
     g.bench_function("rosenbrock_hessian_const 10", |b| {
-        b.iter(|| rosenbrock_hessian_const(black_box(P10), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian_const(black_box(P10)))
     });
     g.bench_function("rosenbrock_hessian_const 20", |b| {
-        b.iter(|| rosenbrock_hessian_const(black_box(P20), black_box(1.0), black_box(100.0)))
+        b.iter(|| rosenbrock_hessian_const(black_box(P20)))
     });
     g.finish();
 }

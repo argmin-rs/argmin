@@ -13,17 +13,14 @@ use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 use ndarray::{array, Array1};
 
-struct Rosenbrock {
-    a: f64,
-    b: f64,
-}
+struct Rosenbrock {}
 
 impl CostFunction for Rosenbrock {
     type Param = Array1<f64>;
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(p.as_slice().unwrap(), self.a, self.b))
+        Ok(rosenbrock(p.as_slice().unwrap()))
     }
 }
 impl Gradient for Rosenbrock {
@@ -31,17 +28,13 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(Array1::from(rosenbrock_derivative(
-            p.as_slice().unwrap(),
-            self.a,
-            self.b,
-        )))
+        Ok(rosenbrock_derivative(&p.to_vec()).into())
     }
 }
 
 fn run() -> Result<(), Error> {
     // Define cost function
-    let cost = Rosenbrock { a: 1.0, b: 100.0 };
+    let cost = Rosenbrock {};
 
     // Define initial parameter vector
     let init_param: Array1<f64> = array![-1.2, 1.0];

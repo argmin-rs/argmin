@@ -13,17 +13,14 @@ use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 use nalgebra::DVector;
 
-struct Rosenbrock {
-    a: f64,
-    b: f64,
-}
+struct Rosenbrock {}
 
 impl CostFunction for Rosenbrock {
     type Param = DVector<f64>;
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(p.as_slice(), self.a, self.b))
+        Ok(rosenbrock(p.as_slice()))
     }
 }
 
@@ -32,17 +29,13 @@ impl Gradient for Rosenbrock {
     type Gradient = DVector<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(DVector::from(rosenbrock_derivative(
-            p.as_slice(),
-            self.a,
-            self.b,
-        )))
+        Ok(DVector::from(rosenbrock_derivative(p.as_slice())))
     }
 }
 
 fn run() -> Result<(), Error> {
     // Define cost function
-    let cost = Rosenbrock { a: 1.0, b: 100.0 };
+    let cost = Rosenbrock {};
 
     // Define initial parameter vector
     let init_param: DVector<f64> = DVector::from(vec![-1.2, 1.0]);
