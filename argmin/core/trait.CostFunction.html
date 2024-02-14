@@ -25,7 +25,7 @@
 
     <span class="doccomment">/// Compute Rosenbrock function
     </span><span class="kw">fn </span>cost(<span class="kw-2">&amp;</span><span class="self">self</span>, param: <span class="kw-2">&amp;</span><span class="self">Self</span>::Param) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Output, Error&gt; {
-        <span class="prelude-val">Ok</span>(rosenbrock(param, <span class="number">1.0</span>, <span class="number">100.0</span>))
+        <span class="prelude-val">Ok</span>(rosenbrock(param))
     }
 }</code></pre></div>
 </div></details><h2 id="required-associated-types" class="section-header">Required Associated Types<a href="#required-associated-types" class="anchor">§</a></h2><div class="methods"><details class="toggle" open><summary><section id="associatedtype.Param" class="method"><a class="src rightside" href="../../src/argmin/core/problem.rs.html#374">source</a><h4 class="code-header">type <a href="#associatedtype.Param" class="associatedtype">Param</a></h4></section></summary><div class="docblock"><p>Type of the parameter vector</p>

@@ -277,7 +277,7 @@
 //! #
 //! #     /// Apply the cost function to a parameter `p`
 //! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
-//! #         Ok(rosenbrock(p, 1.0, 100.0))
+//! #         Ok(rosenbrock(p))
 //! #     }
 //! # }
 //! #
@@ -290,7 +290,7 @@
 //! #
 //! #     /// Compute the gradient at parameter `p`.
 //! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
-//! #         Ok(rosenbrock_derivative(p, 1.0, 100.0))
+//! #         Ok(rosenbrock_derivative(p))
 //! #     }
 //! # }
 //! #

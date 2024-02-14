@@ -313,6 +313,92 @@
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
 <a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -343,10 +429,30 @@
 ///
 /// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
 ///
-/// where `x_i \in (-\infty, \infty)`. The parameters a and b usually are: `a = 1` and `b = 100`.
+/// where `x_i \in (-\infty, \infty)`. The parameters a and b are: `a = 1` and `b = 100`.
 ///
 /// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
-</span><span class="kw">pub fn </span>rosenbrock&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; T
+</span><span class="kw">pub fn </span>rosenbrock&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T
+<span class="kw">where
+    </span>T: Float + FromPrimitive + Sum,
+{
+    rosenbrock_ab(
+        param,
+        T::from_f64(<span class="number">1.0</span>).unwrap(),
+        T::from_f64(<span class="number">100.0</span>).unwrap(),
+    )
+}
+
+<span class="doccomment">/// Multidimensional Rosenbrock test function
+///
+/// Defined as
+///
+/// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
+///
+/// where `x_i \in (-\infty, \infty)`. The parameters a and b can be chosen freely.
+///
+/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+</span><span class="kw">pub fn </span>rosenbrock_ab&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; T
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
 {
@@ -356,9 +462,24 @@
         .map(|(<span class="kw-2">&amp;</span>xi, <span class="kw-2">&amp;</span>xi1)| (a - xi).powi(<span class="number">2</span>) + b * (xi1 - xi.powi(<span class="number">2</span>)).powi(<span class="number">2</span>))
         .sum()
 }
+<span class="doccomment">/// Derivative of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+</span><span class="kw">pub fn </span>rosenbrock_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;T&gt;
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_derivative_ab(
+        param,
+        T::from_f64(<span class="number">1.0</span>).unwrap(),
+        T::from_f64(<span class="number">100.0</span>).unwrap(),
+    )
+}
 
 <span class="doccomment">/// Derivative of the multidimensional Rosenbrock test function
-</span><span class="kw">pub fn </span>rosenbrock_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;T&gt;
+///
+/// The parameters `a` and `b` can be chosen freely.
+</span><span class="kw">pub fn </span>rosenbrock_derivative_ab&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;T&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + AddAssign,
 {
@@ -384,7 +505,23 @@
 }
 
 <span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
-</span><span class="kw">pub fn </span>rosenbrock_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+</span><span class="kw">pub fn </span>rosenbrock_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_hessian_ab(
+        param,
+        T::from_f64(<span class="number">1.0</span>).unwrap(),
+        T::from_f64(<span class="number">100.0</span>).unwrap(),
+    )
+}
+
+<span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+</span><span class="kw">pub fn </span>rosenbrock_hessian_ab&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + AddAssign,
 {
@@ -410,9 +547,28 @@
 
 <span class="doccomment">/// Derivative of the multidimensional Rosenbrock test function
 ///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
-</span><span class="kw">pub fn </span>rosenbrock_derivative_const&lt;<span class="kw">const </span>N: usize, T&gt;(param: <span class="kw-2">&amp;</span>[T; N], a: T, b: T) -&gt; [T; N]
+</span><span class="kw">pub fn </span>rosenbrock_derivative_const&lt;<span class="kw">const </span>N: usize, T&gt;(param: <span class="kw-2">&amp;</span>[T; N]) -&gt; [T; N]
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_derivative_const_ab(
+        param,
+        T::from_f64(<span class="number">1.0</span>).unwrap(),
+        T::from_f64(<span class="number">100.0</span>).unwrap(),
+    )
+}
+
+<span class="doccomment">/// Derivative of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+</span><span class="kw">pub fn </span>rosenbrock_derivative_const_ab&lt;<span class="kw">const </span>N: usize, T&gt;(param: <span class="kw-2">&amp;</span>[T; N], a: T, b: T) -&gt; [T; N]
 <span class="kw">where
     </span>T: Float + FromPrimitive + AddAssign,
 {
@@ -436,7 +592,29 @@
 }
 
 <span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
-</span><span class="kw">pub fn </span>rosenbrock_hessian_const&lt;<span class="kw">const </span>N: usize, T&gt;(x: <span class="kw-2">&amp;</span>[T; N], a: T, b: T) -&gt; [[T; N]; N]
+///
+/// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+</span><span class="kw">pub fn </span>rosenbrock_hessian_const&lt;<span class="kw">const </span>N: usize, T&gt;(param: <span class="kw-2">&amp;</span>[T; N]) -&gt; [[T; N]; N]
+<span class="kw">where
+    </span>T: Float + FromPrimitive + AddAssign,
+{
+    rosenbrock_hessian_const_ab(
+        param,
+        T::from_f64(<span class="number">1.0</span>).unwrap(),
+        T::from_f64(<span class="number">100.0</span>).unwrap(),
+    )
+}
+
+<span class="doccomment">/// Hessian of the multidimensional Rosenbrock test function
+///
+/// The parameters `a` and `b` can be chosen freely.
+///
+/// This is the const generics version, which requires the number of parameters to be known
+/// at compile time.
+</span><span class="kw">pub fn </span>rosenbrock_hessian_const_ab&lt;<span class="kw">const </span>N: usize, T&gt;(x: <span class="kw-2">&amp;</span>[T; N], a: T, b: T) -&gt; [[T; N]; N]
 <span class="kw">where
     </span>T: Float + FromPrimitive + AddAssign,
 {
@@ -469,17 +647,13 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_rosenbrock_optimum() {
         <span class="macro">assert_relative_eq!</span>(
-            rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0_f32</span>, <span class="number">1.0_f32</span>], <span class="number">1.0</span>, <span class="number">100.0</span>),
+            rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0_f32</span>, <span class="number">1.0_f32</span>]),
             <span class="number">0.0</span>,
             epsilon = std::f32::EPSILON
         );
+        <span class="macro">assert_relative_eq!</span>(rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>]), <span class="number">0.0</span>, epsilon = std::f64::EPSILON);
         <span class="macro">assert_relative_eq!</span>(
-            rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>),
-            <span class="number">0.0</span>,
-            epsilon = std::f64::EPSILON
-        );
-        <span class="macro">assert_relative_eq!</span>(
-            rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>),
+            rosenbrock(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>]),
             <span class="number">0.0</span>,
             epsilon = std::f64::EPSILON
         );
@@ -487,8 +661,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_rosenbrock_derivative_optimum() {
-        <span class="kw">let </span>derivative =
-            rosenbrock_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        <span class="kw">let </span>derivative = rosenbrock_derivative(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>]);
         <span class="kw">for </span>elem <span class="kw">in </span>derivative {
             <span class="macro">assert_relative_eq!</span>(elem, <span class="number">0.0</span>, epsilon = std::f64::EPSILON);
         }
@@ -496,8 +669,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_rosenbrock_derivative_const_optimum() {
-        <span class="kw">let </span>derivative =
-            rosenbrock_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        <span class="kw">let </span>derivative = rosenbrock_derivative_const(<span class="kw-2">&amp;</span>[<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>]);
         <span class="kw">for </span>elem <span class="kw">in </span>derivative {
             <span class="macro">assert_relative_eq!</span>(elem, <span class="number">0.0</span>, epsilon = std::f64::EPSILON);
         }
@@ -506,7 +678,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_rosenbrock_hessian() {
         <span class="comment">// Same testcase as in scipy
-        </span><span class="kw">let </span>hessian = rosenbrock_hessian(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        </span><span class="kw">let </span>hessian = rosenbrock_hessian(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>]);
         <span class="kw">let </span>res = <span class="macro">vec!</span>[
             <span class="macro">vec!</span>[-<span class="number">38.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>],
             <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">134.0</span>, -<span class="number">40.0</span>, <span class="number">0.0</span>],
@@ -525,7 +697,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_rosenbrock_hessian_const() {
         <span class="comment">// Same testcase as in scipy
-        </span><span class="kw">let </span>hessian = rosenbrock_hessian_const(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>], <span class="number">1.0</span>, <span class="number">100.0</span>);
+        </span><span class="kw">let </span>hessian = rosenbrock_hessian_const(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>]);
         <span class="kw">let </span>res = <span class="macro">vec!</span>[
             <span class="macro">vec!</span>[-<span class="number">38.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>],
             <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">134.0</span>, -<span class="number">40.0</span>, <span class="number">0.0</span>],
@@ -552,8 +724,8 @@
                                                  g <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>,
                                                  h <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>) {
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
-            <span class="kw">let </span>derivative = rosenbrock_derivative(<span class="kw-2">&amp;</span>param, <span class="number">1.0</span>, <span class="number">100.0</span>);
-            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rosenbrock(<span class="kw-2">&amp;</span>x, <span class="number">1.0</span>, <span class="number">100.0</span>));
+            <span class="kw">let </span>derivative = rosenbrock_derivative(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rosenbrock(<span class="kw-2">&amp;</span>x));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
                 <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-4</span>);
             }
@@ -571,8 +743,8 @@
                                                        g <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>,
                                                        h <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>) {
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
-            <span class="kw">let </span>derivative = rosenbrock_derivative_const(<span class="kw-2">&amp;</span>param, <span class="number">1.0</span>, <span class="number">100.0</span>);
-            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rosenbrock(<span class="kw-2">&amp;</span>x, <span class="number">1.0</span>, <span class="number">100.0</span>));
+            <span class="kw">let </span>derivative = rosenbrock_derivative_const(<span class="kw-2">&amp;</span>param);
+            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rosenbrock(<span class="kw-2">&amp;</span>x));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
                 <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-4</span>);
             }
@@ -590,9 +762,9 @@
                                               g <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>,
                                               h <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>) {
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
-            <span class="kw">let </span>hessian = rosenbrock_hessian(<span class="kw-2">&amp;</span>param, <span class="number">1.0</span>, <span class="number">100.0</span>);
+            <span class="kw">let </span>hessian = rosenbrock_hessian(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>hessian_fd =
-                Vec::from(param).forward_hessian(<span class="kw-2">&amp;</span>|x| rosenbrock_derivative(<span class="kw-2">&amp;</span>x, <span class="number">1.0</span>, <span class="number">100.0</span>));
+                Vec::from(param).forward_hessian(<span class="kw-2">&amp;</span>|x| rosenbrock_derivative(<span class="kw-2">&amp;</span>x));
             <span class="kw">let </span>n = hessian.len();
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
@@ -614,9 +786,9 @@
                                                     g <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>,
                                                     h <span class="kw">in </span>-<span class="number">1.0</span>..<span class="number">1.0</span>) {
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
-            <span class="kw">let </span>hessian = rosenbrock_hessian_const(<span class="kw-2">&amp;</span>param, <span class="number">1.0</span>, <span class="number">100.0</span>);
+            <span class="kw">let </span>hessian = rosenbrock_hessian_const(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>hessian_fd =
-                Vec::from(param).forward_hessian(<span class="kw-2">&amp;</span>|x| rosenbrock_derivative(<span class="kw-2">&amp;</span>x, <span class="number">1.0</span>, <span class="number">100.0</span>));
+                Vec::from(param).forward_hessian(<span class="kw-2">&amp;</span>|x| rosenbrock_derivative(<span class="kw-2">&amp;</span>x));
             <span class="kw">let </span>n = hessian.len();
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);

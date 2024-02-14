@@ -444,9 +444,6 @@
 <a href="#443" id="443">443</a>
 <a href="#444" id="444">444</a>
 <a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -487,10 +484,7 @@
 //! # use argmin::solver::linesearch::MoreThuenteLineSearch;
 //! # use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 //! #
-//! # struct Rosenbrock {
-//! #     a: f64,
-//! #     b: f64,
-//! # }
+//! # struct Rosenbrock {}
 //! #
 //! # /// Implement `CostFunction` for `Rosenbrock`
 //! # impl CostFunction for Rosenbrock {
@@ -501,7 +495,7 @@
 //! #
 //! #     /// Apply the cost function to a parameter `p`
 //! #     fn cost(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Output, Error&gt; {
-//! #         Ok(rosenbrock(p, 1.0, 100.0))
+//! #         Ok(rosenbrock(p))
 //! #     }
 //! # }
 //! #
@@ -514,14 +508,14 @@
 //! #
 //! #     /// Compute the gradient at parameter `p`.
 //! #     fn gradient(&amp;self, p: &amp;Self::Param) -&gt; Result&lt;Self::Gradient, Error&gt; {
-//! #         Ok(rosenbrock_derivative(p, 1.0, 100.0))
+//! #         Ok(rosenbrock_derivative(p))
 //! #     }
 //! # }
 //! #
 //! # fn run() -&gt; Result&lt;(), Error&gt; {
 //! #
 //! # // Define cost function (must implement `CostFunction` and `Gradient`)
-//! # let problem = Rosenbrock { a: 1.0, b: 100.0 };
+//! # let problem = Rosenbrock { };
 //! #
 //! # // Define initial parameter vector
 //! # let init_param: Vec&lt;f64&gt; = vec![-1.2, 1.0];
