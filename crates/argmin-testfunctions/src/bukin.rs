@@ -132,9 +132,12 @@ mod tests {
             let derivative = bukin_n6_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| bukin_n6(&[x[0], x[1]]));
             for i in 0..derivative.len() {
-                // finite differences aren't really that useful here, therefore the extremely
-                // high epsilon. We're happy if we're somewhat close.
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1.0);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -146,14 +149,17 @@ mod tests {
             let hessian = bukin_n6_hessian(&param);
             let hessian_fd = Vec::from(param).central_hessian(&|x| bukin_n6_derivative(&[x[0], x[1]]).to_vec());
             let n = hessian.len();
-            println!("1: {a}/{b} {hessian:?}");
-            println!("2: {a}/{b} {hessian_fd:?}");
+            // println!("1: {a}/{b} {hessian:?}");
+            // println!("2: {a}/{b} {hessian_fd:?}");
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
-                    // finite differences aren't really that useful here, therefore the extremely
-                    // high epsilon. We're happy if we're somewhat close.
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 100.0);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-5,
+                        max_relative = 1e-5,
+                    );
                 }
             }
         }

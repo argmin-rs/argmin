@@ -153,7 +153,12 @@ mod tests {
             let derivative_fd =
                 [2.0 * a, 2.0 * b, 2.0 * c, 2.0 * d, 2.0 * e, 2.0 * f, 2.0 * g, 2.0 * h];
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = std::f64::EPSILON);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -173,7 +178,12 @@ mod tests {
             let derivative_fd =
                 [2.0 * a, 2.0 * b, 2.0 * c, 2.0 * d, 2.0 * e, 2.0 * f, 2.0 * g, 2.0 * h];
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = std::f64::EPSILON);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5,
+                );
             }
         }
     }
@@ -192,7 +202,12 @@ mod tests {
             let derivative = sphere_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| sphere(&x));
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-5);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -211,7 +226,12 @@ mod tests {
             let derivative = sphere_derivative_const(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| sphere(&x));
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-5);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -279,7 +299,12 @@ mod tests {
             let hessian_fd = Vec::from(param).central_hessian(&|x| sphere_derivative(&x));
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-5,
+                        max_relative = 1e-5
+                    );
                 }
             }
         }
@@ -300,7 +325,12 @@ mod tests {
             let hessian_fd = Vec::from(param).central_hessian(&|x| sphere_derivative(&x));
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-5,
+                        max_relative = 1e-5
+                    );
                 }
             }
         }

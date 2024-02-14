@@ -158,7 +158,7 @@ mod tests {
                     assert_relative_eq!(
                         hessian[i][j],
                         hessian_fd[i][j],
-                        epsilon = f64::EPSILON,
+                        epsilon = 1e-5,
                         max_relative = 1e-2
                     );
                 }

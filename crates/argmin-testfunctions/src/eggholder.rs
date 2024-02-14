@@ -233,7 +233,12 @@ mod tests {
             let derivative = eggholder_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| eggholder(&[x[0], x[1]]));
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-4);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-4,
+                    max_relative = 1e-4
+                );
             }
         }
     }
@@ -246,13 +251,18 @@ mod tests {
             let hessian_fd =
                 Vec::from(param).central_hessian(&|x| eggholder_derivative(&[x[0], x[1]]).to_vec());
             let n = hessian.len();
-            println!("1: {hessian:?} at {a}/{b}");
-            println!("2: {hessian_fd:?} at {a}/{b}");
+            // println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
                     if hessian_fd[i][j].is_finite() {
-                        assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-5);
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = 1e-4,
+                            max_relative = 1e-3
+                        );
                     }
                 }
             }

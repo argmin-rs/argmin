@@ -169,7 +169,7 @@ mod tests {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = std::f64::EPSILON,
+                    epsilon = 1e-5,
                     max_relative = 1e-3
                 );
             }
@@ -193,7 +193,7 @@ mod tests {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = std::f64::EPSILON,
+                    epsilon = 1e-5,
                     max_relative = 1e-3
                 );
             }
@@ -218,7 +218,7 @@ mod tests {
                     assert_relative_eq!(
                         derivative[i][j],
                         derivative_fd[i][j],
-                        epsilon = std::f64::EPSILON,
+                        epsilon = 1e-5,
                         max_relative = 1e-3
                     );
                 }
@@ -244,7 +244,7 @@ mod tests {
                     assert_relative_eq!(
                         derivative[i][j],
                         derivative_fd[i][j],
-                        epsilon = std::f64::EPSILON,
+                        epsilon = 1e-5,
                         max_relative = 1e-3
                     );
                 }

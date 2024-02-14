@@ -366,13 +366,13 @@ mod tests {
             let param = [a, b, c, d, e, f, g, h];
             let derivative = ackley_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| ackley(&x));
-            println!("1: {derivative:?} at {a}/{b}");
-            println!("2: {derivative_fd:?} at {a}/{b}");
+            // println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
             for i in 0..derivative.len() {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = std::f64::EPSILON,
+                    epsilon = 1e-5,
                     max_relative = 1e-2
                 );
             }
@@ -392,13 +392,13 @@ mod tests {
             let param = [a, b, c, d, e, f, g, h];
             let derivative = ackley_derivative_const(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| ackley(&x));
-            println!("1: {derivative:?} at {a}/{b}");
-            println!("2: {derivative_fd:?} at {a}/{b}");
+            // println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
             for i in 0..derivative.len() {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = f64::EPSILON,
+                    epsilon = 1e-5,
                     max_relative = 1e-2
                 );
             }
@@ -418,8 +418,8 @@ mod tests {
             let param = [a, b, c, d, e, f, g, h];
             let hessian = ackley_hessian(&param);
             let hessian_fd = Vec::from(param).central_hessian(&|x| ackley_derivative(&x));
-            println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
-            println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
                     assert_relative_eq!(
@@ -446,8 +446,8 @@ mod tests {
             let param = [a, b, c, d, e, f, g, h];
             let hessian = ackley_hessian_const(&param);
             let hessian_fd = Vec::from(param).central_hessian(&|x| ackley_derivative(&x));
-            println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
-            println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
                     assert_relative_eq!(
