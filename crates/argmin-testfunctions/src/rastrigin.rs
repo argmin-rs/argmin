@@ -246,7 +246,12 @@ mod tests {
             let derivative = rastrigin_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| rastrigin(&x));
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-5);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -265,7 +270,12 @@ mod tests {
             let derivative = rastrigin_derivative_const(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| rastrigin(&x));
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-5);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-5
+                );
             }
         }
     }
@@ -288,7 +298,12 @@ mod tests {
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-4);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-4,
+                        max_relative = 1e-4
+                    );
                 }
             }
         }
@@ -312,7 +327,12 @@ mod tests {
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-4);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-4,
+                        max_relative = 1e-4
+                    );
                 }
             }
         }

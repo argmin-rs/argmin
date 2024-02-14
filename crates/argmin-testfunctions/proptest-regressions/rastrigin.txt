@@ -5,3 +5,5 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 8e289051f77d8ac74e2cc8699a73d8c8034d201b01e49ef4251cb8b8f5d5bdb5 # shrinks to a = 0.0, b = 2.345625139732665, c = -2.484074023995798, d = 4.845993399341542, e = 2.354931057240211, f = 2.9787172952472325, g = -0.6695655149267524, h = 1.8335987606397237
+cc c828b3b164ff365c1a0e1ae7378b10b35e94d9ed33d49213e7a0f27a623a6250 # shrinks to a = -1.2501843544350766, b = 0.0, c = 0.0, d = 0.0, e = 0.0, f = 0.0, g = 0.0, h = 0.0
+cc 2fd8d694f3a02024b285d3128654cdac863e7d44d28e53d64250a685e86ff78b # shrinks to a = 0.0, b = 0.0, c = 0.0, d = 0.0, e = 0.0, f = 0.0, g = 0.7496803006161671, h = 0.0

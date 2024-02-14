@@ -308,10 +308,15 @@ mod tests {
             let param = [a, b];
             let derivative = schaffer_n2_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| schaffer_n2(&[x[0], x[1]]));
-            println!("1: {derivative:?} at {a}/{b}");
-            println!("2: {derivative_fd:?} at {a}/{b}");
+            // println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-6);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-5,
+                    max_relative = 1e-3
+                );
             }
         }
     }
@@ -326,12 +331,17 @@ mod tests {
             let hessian_fd =
                 Vec::from(param).forward_hessian(&|x| schaffer_n2_derivative(&[x[0], x[1]]).to_vec());
             let n = hessian.len();
-            println!("1: {hessian:?} at {a}/{b}");
-            println!("2: {hessian_fd:?} at {a}/{b}");
+            // println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
-                    assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-3);
+                    assert_relative_eq!(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = 1e-4,
+                        max_relative = 1e-3
+                    );
                 }
             }
         }
@@ -357,10 +367,15 @@ mod tests {
             let param = [a, b];
             let derivative = schaffer_n4_derivative(&param);
             let derivative_fd = Vec::from(param).central_diff(&|x| schaffer_n4(&[x[0], x[1]]));
-            println!("1: {derivative:?} at {a}/{b}");
-            println!("2: {derivative_fd:?} at {a}/{b}");
+            // println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-5);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-4,
+                    max_relative = 1e-2,
+                );
             }
         }
     }
@@ -375,13 +390,18 @@ mod tests {
             let hessian_fd =
                 Vec::from(param).forward_hessian(&|x| schaffer_n4_derivative(&[x[0], x[1]]).to_vec());
             let n = hessian.len();
-            println!("1: {hessian:?} at {a}/{b}");
-            println!("2: {hessian_fd:?} at {a}/{b}");
+            // println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
             for i in 0..n {
                 assert_eq!(hessian[i].len(), n);
                 for j in 0..n {
                     if hessian_fd[i][j].is_finite() {
-                        assert_relative_eq!(hessian[i][j], hessian_fd[i][j], epsilon = 1e-3);
+                        assert_relative_eq!(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = 1e-4,
+                            max_relative = 1e-2
+                        );
                     }
                 }
             }

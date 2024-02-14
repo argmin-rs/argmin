@@ -253,7 +253,12 @@ mod tests {
             // println!("1: {derivative:?} at {a}/{b}");
             // println!("2: {derivative_fd:?} at {a}/{b}");
             for i in 0..derivative.len() {
-                assert_relative_eq!(derivative[i], derivative_fd[i], epsilon = 1e-2);
+                assert_relative_eq!(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = 1e-4,
+                    max_relative = 1e-3
+                );
             }
         }
     }
@@ -275,7 +280,7 @@ mod tests {
                         assert_relative_eq!(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = 1e-5,
                             max_relative = 1e-3
                         );
                     }

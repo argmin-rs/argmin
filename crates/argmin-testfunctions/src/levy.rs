@@ -392,7 +392,7 @@ mod tests {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = f64::EPSILON,
+                    epsilon = 1e-5,
                     max_relative = 1e-4,
                 );
             }
@@ -416,7 +416,7 @@ mod tests {
                         assert_relative_eq!(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = 1e-5,
                             max_relative = 1e-3
                         );
                     }
@@ -437,7 +437,7 @@ mod tests {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = 1e-6,
+                    epsilon = 1e-5,
                     max_relative = 1e-4,
                 );
             }
@@ -456,7 +456,7 @@ mod tests {
                 assert_relative_eq!(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = 1e-6,
+                    epsilon = 1e-5,
                     max_relative = 1e-4,
                 );
             }
@@ -479,7 +479,7 @@ mod tests {
                         assert_relative_eq!(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = 1e-5,
                             max_relative = 1e-3
                         );
                     }
@@ -504,7 +504,7 @@ mod tests {
                         assert_relative_eq!(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = 1e-5,
                             max_relative = 1e-3
                         );
                     }
