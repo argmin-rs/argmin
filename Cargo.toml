@@ -4,6 +4,7 @@ resolver = "2"
 members = [
     "crates/*",
     "examples/*",
+    "python/argmin-testfunctions-py",
 ]
 
 exclude = [

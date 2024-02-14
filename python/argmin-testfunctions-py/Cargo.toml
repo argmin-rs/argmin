@@ -1,0 +1,23 @@
+[package]
+name = "argmin-testfunctions-py"
+version = "0.1.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+description = "Test functions for optimization algorithms"
+documentation = "https://docs.rs/argmin_testfunctions/"
+homepage = "http://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["test", "function", "optimization"]
+categories = ["science"]
+publish = false
+
+[lib]
+name = "argmin_testfunctions_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+argmin_testfunctions = { version = "0.1.1", path = "../../crates/argmin-testfunctions" }
+paste = "1"
+pyo3 = "0.19"
