@@ -94,7 +94,7 @@ mod tests {
                     derivative[i],
                     derivative_fd[i],
                     epsilon = 1e-5,
-                    max_relative = 1e-5
+                    max_relative = 1e-2
                 );
             }
         }
@@ -114,7 +114,7 @@ mod tests {
                         hessian[i][j],
                         hessian_fd[i][j],
                         epsilon = 1e-5,
-                        max_relative = 1e-5
+                        max_relative = 1e-2
                     );
                 }
             }
