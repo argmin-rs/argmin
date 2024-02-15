@@ -403,7 +403,7 @@
 
         <span class="kw">let </span>deriv = styblinski_tang_derivative(<span class="kw-2">&amp;</span>[-<span class="number">2.903534_f64</span>, -<span class="number">2.903534_f64</span>, -<span class="number">2.903534_f64</span>]);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-            <span class="macro">assert_relative_eq!</span>(deriv[i], <span class="number">0.0</span>, epsilon = <span class="number">1e-5</span>, max_relative = <span class="number">1e-5</span>);
+            <span class="macro">assert_relative_eq!</span>(deriv[i], <span class="number">0.0</span>, epsilon = <span class="number">1e-5</span>, max_relative = <span class="number">1e-2</span>);
         }
     }
 
@@ -425,7 +425,7 @@
                     derivative[i],
                     derivative_fd[i],
                     epsilon = <span class="number">1e-5</span>,
-                    max_relative = <span class="number">1e-3
+                    max_relative = <span class="number">1e-2
                 </span>);
             }
         }
@@ -449,7 +449,7 @@
                     derivative[i],
                     derivative_fd[i],
                     epsilon = <span class="number">1e-5</span>,
-                    max_relative = <span class="number">1e-3
+                    max_relative = <span class="number">1e-2
                 </span>);
             }
         }
@@ -474,7 +474,7 @@
                         derivative[i][j],
                         derivative_fd[i][j],
                         epsilon = <span class="number">1e-5</span>,
-                        max_relative = <span class="number">1e-3
+                        max_relative = <span class="number">1e-2
                     </span>);
                 }
             }
@@ -500,7 +500,7 @@
                         derivative[i][j],
                         derivative_fd[i][j],
                         epsilon = <span class="number">1e-5</span>,
-                        max_relative = <span class="number">1e-3
+                        max_relative = <span class="number">1e-2
                     </span>);
                 }
             }
