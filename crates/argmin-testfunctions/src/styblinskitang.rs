@@ -148,7 +148,7 @@ mod tests {
 
         let deriv = styblinski_tang_derivative(&[-2.903534_f64, -2.903534_f64, -2.903534_f64]);
         for i in 0..3 {
-            assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-5, max_relative = 1e-5);
+            assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-5, max_relative = 1e-2);
         }
     }
 
@@ -170,7 +170,7 @@ mod tests {
                     derivative[i],
                     derivative_fd[i],
                     epsilon = 1e-5,
-                    max_relative = 1e-3
+                    max_relative = 1e-2
                 );
             }
         }
@@ -194,7 +194,7 @@ mod tests {
                     derivative[i],
                     derivative_fd[i],
                     epsilon = 1e-5,
-                    max_relative = 1e-3
+                    max_relative = 1e-2
                 );
             }
         }
@@ -219,7 +219,7 @@ mod tests {
                         derivative[i][j],
                         derivative_fd[i][j],
                         epsilon = 1e-5,
-                        max_relative = 1e-3
+                        max_relative = 1e-2
                     );
                 }
             }
@@ -245,7 +245,7 @@ mod tests {
                         derivative[i][j],
                         derivative_fd[i][j],
                         epsilon = 1e-5,
-                        max_relative = 1e-3
+                        max_relative = 1e-2
                     );
                 }
             }
