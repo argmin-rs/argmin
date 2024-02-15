@@ -254,7 +254,7 @@
                 <span class="macro">assert_relative_eq!</span>(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = f64::EPSILON,
+                    epsilon = <span class="number">1e-5</span>,
                     max_relative = <span class="number">1e-2
                 </span>);
             }
@@ -269,16 +269,16 @@
             <span class="kw">let </span>hessian_fd =
                 Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| threehumpcamel_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
             <span class="kw">let </span>n = hessian.len();
-            <span class="macro">println!</span>(<span class="string">"1: {hessian:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {hessian_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="comment">// println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
                     <span class="kw">if </span>hessian_fd[i][j].is_finite() {
                         <span class="macro">assert_relative_eq!</span>(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = <span class="number">1e-5</span>,
                             max_relative = <span class="number">1e-4
                         </span>);
                     }

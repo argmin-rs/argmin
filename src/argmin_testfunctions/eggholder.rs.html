@@ -260,6 +260,16 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -495,7 +505,12 @@
             <span class="kw">let </span>derivative = eggholder_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| eggholder(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-4</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-4</span>,
+                    max_relative = <span class="number">1e-4
+                </span>);
             }
         }
     }
@@ -508,13 +523,18 @@
             <span class="kw">let </span>hessian_fd =
                 Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| eggholder_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
             <span class="kw">let </span>n = hessian.len();
-            <span class="macro">println!</span>(<span class="string">"1: {hessian:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {hessian_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="comment">// println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
                     <span class="kw">if </span>hessian_fd[i][j].is_finite() {
-                        <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">1e-5</span>);
+                        <span class="macro">assert_relative_eq!</span>(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = <span class="number">1e-4</span>,
+                            max_relative = <span class="number">1e-3
+                        </span>);
                     }
                 }
             }

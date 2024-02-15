@@ -319,6 +319,26 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -567,7 +587,12 @@
             <span class="kw">let </span>derivative = rastrigin_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rastrigin(<span class="kw-2">&amp;</span>x));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-5</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-5</span>,
+                    max_relative = <span class="number">1e-5
+                </span>);
             }
         }
     }
@@ -586,7 +611,12 @@
             <span class="kw">let </span>derivative = rastrigin_derivative_const(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| rastrigin(<span class="kw-2">&amp;</span>x));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-5</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-5</span>,
+                    max_relative = <span class="number">1e-5
+                </span>);
             }
         }
     }
@@ -609,7 +639,12 @@
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                    <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">1e-4</span>);
+                    <span class="macro">assert_relative_eq!</span>(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = <span class="number">1e-4</span>,
+                        max_relative = <span class="number">1e-4
+                    </span>);
                 }
             }
         }
@@ -633,7 +668,12 @@
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                    <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">1e-4</span>);
+                    <span class="macro">assert_relative_eq!</span>(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = <span class="number">1e-4</span>,
+                        max_relative = <span class="number">1e-4
+                    </span>);
                 }
             }
         }

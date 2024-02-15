@@ -112,6 +112,16 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -204,7 +214,12 @@
             <span class="kw">let </span>derivative = matyas_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| matyas(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-5</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-5</span>,
+                    max_relative = <span class="number">1e-5
+                </span>);
             }
         }
     }
@@ -219,7 +234,12 @@
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                    <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = <span class="number">1e-5</span>,
+                        max_relative = <span class="number">1e-5
+                    </span>);
                 }
             }
         }

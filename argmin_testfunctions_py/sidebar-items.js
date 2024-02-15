@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["add_function","func"]};

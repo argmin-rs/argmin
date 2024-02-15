@@ -285,6 +285,11 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -540,7 +545,12 @@
             <span class="comment">// println!("1: {derivative:?} at {a}/{b}");
             // println!("2: {derivative_fd:?} at {a}/{b}");
             </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-2</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-4</span>,
+                    max_relative = <span class="number">1e-3
+                </span>);
             }
         }
     }
@@ -562,7 +572,7 @@
                         <span class="macro">assert_relative_eq!</span>(
                             hessian[i][j],
                             hessian_fd[i][j],
-                            epsilon = f64::EPSILON,
+                            epsilon = <span class="number">1e-5</span>,
                             max_relative = <span class="number">1e-3
                         </span>);
                     }

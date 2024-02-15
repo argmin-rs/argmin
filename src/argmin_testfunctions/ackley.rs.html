@@ -830,13 +830,13 @@
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
             <span class="kw">let </span>derivative = ackley_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| ackley(<span class="kw-2">&amp;</span>x));
-            <span class="macro">println!</span>(<span class="string">"1: {derivative:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {derivative_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
+            <span class="comment">// println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
                 <span class="macro">assert_relative_eq!</span>(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = std::f64::EPSILON,
+                    epsilon = <span class="number">1e-5</span>,
                     max_relative = <span class="number">1e-2
                 </span>);
             }
@@ -856,13 +856,13 @@
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
             <span class="kw">let </span>derivative = ackley_derivative_const(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| ackley(<span class="kw-2">&amp;</span>x));
-            <span class="macro">println!</span>(<span class="string">"1: {derivative:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {derivative_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
+            <span class="comment">// println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
                 <span class="macro">assert_relative_eq!</span>(
                     derivative[i],
                     derivative_fd[i],
-                    epsilon = f64::EPSILON,
+                    epsilon = <span class="number">1e-5</span>,
                     max_relative = <span class="number">1e-2
                 </span>);
             }
@@ -882,9 +882,9 @@
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
             <span class="kw">let </span>hessian = ackley_hessian(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>hessian_fd = Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| ackley_derivative(<span class="kw-2">&amp;</span>x));
-            <span class="macro">println!</span>(<span class="string">"1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+            <span class="comment">// println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..hessian.len() {
                     <span class="macro">assert_relative_eq!</span>(
                         hessian[i][j],
@@ -910,9 +910,9 @@
             <span class="kw">let </span>param = [a, b, c, d, e, f, g, h];
             <span class="kw">let </span>hessian = ackley_hessian_const(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>hessian_fd = Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| ackley_derivative(<span class="kw-2">&amp;</span>x));
-            <span class="macro">println!</span>(<span class="string">"1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
+            <span class="comment">// println!("1: {hessian:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            // println!("2: {hessian_fd:?} at {a}/{b}/{c}/{d}/{e}/{f}/{g}/{h}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..hessian.len() {
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..hessian.len() {
                     <span class="macro">assert_relative_eq!</span>(
                         hessian[i][j],

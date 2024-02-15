@@ -236,6 +236,16 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -444,10 +454,15 @@
             <span class="kw">let </span>param = [a, b];
             <span class="kw">let </span>derivative = holder_table_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| holder_table(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
-            <span class="macro">println!</span>(<span class="string">"1: {derivative:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {derivative_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1e-2</span>);
+            <span class="comment">// println!("1: {derivative:?} at {a}/{b}");
+            // println!("2: {derivative_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-5</span>,
+                    max_relative = <span class="number">1e-3
+                </span>);
             }
         }
     }
@@ -460,13 +475,18 @@
             <span class="kw">let </span>hessian_fd =
                 Vec::from(param).forward_hessian(<span class="kw-2">&amp;</span>|x| holder_table_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
             <span class="kw">let </span>n = hessian.len();
-            <span class="macro">println!</span>(<span class="string">"1: {hessian:?} at {a}/{b}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {hessian_fd:?} at {a}/{b}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="comment">// println!("1: {hessian:?} at {a}/{b}");
+            // println!("2: {hessian_fd:?} at {a}/{b}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
                     <span class="kw">if </span>hessian_fd[i][j].is_finite() {
-                        <span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">1e-5</span>);
+                        <span class="macro">assert_relative_eq!</span>(
+                            hessian[i][j],
+                            hessian_fd[i][j],
+                            epsilon = <span class="number">1e-5</span>,
+                            max_relative = <span class="number">1e-5
+                        </span>);
                     }
                 }
             }

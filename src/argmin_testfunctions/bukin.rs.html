@@ -160,6 +160,12 @@
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -294,9 +300,12 @@
             <span class="kw">let </span>derivative = bukin_n6_derivative(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| bukin_n6(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
-                <span class="comment">// finite differences aren't really that useful here, therefore the extremely
-                // high epsilon. We're happy if we're somewhat close.
-                </span><span class="macro">assert_relative_eq!</span>(derivative[i], derivative_fd[i], epsilon = <span class="number">1.0</span>);
+                <span class="macro">assert_relative_eq!</span>(
+                    derivative[i],
+                    derivative_fd[i],
+                    epsilon = <span class="number">1e-5</span>,
+                    max_relative = <span class="number">1e-5
+                </span>);
             }
         }
     }
@@ -308,14 +317,17 @@
             <span class="kw">let </span>hessian = bukin_n6_hessian(<span class="kw-2">&amp;</span>param);
             <span class="kw">let </span>hessian_fd = Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| bukin_n6_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
             <span class="kw">let </span>n = hessian.len();
-            <span class="macro">println!</span>(<span class="string">"1: {a}/{b} {hessian:?}"</span>);
-            <span class="macro">println!</span>(<span class="string">"2: {a}/{b} {hessian_fd:?}"</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="comment">// println!("1: {a}/{b} {hessian:?}");
+            // println!("2: {a}/{b} {hessian_fd:?}");
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 <span class="macro">assert_eq!</span>(hessian[i].len(), n);
                 <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                    <span class="comment">// finite differences aren't really that useful here, therefore the extremely
-                    // high epsilon. We're happy if we're somewhat close.
-                    </span><span class="macro">assert_relative_eq!</span>(hessian[i][j], hessian_fd[i][j], epsilon = <span class="number">100.0</span>);
+                    <span class="macro">assert_relative_eq!</span>(
+                        hessian[i][j],
+                        hessian_fd[i][j],
+                        epsilon = <span class="number">1e-5</span>,
+                        max_relative = <span class="number">1e-5</span>,
+                    );
                 }
             }
         }
