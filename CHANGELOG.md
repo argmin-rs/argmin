@@ -5,11 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (since argmin version 0.6.0),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
-## argmin [argmin unreleased]
+## [argmin unreleased]
 
-## argmin-math [argmin-math unreleased]
+## [argmin-math unreleased]
 
-## argmin [argmin v0.9.0] 2024-01-06
+## [argmin-testfunctions-py v0.0.1] 2024-02-16
+
+* The first version of a Python wrapper around `argmin_testfunctions` was released. 
+* The fact that this is still experimental is expressed with the version number 0.0.1. Eventually this module's version may end up in lockstep with `argmin_testfunctions`' version number.
+
+## [argmin_testfunctions v0.2.0] 2024-02-16
+
+All work of this release was done by @stefan-k.
+
+### Added
+
+* Added derivative and Hessian calculation to all test functions.
+* Tested all derivatives and Hessian against finite differences (with `finitediff`) on multiple positions with `proptest`.
+* Added const generics versions for the derivatives and Hessians of multi dimensional test functions to avoid allocations.
+* Those test functions which operate on a fixed number of parameters now take a fixed length array as input instead of a slice.
+
+### Fixed
+
+* Bugs in the Levy test function were fixed.
+
+### Changed
+
+* Rust edition 2021
+* Repository was moved into argmin monorepo
+* `rosenbrock` now only takes the parameters as input. For setting the additional optional parameters `a` and `b` one can use `rosenbrock_ab`
+* All `rosenbrock_2d*` functions were removed.
+
+## [argmin v0.9.0] 2024-01-06
 
 ### Added
 
@@ -31,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated gnuplot to 0.0.39 (@stefan-k, #364)
 * Switched to resolver = 2 for entire workspace (@stefan-k, #372)
 
-## argmin [argmin v0.8.1] 2023-02-20
+## [argmin v0.8.1] 2023-02-20
 
 ### Added
 
@@ -49,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Updated slog-term to 2.9 (@stefan-k)
 * Updated slog-json to 2.6 (@stefan-k)
 
-## argmin [argmin v0.8.0] 2023-01-28
+## [argmin v0.8.0] 2023-01-28
 
 ### Added
 
@@ -71,7 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The check whether the target cost is reached is now based on the current best cost function value rather than the current cost function value (@relf)
 
 
-## argmin-math [argmin-math v0.3.0] 2023-01-28
+## [argmin-math v0.3.0] 2023-01-28
 
 ### Added
 
@@ -263,8 +290,11 @@ This is a rather large release with many (breaking) changes.
 
 For older versions please see the Git history.
 
-[argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...HEAD
+[argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...HEAD
 [argmin-math unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...HEAD
+[argmin_testfunctions unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...HEAD
+[argmin-testfunctions-py v0.0.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin-testfunctions-py-v0.0.1
+[argmin_testfunctions v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin_testfunctions-v0.2.0
 [argmin v0.9.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...argmin-v0.9.0
 [argmin v0.8.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...argmin-v0.8.1
 [argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0

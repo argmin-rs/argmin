@@ -17,6 +17,9 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/argmin-testfunctions-py/">
+    <img alt="PyPI" src="https://img.shields.io/pypi/v/argmin-testfunctions-py?style=flat-square">
+  </a>
   <a href="https://github.com/argmin-rs/argmin/actions"
     ><img
       src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/python.yml?branch=main&label=argmin CI&style=flat-square"
