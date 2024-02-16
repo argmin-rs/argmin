@@ -33,16 +33,15 @@
   /></a>
 </p>
 
-This makes the test functions of the `argmin_testfunctions` Rust crate available in Python. 
+This Python module makes the test functions of the `argmin_testfunctions` Rust crate available in Python. 
 For each test function the derivative and Hessian are available as well. 
-Most functions are 2D only, but some allow an arbitrary number of parameters.
+While most functions are two-dimensional, some allow an arbitrary number of parameters.
 For some functions additional optional parameters are accessible, which can be used to modify the shape of the test function.
-For details on the individual test functions please consult the Rust docs, either for the
+For details on the individual test functions please consult the docs of the Rust library, either for the
 [latest release](https://docs.rs/argmin_testfunctions) or the
 [current main branch](https://argmin-rs.github.io/argmin/argmin_testfunctions/index.html).
 
 ## Examples
-
 
 ```python
 from argmin_testfunctions_py import *
