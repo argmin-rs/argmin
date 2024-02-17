@@ -15,7 +15,7 @@ exclude = []
 
 [dependencies]
 anyhow = "1.0"
-argmin = { version = "0.9.0", path = "../argmin", default-features = false, features = ["serde1"] }
+argmin = { version = "0.10.0", path = "../argmin", default-features = false, features = ["serde1"] }
 spectator = { version = "0.1", path = "../spectator", default-features = false }
 futures = { version = "0.3" }
 time = { version = "0.3" }

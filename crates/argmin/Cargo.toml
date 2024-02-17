@@ -1,6 +1,6 @@
 [package]
 name = "argmin"
-version = "0.9.0"
+version = "0.10.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -8,7 +8,7 @@ description = "Numerical optimization in pure Rust"
 documentation = "https://docs.rs/argmin/"
 homepage = "https://argmin-rs.org"
 repository = "https://github.com/argmin-rs/argmin"
-readme = "../README.md"
+readme = "../../README.md"
 keywords = ["optimization", "math", "science"]
 categories = ["science"]
 exclude = []
@@ -22,7 +22,7 @@ num-traits = "0.2"
 rand = "0.8.5"
 rand_xoshiro = "0.6.0"
 thiserror = "1.0"
-argmin-math = { path = "../argmin-math", version = "0.3", default-features = false, features = ["primitives"] }
+argmin-math = { path = "../argmin-math", version = "0.4", default-features = false, features = ["primitives"] }
 # optional
 ctrlc = { version = "3.2.4", features = ["termination"], optional = true }
 getrandom = { version = "0.2", optional = true }
@@ -35,7 +35,7 @@ finitediff = { version = "0.1.4", features = ["ndarray"] }
 argmin_testfunctions = { version = "0.2.0", path = "../argmin-testfunctions" }
 ndarray = { version = "0.15", features = ["serde-1"] }
 ndarray-linalg = { version = "0.16", features = ["intel-mkl-static"] }
-argmin-math = { path = "../argmin-math", version = "0.3", features = ["vec"] }
+argmin-math = { path = "../argmin-math", version = "0.4", features = ["vec"] }
 argmin-observer-slog = { path = "../argmin-observer-slog" }
 argmin-observer-paramwriter = { path = "../argmin-observer-paramwriter" }
 argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }

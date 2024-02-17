@@ -4,8 +4,8 @@ In order to use argmin, one needs to add both `argmin` and `argmin-math` to `Car
 
 ```toml
 [dependencies]
-argmin = { version = "0.9" }
-argmin-math = { version = "0.3", features = ["ndarray_latest", "nalgebra_latest"] }
+argmin = { version = "0.10" }
+argmin-math = { version = "0.4", features = ["ndarray_latest", "nalgebra_latest"] }
 ```
 
 or, for the current development version:
