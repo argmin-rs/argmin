@@ -5,8 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Observer for Spectator
-//!
 //! This observer sends metrics and parameter vectors to a Spectator instance.
 //!
 //! ## Example
