@@ -5,6 +5,39 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+//! This crate creates checkpoints on disk for an optimization run.
+//!
+//! Saves a checkpoint on disk from which an interrupted optimization run can be resumed.
+//! For details on the usage please see the documentation of [`FileCheckpoint`] or have a look at
+//! the [example](https://github.com/argmin-rs/argmin/tree/main/examples/checkpoint).
+//!
+//! # Usage
+//!
+//! Add the following line to your dependencies list:
+//!
+//! ```toml
+//! [dependencies]
+#![doc = concat!("argmin-checkpointing-file = \"", env!("CARGO_PKG_VERSION"), "\"")]
+//! ```
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
+//!     <http://www.apache.org/licenses/LICENSE-2.0>)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
+//!     <http://opensource.org/licenses/MIT>)
+//!
+//! at your option.
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
+
 pub use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
 use argmin::core::Error;
 use serde::{de::DeserializeOwned, Serialize};
