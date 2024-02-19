@@ -1,6 +1,4 @@
 [advisories]
 ignore = [
-    # "RUSTSEC-2020-0071", # `time` localtime_r segfault
     "RUSTSEC-2020-0159", # `chrono` localtime_r segfault
-    "RUSTSEC-2021-0145", # `chrono` localtime_r segfault
 ]
