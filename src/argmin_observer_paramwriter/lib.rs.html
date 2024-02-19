@@ -141,6 +141,33 @@
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -148,9 +175,36 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="doccomment">//! # Write parameter vectors to a file during optimization.
+</span><span class="doccomment">//! Writes parameter vectors to a file during optimization.
 //!
 //! See documentation of [`ParamWriter`] and [`ParamWriterFormat`] for details.
+//!
+//! # Usage
+//!
+//! Add the following line to your dependencies list:
+//!
+//! ```toml
+//! [dependencies]
+</span><span class="attr">#![doc = <span class="macro">concat!</span>(<span class="string">"argmin-observer-paramwriter = \""</span>, <span class="macro">env!</span>(<span class="string">"CARGO_PKG_VERSION"</span>), <span class="string">"\""</span>)]
+</span><span class="doccomment">//! ```
+//!
+//! # License
+//!
+//! Licensed under either of
+//!
+//!   * Apache License, Version 2.0,
+//!     ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or
+//!     &lt;http://www.apache.org/licenses/LICENSE-2.0&gt;)
+//!   * MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or
+//!     &lt;http://opensource.org/licenses/MIT&gt;)
+//!
+//! at your option.
+//!
+//! ## Contribution
+//!
+//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+//! in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+//! without any additional terms or conditions.
 
 </span><span class="kw">use </span>argmin::core::observers::Observe;
 <span class="kw">use </span>argmin::core::{Error, State, KV};
