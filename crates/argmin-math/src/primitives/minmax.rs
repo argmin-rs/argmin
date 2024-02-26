@@ -53,10 +53,10 @@ mod tests {
                 fn [<test_minmax_ $t>]() {
                     let x = 5 as $t;
                     let y = 10 as $t;
-                    assert_eq!(<$t as ArgminMinMax>::min(&x, &y), x);
-                    assert_eq!(<$t as ArgminMinMax>::max(&x, &y), y);
-                    assert_eq!(<$t as ArgminMinMax>::min(&y, &x), x);
-                    assert_eq!(<$t as ArgminMinMax>::max(&y, &x), y);
+                    assert_eq!(<$t as ArgminMinMax>::min(&x, &y).to_ne_bytes(), x.to_ne_bytes());
+                    assert_eq!(<$t as ArgminMinMax>::max(&x, &y).to_ne_bytes(), y.to_ne_bytes());
+                    assert_eq!(<$t as ArgminMinMax>::min(&y, &x).to_ne_bytes(), x.to_ne_bytes());
+                    assert_eq!(<$t as ArgminMinMax>::max(&y, &x).to_ne_bytes(), y.to_ne_bytes());
                 }
             }
         };
