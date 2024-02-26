@@ -6,18 +6,25 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::ArgminMinMax;
-use num_complex::Complex;
 
 macro_rules! make_minmax {
     ($t:ty) => {
         impl ArgminMinMax for $t {
             #[inline]
             fn min(x: &Self, y: &Self) -> $t {
-                std::cmp::min(x, y)
+                if x <= y {
+                    *x
+                } else {
+                    *y
+                }
             }
 
             fn max(x: &Self, y: &Self) -> $t {
-                std::cmp::max(x, y)
+                if x >= y {
+                    *x
+                } else {
+                    *y
+                }
             }
         }
     };
@@ -33,16 +40,6 @@ make_minmax!(u8);
 make_minmax!(u16);
 make_minmax!(u32);
 make_minmax!(u64);
-make_minmax!(Complex<f32>);
-make_minmax!(Complex<f64>);
-make_minmax!(Complex<i8>);
-make_minmax!(Complex<i16>);
-make_minmax!(Complex<i32>);
-make_minmax!(Complex<i64>);
-make_minmax!(Complex<u8>);
-make_minmax!(Complex<u16>);
-make_minmax!(Complex<u32>);
-make_minmax!(Complex<u64>);
 
 #[cfg(test)]
 mod tests {
