@@ -11,7 +11,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 .venv/
-.evn/
+.env/
 env/
 bin/
 build/
