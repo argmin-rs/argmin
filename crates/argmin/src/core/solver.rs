@@ -23,11 +23,8 @@ use crate::core::{Error, Problem, State, TerminationReason, TerminationStatus, K
 /// use argmin::core::{
 ///     ArgminFloat, Solver, IterState, CostFunction, Error, KV, Problem, TerminationReason, TerminationStatus
 /// };
-/// #[cfg(feature = "serde1")]
-/// use serde::{Deserialize, Serialize};
 ///
 /// #[derive(Clone)]
-/// #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 /// struct OptimizationAlgorithm {}
 ///
 /// impl<O, P, G, J, H, R, F> Solver<O, IterState<P, G, J, H, R, F>> for OptimizationAlgorithm
