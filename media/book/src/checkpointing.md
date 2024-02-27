@@ -4,7 +4,8 @@ Checkpointing is a useful mechanism for mitigating the effects of crashes when s
 Checkpoints are snapshots of the current state of the optimization which can be resumed from in case of a crash.
 These checkpoints are saved regularly at a user-chosen frequency.
 
-Currently only saving checkpoints to disk with [`FileCheckpoint`](https://docs.rs/argmin/latest/argmin/core/checkpointing/struct.FileCheckpoint.html) is provided.
+Currently only saving checkpoints to disk with [`FileCheckpoint`](https://docs.rs/argmin-checkpointing-file/latest/argmin_checkpointing_file/struct.FileCheckpoint.html) is provided
+in the [`argmin-checkpointing-file`](https://crates.io/crates/argmin-checkpointing-file) crate.
 Via the [`Checkpoint`](https://docs.rs/argmin/latest/argmin/core/checkpointing/trait.Checkpoint.html) trait other checkpointing approaches can be implemented (see the chapter on [implementing a checkpointing method](./implementing_checkpointing.md) for details).
 
 The [`CheckpointingFrequency`](https://docs.rs/argmin/latest/argmin/core/checkpointing/enum.CheckpointingFrequency.html) defines how often checkpoints are saved and can be chosen to be either `Always` (every iteration), `Every(u64)` (every Nth iteration) or `Never`.
@@ -20,7 +21,8 @@ If the run crashes and a checkpoint is found on disk, then it will resume from t
 # extern crate argmin_testfunctions;
 # use argmin::core::{CostFunction, Error, Executor, Gradient, observers::ObserverMode};
 # #[cfg(feature = "serde1")]
-# use argmin::core::checkpointing::{FileCheckpoint, CheckpointingFrequency};
+use argmin::core::checkpointing::CheckpointingFrequency;
+use argmin_checkpointing_file::FileCheckpoint;
 # use argmin_observer_slog::SlogLogger;
 # use argmin::solver::landweber::Landweber;
 # use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
