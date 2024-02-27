@@ -9,6 +9,7 @@ doc-comment = "0.3.3"
 argmin = { path = "../../../crates/argmin", features = ["serde1", "ctrlc", "wasm-bindgen", "rayon"] }
 argmin-math = { path = "../../../crates/argmin-math", features = ["latest_all"] }
 argmin-observer-slog = { path = "../../../crates/argmin-observer-slog", features = ["serde1"] }
+argmin-checkpointing-file = { path = "../../../crates/argmin-checkpointing-file" }
 argmin-observer-spectator = { path = "../../../crates/argmin-observer-spectator" }
 argmin_testfunctions = { version = "*", path = "../../../crates/argmin-testfunctions" }
 serde = "1"

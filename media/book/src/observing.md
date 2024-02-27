@@ -95,6 +95,7 @@ let res = Executor::new(cost, solver)
 # }
 ```
 
+<!--
 ## Using Spectator
 
 [Spectator](https://crates.io/crates/spectator)  is a graphical visualization tool for showing the progress of optimization runs.
@@ -209,3 +210,4 @@ let res = Executor::new(cost, solver)
 #     }
 # }
 ```
+-->
