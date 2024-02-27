@@ -116,9 +116,6 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -144,11 +141,8 @@
 /// use argmin::core::{
 ///     ArgminFloat, Solver, IterState, CostFunction, Error, KV, Problem, TerminationReason, TerminationStatus
 /// };
-/// #[cfg(feature = "serde1")]
-/// use serde::{Deserialize, Serialize};
 ///
 /// #[derive(Clone)]
-/// #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 /// struct OptimizationAlgorithm {}
 ///
 /// impl&lt;O, P, G, J, H, R, F&gt; Solver&lt;O, IterState&lt;P, G, J, H, R, F&gt;&gt; for OptimizationAlgorithm
