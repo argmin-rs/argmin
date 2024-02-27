@@ -6,13 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
 ## [argmin unreleased]
+* Added a new GUI observer called Spectator (`argmin-observer-spectator` and `spectator` packages) (@stefan-k, #311)
 
 ## [argmin-math unreleased]
 
 ## [argmin v0.10.0] 2024-02-27
 
 ### Added
-* Added a new GUI observer called Spectator (`argmin-observer-spectator` and `spectator` packages) (@stefan-k, #311)
 * Added optional timeout to Executor (@stefan-k, #405)
 
 ### Changed

@@ -46,6 +46,21 @@ Interrupt handling now includes `SIGINT`, `SIGTERM` and `SIGHUP`. Consequently,
 `TerminationReason::KeyboardInterrupt` was renamed to `TerminationReason::Interrupt`.
 This is a breaking change for those who match on `TerminationReason`.
 
+##### Optional timeout
+
+`Executor` now allows one to terminate a run after a given timeout, which can be set with the `timeout` method of `Executor`. 
+The check whether the overall runtime exceeds the timeout is performed after every iteration,
+therefore the actual runtime can be longer than the set timeout.
+In case of timeout, the run terminates with `TerminationReason::Timeout`.
+
+The timeout is set via the `timeout` method of `Executor`:
+
+```rust
+let res = Executor::new(operator, solver)
+    .timeout(std::time::Duration::from_secs(3))
+    .run()?;
+```
+
 ##### The optional `serde1` feature
 
 With moving observers out of the argmin crate, it became easier to reason about the optional
