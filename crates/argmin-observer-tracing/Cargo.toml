@@ -1,0 +1,22 @@
+[package]
+name = "argmin-observer-tracing"
+version = "0.1.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "tracing based observer for argmin"
+documentation = "https://docs.rs/argmin-observer-tracing/"
+homepage = "https://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["optimization", "math", "science"]
+categories = ["science"]
+exclude = []
+
+[dependencies]
+anyhow = "1.0"
+argmin = { version = "0.10.0", path = "../argmin", default-features = false }
+tracing = "0.1.40"
+
+[features]
+default = []
