@@ -81,6 +81,15 @@ jobs:
       - name: Test (testfunctions)
         run: cargo test -p argmin_testfunctions
 
+  tests-finitediff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test (testfunctions)
+        run: cargo test -p finitediff --all-features
+
   tests-argmin-math:
     runs-on: ubuntu-latest
     steps:
