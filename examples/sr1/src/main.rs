@@ -14,8 +14,7 @@ use argmin::{
     },
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::styblinski_tang;
-use finitediff::FiniteDiff;
+use argmin_testfunctions::{styblinski_tang, styblinski_tang_derivative};
 use ndarray::{array, Array1, Array2};
 
 struct StyblinskiTang {}
@@ -33,7 +32,7 @@ impl Gradient for StyblinskiTang {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok((*p).forward_diff(&|x| styblinski_tang(&x.to_vec())))
+        Ok(styblinski_tang_derivative(&p.to_vec()).into())
     }
 }
 

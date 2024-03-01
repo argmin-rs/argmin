@@ -20,7 +20,7 @@ impl CostFunction for Rosenbrock {
     type Output = f64;
 
     fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(rosenbrock(p.as_slice().unwrap()))
+        Ok(rosenbrock(&p.to_vec()))
     }
 }
 impl Gradient for Rosenbrock {
@@ -28,7 +28,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok(rosenbrock_derivative(&p.to_vec()).into())
+        Ok(Array1::from(rosenbrock_derivative(&p.to_vec()).to_vec()))
     }
 }
 

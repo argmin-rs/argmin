@@ -14,9 +14,8 @@ use argmin::{
     },
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::rosenbrock;
-use finitediff::FiniteDiff;
-use ndarray::{array, Array1, Array2};
+use argmin_testfunctions::{rosenbrock, rosenbrock_derivative, rosenbrock_hessian};
+use ndarray::{array, Array, Array1, Array2};
 
 struct Rosenbrock {}
 
@@ -33,7 +32,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec())))
+        Ok(Array1::from(rosenbrock_derivative(&p.to_vec()).to_vec()))
     }
 }
 
@@ -42,7 +41,11 @@ impl Hessian for Rosenbrock {
     type Hessian = Array2<f64>;
 
     fn hessian(&self, p: &Self::Param) -> Result<Self::Hessian, Error> {
-        Ok((*p).forward_hessian(&|x| self.gradient(x).unwrap()))
+        let h = rosenbrock_hessian(&p.to_vec())
+            .into_iter()
+            .flatten()
+            .collect();
+        Ok(Array::from_shape_vec((p.len(), p.len()), h)?)
     }
 }
 
