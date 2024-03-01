@@ -5,122 +5,135 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::utils::*;
-use crate::EPS_F64;
+use std::ops::AddAssign;
 
-/// I wish this wasn't necessary!
-const EPS_F64_NOGRAD: f64 = EPS_F64 * 2.0;
+use num::{Float, FromPrimitive};
 
-pub fn forward_hessian_vec_f64(
-    x: &Vec<f64>,
-    grad: &dyn Fn(&Vec<f64>) -> Vec<f64>,
-) -> Vec<Vec<f64>> {
+use crate::utils::{mod_and_calc, restore_symmetry_vec, KV};
+
+pub fn forward_hessian_vec<F>(x: &Vec<F>, grad: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
+where
+    F: Float + FromPrimitive,
+{
+    let eps_sqrt = F::epsilon().sqrt();
     let fx = (grad)(x);
     let mut xt = x.clone();
-    let out: Vec<Vec<f64>> = (0..x.len())
+    let out: Vec<Vec<F>> = (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc_vec_f64(&mut xt, grad, i, EPS_F64.sqrt());
+            let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt);
             fx1.iter()
                 .zip(fx.iter())
-                .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
-                .collect::<Vec<f64>>()
+                .map(|(&a, &b)| (a - b) / eps_sqrt)
+                .collect::<Vec<F>>()
         })
         .collect();
 
     // restore symmetry
-    restore_symmetry_vec_f64(out)
+    restore_symmetry_vec(out)
 }
 
-pub fn central_hessian_vec_f64(
-    x: &Vec<f64>,
-    grad: &dyn Fn(&Vec<f64>) -> Vec<f64>,
-) -> Vec<Vec<f64>> {
-    let mut xt = x.clone();
-    let out: Vec<Vec<f64>> = (0..x.len())
+pub fn central_hessian_vec<F>(x: &[F], grad: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
+where
+    F: Float + FromPrimitive,
+{
+    let eps_sqrt = F::epsilon().sqrt();
+    let mut xt = x.to_owned();
+    let out: Vec<Vec<F>> = (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc_vec_f64(&mut xt, grad, i, EPS_F64.sqrt());
-            let fx2 = mod_and_calc_vec_f64(&mut xt, grad, i, -EPS_F64.sqrt());
+            let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt);
+            let fx2 = mod_and_calc(&mut xt, grad, i, -eps_sqrt);
             fx1.iter()
                 .zip(fx2.iter())
-                .map(|(a, b)| (a - b) / (2.0 * EPS_F64.sqrt()))
-                .collect::<Vec<f64>>()
+                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+                .collect::<Vec<F>>()
         })
         .collect();
 
     // restore symmetry
-    restore_symmetry_vec_f64(out)
+    restore_symmetry_vec(out)
 }
 
-pub fn forward_hessian_vec_prod_vec_f64(
-    x: &Vec<f64>,
-    grad: &dyn Fn(&Vec<f64>) -> Vec<f64>,
-    p: &Vec<f64>,
-) -> Vec<f64> {
+pub fn forward_hessian_vec_prod_vec<F>(
+    x: &Vec<F>,
+    grad: &dyn Fn(&Vec<F>) -> Vec<F>,
+    p: &[F],
+) -> Vec<F>
+where
+    F: Float,
+{
+    let eps_sqrt = F::epsilon().sqrt();
     let fx = (grad)(x);
-    let out: Vec<f64> = {
+    let out: Vec<F> = {
         let x1 = x
             .iter()
             .zip(p.iter())
-            .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
+            .map(|(&xi, &pi)| xi + pi * eps_sqrt)
             .collect();
         let fx1 = (grad)(&x1);
         fx1.iter()
             .zip(fx.iter())
-            .map(|(a, b)| (a - b) / (EPS_F64.sqrt()))
-            .collect::<Vec<f64>>()
+            .map(|(&a, &b)| (a - b) / eps_sqrt)
+            .collect::<Vec<F>>()
     };
     out
 }
 
-pub fn central_hessian_vec_prod_vec_f64(
-    x: &Vec<f64>,
-    grad: &dyn Fn(&Vec<f64>) -> Vec<f64>,
-    p: &Vec<f64>,
-) -> Vec<f64> {
-    let out: Vec<f64> = {
+pub fn central_hessian_vec_prod_vec<F>(x: &[F], grad: &dyn Fn(&Vec<F>) -> Vec<F>, p: &[F]) -> Vec<F>
+where
+    F: Float + FromPrimitive,
+{
+    let eps_sqrt = F::epsilon().sqrt();
+    let out: Vec<F> = {
         let x1 = x
             .iter()
             .zip(p.iter())
-            .map(|(xi, pi)| xi + pi * EPS_F64.sqrt())
+            .map(|(&xi, &pi)| xi + pi * eps_sqrt)
             .collect();
         let x2 = x
             .iter()
             .zip(p.iter())
-            .map(|(xi, pi)| xi - pi * EPS_F64.sqrt())
+            .map(|(&xi, &pi)| xi - pi * eps_sqrt)
             .collect();
         let fx1 = (grad)(&x1);
         let fx2 = (grad)(&x2);
         fx1.iter()
             .zip(fx2.iter())
-            .map(|(a, b)| (a - b) / (2.0 * EPS_F64.sqrt()))
-            .collect::<Vec<f64>>()
+            .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+            .collect::<Vec<F>>()
     };
     out
 }
 
-pub fn forward_hessian_nograd_vec_f64(x: &Vec<f64>, f: &dyn Fn(&Vec<f64>) -> f64) -> Vec<Vec<f64>> {
+pub fn forward_hessian_nograd_vec<F>(x: &Vec<F>, f: &dyn Fn(&Vec<F>) -> F) -> Vec<Vec<F>>
+where
+    F: Float + FromPrimitive + AddAssign,
+{
+    // TODO: Check why this is necessary
+    let eps_nograd = F::from_f64(2.0).unwrap() * F::epsilon();
+    let eps_sqrt_nograd = eps_nograd.sqrt();
+
     let fx = (f)(x);
     let n = x.len();
     let mut xt = x.clone();
 
     // Precompute f(x + sqrt(EPS) * e_i) for all i
-    let fxei: Vec<f64> = (0..n)
-        .map(|i| mod_and_calc_vec_f64(&mut xt, f, i, EPS_F64_NOGRAD.sqrt()))
+    let fxei: Vec<F> = (0..n)
+        .map(|i| mod_and_calc(&mut xt, f, i, eps_sqrt_nograd))
         .collect();
 
-    let mut out: Vec<Vec<f64>> = vec![vec![0.0; n]; n];
+    let mut out: Vec<Vec<F>> = vec![vec![F::from_f64(0.0).unwrap(); n]; n];
 
     for i in 0..n {
         for j in 0..=i {
             let t = {
                 let xti = xt[i];
                 let xtj = xt[j];
-                xt[i] += EPS_F64_NOGRAD.sqrt();
-                xt[j] += EPS_F64_NOGRAD.sqrt();
+                xt[i] += eps_sqrt_nograd;
+                xt[j] += eps_sqrt_nograd;
                 let fxij = (f)(&xt);
                 xt[i] = xti;
                 xt[j] = xtj;
-                (fxij - fxei[i] - fxei[j] + fx) / EPS_F64_NOGRAD
+                (fxij - fxei[i] - fxei[j] + fx) / eps_nograd
             };
             out[i][j] = t;
             out[j][i] = t;
@@ -129,11 +142,18 @@ pub fn forward_hessian_nograd_vec_f64(x: &Vec<f64>, f: &dyn Fn(&Vec<f64>) -> f64
     out
 }
 
-pub fn forward_hessian_nograd_sparse_vec_f64(
-    x: &Vec<f64>,
-    f: &dyn Fn(&Vec<f64>) -> f64,
+pub fn forward_hessian_nograd_sparse_vec<F>(
+    x: &Vec<F>,
+    f: &dyn Fn(&Vec<F>) -> F,
     indices: Vec<[usize; 2]>,
-) -> Vec<Vec<f64>> {
+) -> Vec<Vec<F>>
+where
+    F: Float + FromPrimitive + AddAssign,
+{
+    // TODO: Check why this is necessary
+    let eps_nograd = F::from_f64(2.0).unwrap() * F::epsilon();
+    let eps_sqrt_nograd = eps_nograd.sqrt();
+
     let fx = (f)(x);
     let n = x.len();
     let mut xt = x.clone();
@@ -149,26 +169,23 @@ pub fn forward_hessian_nograd_sparse_vec_f64(
     let mut fxei = KV::new(idxs.len());
 
     for idx in idxs.iter() {
-        fxei.set(
-            *idx,
-            mod_and_calc_vec_f64(&mut xt, f, *idx, EPS_F64_NOGRAD.sqrt()),
-        );
+        fxei.set(*idx, mod_and_calc(&mut xt, f, *idx, eps_sqrt_nograd));
     }
 
-    let mut out: Vec<Vec<f64>> = vec![vec![0.0; n]; n];
+    let mut out: Vec<Vec<F>> = vec![vec![F::from_f64(0.0).unwrap(); n]; n];
     for [i, j] in indices {
         let t = {
             let xti = xt[i];
             let xtj = xt[j];
-            xt[i] += EPS_F64_NOGRAD.sqrt();
-            xt[j] += EPS_F64_NOGRAD.sqrt();
+            xt[i] += eps_sqrt_nograd;
+            xt[j] += eps_sqrt_nograd;
             let fxij = (f)(&xt);
             xt[i] = xti;
             xt[j] = xtj;
 
             let fxi = fxei.get(i).unwrap();
             let fxj = fxei.get(j).unwrap();
-            (fxij - fxi - fxj + fx) / EPS_F64_NOGRAD
+            (fxij - fxi - fxj + fx) / eps_nograd
         };
         out[i][j] = t;
         out[j][i] = t;
@@ -213,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_vec_f64() {
-        let hessian = forward_hessian_vec_f64(&x(), &g);
+        let hessian = forward_hessian_vec(&x(), &g);
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -226,7 +243,7 @@ mod tests {
 
     #[test]
     fn test_central_hessian_vec_f64() {
-        let hessian = central_hessian_vec_f64(&x(), &g);
+        let hessian = central_hessian_vec(&x(), &g);
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -239,7 +256,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_vec_prod_vec_f64() {
-        let hessian = forward_hessian_vec_prod_vec_f64(&x(), &g, &p());
+        let hessian = forward_hessian_vec_prod_vec(&x(), &g, &p());
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -250,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_central_hessian_vec_prod_vec_f64() {
-        let hessian = central_hessian_vec_prod_vec_f64(&x(), &g, &p());
+        let hessian = central_hessian_vec_prod_vec(&x(), &g, &p());
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -261,7 +278,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_nograd_vec_f64() {
-        let hessian = forward_hessian_nograd_vec_f64(&x(), &f);
+        let hessian = forward_hessian_nograd_vec(&x(), &f);
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         for i in 0..4 {
@@ -274,7 +291,7 @@ mod tests {
     #[test]
     fn test_forward_hessian_nograd_sparse_vec_f64() {
         let indices = vec![[1, 1], [2, 3], [3, 3]];
-        let hessian = forward_hessian_nograd_sparse_vec_f64(&x(), &f, indices);
+        let hessian = forward_hessian_nograd_sparse_vec(&x(), &f, indices);
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
