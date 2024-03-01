@@ -14,3 +14,4 @@ categories = ["science"]
 
 [dependencies]
 ndarray = { version = "0.15.0", optional = true }
+num = "0.4.1"
