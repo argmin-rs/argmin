@@ -10,8 +10,7 @@ use argmin::{
     solver::{linesearch::MoreThuenteLineSearch, quasinewton::DFP},
 };
 use argmin_observer_slog::SlogLogger;
-use argmin_testfunctions::rosenbrock;
-use finitediff::FiniteDiff;
+use argmin_testfunctions::{rosenbrock, rosenbrock_derivative};
 use ndarray::{array, Array1, Array2};
 
 struct Rosenbrock {}
@@ -29,7 +28,7 @@ impl Gradient for Rosenbrock {
     type Gradient = Array1<f64>;
 
     fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
-        Ok((*p).forward_diff(&|x| rosenbrock(&x.to_vec())))
+        Ok(Array1::from(rosenbrock_derivative(&p.to_vec()).to_vec()))
     }
 }
 
