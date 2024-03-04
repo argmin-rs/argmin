@@ -36,15 +36,15 @@ pub fn central_hessian_vec<F>(x: &[F], grad: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
     let mut xt = x.to_owned();
     let out: Vec<Vec<F>> = (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt);
-            let fx2 = mod_and_calc(&mut xt, grad, i, -eps_sqrt);
+            let fx1 = mod_and_calc(&mut xt, grad, i, eps_cbrt);
+            let fx2 = mod_and_calc(&mut xt, grad, i, -eps_cbrt);
             fx1.iter()
                 .zip(fx2.iter())
-                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
                 .collect::<Vec<F>>()
         })
         .collect();
@@ -82,23 +82,23 @@ pub fn central_hessian_vec_prod_vec<F>(x: &[F], grad: &dyn Fn(&Vec<F>) -> Vec<F>
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
     let out: Vec<F> = {
         let x1 = x
             .iter()
             .zip(p.iter())
-            .map(|(&xi, &pi)| xi + pi * eps_sqrt)
+            .map(|(&xi, &pi)| xi + pi * eps_cbrt)
             .collect();
         let x2 = x
             .iter()
             .zip(p.iter())
-            .map(|(&xi, &pi)| xi - pi * eps_sqrt)
+            .map(|(&xi, &pi)| xi - pi * eps_cbrt)
             .collect();
         let fx1 = (grad)(&x1);
         let fx2 = (grad)(&x2);
         fx1.iter()
             .zip(fx2.iter())
-            .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+            .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
             .collect::<Vec<F>>()
     };
     out

@@ -44,7 +44,7 @@ pub fn central_hessian_ndarray<F>(
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
 
     let mut xt = x.clone();
     // TODO: get rid of this!
@@ -53,10 +53,10 @@ where
     let n = x.len();
     let mut out = ndarray::Array2::zeros((n, rn));
     for i in 0..n {
-        let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt);
-        let fx2 = mod_and_calc(&mut xt, grad, i, -eps_sqrt);
+        let fx1 = mod_and_calc(&mut xt, grad, i, eps_cbrt);
+        let fx2 = mod_and_calc(&mut xt, grad, i, -eps_cbrt);
         for j in 0..rn {
-            out[(i, j)] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_sqrt);
+            out[(i, j)] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
         }
     }
     // restore symmetry
@@ -87,13 +87,13 @@ pub fn central_hessian_vec_prod_ndarray<F>(
 where
     F: Float + FromPrimitive + ScalarOperand,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
 
-    let x1 = x + &(p.mapv(|pi| pi * eps_sqrt));
-    let x2 = x - &(p.mapv(|pi| pi * eps_sqrt));
+    let x1 = x + &(p.mapv(|pi| pi * eps_cbrt));
+    let x2 = x - &(p.mapv(|pi| pi * eps_cbrt));
     let fx1 = (grad)(&x1);
     let fx2 = (grad)(&x2);
-    (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_sqrt)
+    (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt)
 }
 
 pub fn forward_hessian_nograd_ndarray<F>(
