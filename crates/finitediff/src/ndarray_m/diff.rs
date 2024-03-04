@@ -35,14 +35,14 @@ pub fn central_diff_ndarray<F>(
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
 
     let mut xt = x.clone();
     (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, f, i, eps_sqrt);
-            let fx2 = mod_and_calc(&mut xt, f, i, -eps_sqrt);
-            (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_sqrt)
+            let fx1 = mod_and_calc(&mut xt, f, i, eps_cbrt);
+            let fx2 = mod_and_calc(&mut xt, f, i, -eps_cbrt);
+            (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt)
         })
         .collect()
 }

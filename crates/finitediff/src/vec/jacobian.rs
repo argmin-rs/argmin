@@ -35,14 +35,14 @@ where
     F: Float + FromPrimitive,
 {
     let mut xt = x.to_owned();
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
     (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, fs, i, eps_sqrt);
-            let fx2 = mod_and_calc(&mut xt, fs, i, -eps_sqrt);
+            let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt);
+            let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt);
             fx1.iter()
                 .zip(fx2.iter())
-                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
                 .collect::<Vec<F>>()
         })
         .collect()
@@ -74,22 +74,22 @@ pub fn central_jacobian_vec_prod_vec<F>(x: &[F], fs: &dyn Fn(&Vec<F>) -> Vec<F>,
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
     let x1 = x
         .iter()
         .zip(p.iter())
-        .map(|(&xi, &pi)| xi + eps_sqrt * pi)
+        .map(|(&xi, &pi)| xi + eps_cbrt * pi)
         .collect();
     let x2 = x
         .iter()
         .zip(p.iter())
-        .map(|(&xi, &pi)| xi - eps_sqrt * pi)
+        .map(|(&xi, &pi)| xi - eps_cbrt * pi)
         .collect();
     let fx1 = (fs)(&x1);
     let fx2 = (fs)(&x2);
     fx1.iter()
         .zip(fx2.iter())
-        .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_sqrt))
+        .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
         .collect::<Vec<F>>()
 }
 
@@ -134,17 +134,17 @@ where
     F: Float + FromPrimitive + AddAssign,
 {
     let mut out = vec![];
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
     let mut xt = x.to_owned();
     for (i, pert_item) in pert.iter().enumerate() {
         for j in pert_item.x_idx.iter() {
-            xt[*j] += eps_sqrt;
+            xt[*j] += eps_cbrt;
         }
 
         let fx1 = (fs)(&xt);
 
         for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j] - eps_sqrt;
+            xt[*j] = x[*j] - eps_cbrt;
         }
 
         let fx2 = (fs)(&xt);
@@ -159,7 +159,7 @@ where
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
             for j in pert_item.r_idx[k].iter() {
-                out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_sqrt);
+                out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
             }
         }
     }

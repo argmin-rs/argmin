@@ -45,7 +45,7 @@ pub fn central_jacobian_ndarray<F>(
 where
     F: Float + FromPrimitive,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
 
     let mut xt = x.clone();
 
@@ -60,10 +60,10 @@ where
 
     let mut out = Array2::zeros((n, rn));
     for i in 0..n {
-        let fx1 = mod_and_calc(&mut xt, fs, i, eps_sqrt);
-        let fx2 = mod_and_calc(&mut xt, fs, i, -eps_sqrt);
+        let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt);
+        let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt);
         for j in 0..rn {
-            out[(i, j)] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_sqrt);
+            out[(i, j)] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
         }
     }
     out
@@ -93,12 +93,12 @@ pub fn central_jacobian_vec_prod_ndarray<F>(
 where
     F: Float + FromPrimitive + ScalarOperand,
 {
-    let eps_sqrt = F::epsilon().sqrt();
-    let x1 = x + &p.mapv(|pi| eps_sqrt * pi);
-    let x2 = x + &p.mapv(|pi| -eps_sqrt * pi);
+    let eps_cbrt = F::epsilon().sqrt();
+    let x1 = x + &p.mapv(|pi| eps_cbrt * pi);
+    let x2 = x + &p.mapv(|pi| -eps_cbrt * pi);
     let fx1 = (fs)(&x1);
     let fx2 = (fs)(&x2);
-    (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_sqrt)
+    (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt)
 }
 
 pub fn forward_jacobian_pert_ndarray<F>(
@@ -142,19 +142,19 @@ pub fn central_jacobian_pert_ndarray<F>(
 where
     F: Float + FromPrimitive + AddAssign,
 {
-    let eps_sqrt = F::epsilon().sqrt();
+    let eps_cbrt = F::epsilon().cbrt();
 
     let mut out = ndarray::Array2::zeros((1, 1));
     let mut xt = x.clone();
     for (i, pert_item) in pert.iter().enumerate() {
         for j in pert_item.x_idx.iter() {
-            xt[*j] += eps_sqrt;
+            xt[*j] += eps_cbrt;
         }
 
         let fx1 = (fs)(&xt);
 
         for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j] - eps_sqrt;
+            xt[*j] = x[*j] - eps_cbrt;
         }
 
         let fx2 = (fs)(&xt);
@@ -169,7 +169,7 @@ where
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
             for j in pert_item.r_idx[k].iter() {
-                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_sqrt);
+                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
             }
         }
     }
