@@ -1,4 +1,4 @@
-// Copyright 2018-2020 argmin developers
+// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -14,20 +14,19 @@ use crate::utils::mod_and_calc;
 
 pub fn forward_jacobian_vec<F>(x: &Vec<F>, fs: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
 where
-    F: Float,
+    F: Float + FromPrimitive,
 {
     let fx = (fs)(x);
     let mut xt = x.clone();
     let eps_sqrt = F::epsilon().sqrt();
-    (0..x.len())
-        .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, fs, i, eps_sqrt);
-            fx1.iter()
-                .zip(fx.iter())
-                .map(|(&a, &b)| (a - b) / eps_sqrt)
-                .collect::<Vec<F>>()
-        })
-        .collect()
+    let mut out: Vec<Vec<F>> = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx.len()];
+    for j in 0..x.len() {
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt);
+        for i in 0..fx.len() {
+            out[i][j] = (fx1[i] - fx[i]) / eps_sqrt;
+        }
+    }
+    out
 }
 
 pub fn central_jacobian_vec<F>(x: &[F], fs: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
@@ -36,16 +35,32 @@ where
 {
     let mut xt = x.to_owned();
     let eps_cbrt = F::epsilon().cbrt();
-    (0..x.len())
-        .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt);
-            let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt);
-            fx1.iter()
-                .zip(fx2.iter())
-                .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
-                .collect::<Vec<F>>()
-        })
-        .collect()
+
+    let comp = |(a, b): (&F, &F)| (*a - *b) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+
+    // We need to compute first iteration here, in order to know which dimension the output
+    // of `fs` has.
+    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt);
+    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt);
+    let t0 = fx1.iter().zip(fx2.iter()).map(comp).collect::<Vec<F>>();
+
+    // Now we can create the actual Jacobian
+    let mut out: Vec<Vec<F>> = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx1.len()];
+
+    // Fill in first column
+    for i in 0..t0.len() {
+        out[i][0] = t0[i];
+    }
+
+    // Fill in all the other columns
+    for j in 1..x.len() {
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt);
+        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt);
+        for i in 0..fx1.len() {
+            out[i][j] = comp((&fx1[i], &fx2[i]));
+        }
+    }
+    out
 }
 
 pub fn forward_jacobian_vec_prod_vec<F>(
@@ -106,19 +121,19 @@ where
     let mut xt = x.clone();
     let mut out = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx.len()];
     for pert_item in pert.iter() {
-        for j in pert_item.x_idx.iter() {
-            xt[*j] += eps_sqrt;
+        for i in pert_item.x_idx.iter() {
+            xt[*i] += eps_sqrt;
         }
 
         let fx1 = (fs)(&xt);
 
-        for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j];
+        for i in pert_item.x_idx.iter() {
+            xt[*i] = x[*i];
         }
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
-            for j in pert_item.r_idx[k].iter() {
-                out[*x_idx][*j] = (fx1[*j] - fx[*j]) / eps_sqrt;
+            for i in pert_item.r_idx[k].iter() {
+                out[*i][*x_idx] = (fx1[*i] - fx[*i]) / eps_sqrt;
             }
         }
     }
@@ -153,13 +168,14 @@ where
             xt[*j] = x[*j];
         }
 
+        // TODO: Move this out of loop (probably compute iteration 0 prior to rest of loop)
         if i == 0 {
             out = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx1.len()];
         }
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
             for j in pert_item.r_idx[k].iter() {
-                out[*x_idx][*j] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+                out[*j][*x_idx] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
             }
         }
     }
@@ -187,12 +203,12 @@ mod tests {
 
     fn res1() -> Vec<Vec<f64>> {
         vec![
-            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+            vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![-6.0, 5.0, 6.0, 0.0, 0.0, 0.0],
+            vec![0.0, -6.0, 5.0, 6.0, 0.0, 0.0],
+            vec![0.0, 0.0, -6.0, 5.0, 6.0, 0.0],
+            vec![0.0, 0.0, 0.0, -6.0, 5.0, 6.0],
+            vec![0.0, 0.0, 0.0, 0.0, -6.0, 9.0],
         ]
     }
 
