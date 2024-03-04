@@ -1,4 +1,4 @@
-// Copyright 2018-2020 argmin developers
+// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -59,9 +59,9 @@
 //! ### For `Vec<f64>`
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
-//! // Define cost function `f(x)`
+//! // Define function `f(x)`
 //! let f = |x: &Vec<f64>| -> f64 {
 //!     // ...
 //! #     x[0] + x[1].powi(2)
@@ -71,10 +71,12 @@
 //! let x = vec![1.0f64, 1.0];
 //!
 //! // Calculate gradient of `f` at `x` using forward differences
-//! let grad_forward = x.forward_diff(&f);
+//! let g_forward = vec::forward_diff(&f);
+//! let grad_forward = g_forward(&x);
 //!
 //! // Calculate gradient of `f` at `x` using central differences
-//! let grad_central = x.central_diff(&f);
+//! let g_central = vec::central_diff(&f);
+//! let grad_central = g_central(&x);
 //! #
 //! #  // Desired solution
 //! #  let res = vec![1.0f64, 2.0];
@@ -92,7 +94,7 @@
 //! # #[cfg(feature = "ndarray")]
 //! # {
 //! use ndarray::{array, Array1};
-//! use finitediff::FiniteDiff;
+//! use finitediff::ndarr;
 //!
 //! // Define cost function `f(x)`
 //! let f = |x: &Array1<f64>| -> f64 {
@@ -104,10 +106,12 @@
 //! let x = array![1.0f64, 1.0];
 //!
 //! // Calculate gradient of `f` at `x` using forward differences
-//! let grad_forward = x.forward_diff(&f);
+//! let g_forward = ndarr::forward_diff(&f);
+//! let grad_forward = g_forward(&x);
 //!
 //! // Calculate gradient of `f` at `x` using central differences
-//! let grad_central = x.central_diff(&f);
+//! let g_central = ndarr::central_diff(&f);
+//! let grad_central = g_central(&x);
 //! #
 //! #  // Desired solution
 //! #  let res = vec![1.0f64, 2.0];
@@ -129,7 +133,7 @@
 //! The calculation of the full Jacobian requires `n+1` evaluations of the function `f`.
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let f = |x: &Vec<f64>| -> Vec<f64> {
 //!     // ...
@@ -146,18 +150,20 @@
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
 //!
 //! // Using forward differences
-//! let jacobian_forward = x.forward_jacobian(&f);
+//! let j_forward = vec::forward_jacobian(&f);
+//! let jacobian_forward = j_forward(&x);
 //!
 //! // Using central differences
-//! let jacobian_central = x.central_jacobian(&f);
+//! let j_central = vec::central_jacobian(&f);
+//! let jacobian_central = j_central(&x);
 //!
 //! #  let res = vec![
-//! #      vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-//! #      vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-//! #      vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-//! #      vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-//! #      vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-//! #      vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+//! #      vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
+//! #      vec![-6.0, 5.0, 6.0, 0.0, 0.0, 0.0],
+//! #      vec![0.0, -6.0, 5.0, 6.0, 0.0, 0.0],
+//! #      vec![0.0, 0.0, -6.0, 5.0, 6.0, 0.0],
+//! #      vec![0.0, 0.0, 0.0, -6.0, 5.0, 6.0],
+//! #      vec![0.0, 0.0, 0.0, 0.0, -6.0, 9.0],
 //! #  ];
 //! #
 //! #  // Check result
@@ -176,7 +182,7 @@
 //! `f`, `J(x)*p` only requires `2`.
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let f = |x: &Vec<f64>| -> Vec<f64> {
 //!     // ...
@@ -194,10 +200,12 @@
 //! let p = vec![1.0f64, 2.0, 3.0, 4.0, 5.0, 6.0];
 //!
 //! // using forward differences
-//! let jacobian_forward = x.forward_jacobian_vec_prod(&f, &p);
+//! let j_forward = vec::forward_jacobian_vec_prod(&f);
+//! let jacobian_forward = j_forward(&x, &p);
 //!
 //! // using central differences
-//! let jacobian_central = x.central_jacobian_vec_prod(&f, &p);
+//! let j_central = vec::central_jacobian_vec_prod(&f);
+//! let jacobian_central = j_central(&x, &p);
 //! #
 //! #  let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
 //! #
@@ -214,7 +222,7 @@
 //! Nocedal & Wright for details.
 //!
 //! ```rust
-//! use finitediff::{FiniteDiff, PerturbationVector};
+//! use finitediff::{vec, PerturbationVector};
 //!
 //! let f = |x: &Vec<f64>| -> Vec<f64> {
 //!     // ...
@@ -243,18 +251,20 @@
 //! ];
 //!
 //! // using forward differences
-//! let jacobian_forward = x.forward_jacobian_pert(&f, &pert);
+//! let j_forward = vec::forward_jacobian_pert(&f);
+//! let jacobian_forward = j_forward(&x, &pert);
 //!
 //! // using central differences
-//! let jacobian_central = x.central_jacobian_pert(&f, &pert);
+//! let j_central = vec::central_jacobian_pert(&f);
+//! let jacobian_central = j_central(&x, &pert);
 //! #
 //! #  let res = vec![
-//! #      vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-//! #      vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-//! #      vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-//! #      vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-//! #      vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-//! #      vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+//! #      vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
+//! #      vec![-6.0, 5.0, 6.0, 0.0, 0.0, 0.0],
+//! #      vec![0.0, -6.0, 5.0, 6.0, 0.0, 0.0],
+//! #      vec![0.0, 0.0, -6.0, 5.0, 6.0, 0.0],
+//! #      vec![0.0, 0.0, 0.0, -6.0, 5.0, 6.0],
+//! #      vec![0.0, 0.0, 0.0, 0.0, -6.0, 9.0],
 //! #  ];
 //! #
 //! #  // Check result
@@ -273,7 +283,7 @@
 //! ### Full Hessian
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let g = |x: &Vec<f64>| -> Vec<f64> {
 //!     // ...
@@ -283,10 +293,12 @@
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
 //!
 //! // using forward differences
-//! let hessian_forward = x.forward_hessian(&g);
+//! let h_forward = vec::forward_hessian(&g);
+//! let hessian_forward = h_forward(&x);
 //!
 //! // using central differences
-//! let hessian_central = x.central_hessian(&g);
+//! let h_central = vec::central_hessian(&g);
+//! let hessian_central = h_central(&x);
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -307,7 +319,7 @@
 //! ### Product of the Hessian `H(x)` with a vector `p`
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let g = |x: &Vec<f64>| -> Vec<f64> {
 //!     // ...
@@ -318,10 +330,12 @@
 //! let p = vec![2.0, 3.0, 4.0, 5.0];
 //!
 //! // using forward differences
-//! let hessian_forward = x.forward_hessian_vec_prod(&g, &p);
+//! let h_forward = vec::forward_hessian_vec_prod(&g);
+//! let hessian_forward = h_forward(&x, &p);
 //!
 //! // using forward differences
-//! let hessian_central = x.central_hessian_vec_prod(&g, &p);
+//! let h_central = vec::central_hessian_vec_prod(&g);
+//! let hessian_central = h_central(&x, &p);
 //! #
 //! #  let res = vec![0.0, 6.0, 10.0, 18.0];
 //! #
@@ -334,7 +348,7 @@
 //! ### Calculation of the Hessian without knowledge of the gradient
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let f = |x: &Vec<f64>| -> f64 {
 //!     // ...
@@ -343,7 +357,8 @@
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
 //!
-//! let hessian = x.forward_hessian_nograd(&f);
+//! let h = vec::forward_hessian_nograd(&f);
+//! let hessian = h(&x);
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -363,7 +378,7 @@
 //! ### Calculation of the sparse Hessian without knowledge of the gradient
 //!
 //! ```rust
-//! use finitediff::FiniteDiff;
+//! use finitediff::vec;
 //!
 //! let f = |x: &Vec<f64>| -> f64 {
 //!     // ...
@@ -376,7 +391,8 @@
 //! // elements of the Hessian will be zero
 //! let indices = vec![[1, 1], [2, 3], [3, 3]];
 //!
-//! let hessian = x.forward_hessian_nograd_sparse(&f, indices);
+//! let h = vec::forward_hessian_nograd_sparse(&f);
+//! let hessian = h(&x, indices);
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -393,154 +409,11 @@
 //! #  }
 //! ```
 
-mod array;
+pub mod array;
 #[cfg(feature = "ndarray")]
-mod ndarray_m;
+pub mod ndarr;
 mod pert;
 mod utils;
-mod vec;
+pub mod vec;
 
 pub use pert::{PerturbationVector, PerturbationVectors};
-
-pub trait FiniteDiff
-where
-    Self: Sized,
-{
-    type Scalar;
-    type Jacobian;
-    type Hessian;
-    type OperatorOutput;
-
-    /// Forward difference calculated as
-    ///
-    /// `df/dx_i (x) \approx (f(x + sqrt(EPS_F64) * e_i) - f(x))/sqrt(EPS_F64)  \forall i`
-    ///
-    /// where `f` is the cost function and `e_i` is the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `f`.
-    fn forward_diff(&self, f: &dyn Fn(&Self) -> Self::Scalar) -> Self;
-
-    /// Central difference calculated as
-    ///
-    /// `df/dx_i (x) \approx (f(x + sqrt(EPS_F64) * e_i) - f(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
-    ///
-    /// where `f` is the cost function and `e_i` is the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `f`.
-    fn central_diff(&self, f: &dyn Fn(&Self) -> Self::Scalar) -> Self;
-
-    /// Calculation of the Jacobian J(x) of a vector function `fs` using forward differences:
-    ///
-    /// `dfs/dx_i (x) \approx (fs(x + sqrt(EPS_F64) * e_i) - fs(x))/sqrt(EPS_F64)  \forall i`
-    ///
-    /// where `e_i` is the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `fs`.
-    fn forward_jacobian(&self, fs: &dyn Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
-
-    /// Calculation of the Jacobian J(x) of a vector function `fs` using central differences:
-    ///
-    /// `dfs/dx_i (x) \approx (fs(x + sqrt(EPS_F64) * e_i) - fs(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
-    ///
-    /// where `e_i` is the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `fs`.
-    fn central_jacobian(&self, fs: &dyn Fn(&Self) -> Self::OperatorOutput) -> Self::Jacobian;
-
-    /// Calculation of the product of the Jacobian J(x) of a vector function `fs` with a vector `p`
-    /// using forward differences:
-    ///
-    /// `J(x)*p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x))/sqrt(EPS_F64)  \forall i`
-    ///
-    /// where `e_i` is the `i`th unit vector.
-    /// This requires 2 evaluations of `fs`.
-    fn forward_jacobian_vec_prod(
-        &self,
-        fs: &dyn Fn(&Self) -> Self::OperatorOutput,
-        p: &Self,
-    ) -> Self;
-
-    /// Calculation of the product of the Jacobian J(x) of a vector function `fs` with a vector `p`
-    /// using central differences:
-    ///
-    /// `J(x)*p \approx (fs(x + sqrt(EPS_F64) * p) - fs(x - sqrt(EPS_F64) * p))/(2.0 * sqrt(EPS_F64))  \forall i`
-    ///
-    /// where `e_i` is the `i`th unit vector.
-    /// This requires 2 evaluations of `fs`.
-    fn central_jacobian_vec_prod(
-        &self,
-        fs: &dyn Fn(&Self) -> Self::OperatorOutput,
-        p: &Self,
-    ) -> Self;
-
-    fn forward_jacobian_pert(
-        &self,
-        fs: &dyn Fn(&Self) -> Self::OperatorOutput,
-        pert: &PerturbationVectors,
-    ) -> Self::Jacobian;
-
-    fn central_jacobian_pert(
-        &self,
-        fs: &dyn Fn(&Self) -> Self::OperatorOutput,
-        pert: &PerturbationVectors,
-    ) -> Self::Jacobian;
-
-    /// Calculation of the Hessian using forward differences
-    ///
-    /// `dg/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x))/sqrt(EPS_F64)  \forall i`
-    ///
-    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
-    /// the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `n+1` evaluations of `g`.
-    fn forward_hessian(&self, g: &dyn Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
-
-    /// Calculation of the Hessian using central differences
-    ///
-    /// `dg/dx_i (x) \approx (g(x + sqrt(EPS_F64) * e_i) - g(x - sqrt(EPS_F64) * e_i))/(2.0 * sqrt(EPS_F64))  \forall i`
-    ///
-    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
-    /// the `i`th unit vector.
-    /// For a parameter vector of length `n`, this requires `2*n` evaluations of `g`.
-    fn central_hessian(&self, g: &dyn Fn(&Self) -> Self::OperatorOutput) -> Self::Hessian;
-
-    /// Calculation of the product of the Hessian H(x) of a function `g` with a vector `p`
-    /// using forward differences:
-    ///
-    /// `H(x)*p \approx (g(x + sqrt(EPS_F64) * p) - g(x))/sqrt(EPS_F64)  \forall i`
-    ///
-    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
-    /// the `i`th unit vector.
-    /// This requires 2 evaluations of `g`.
-    fn forward_hessian_vec_prod(&self, g: &dyn Fn(&Self) -> Self::OperatorOutput, p: &Self)
-        -> Self;
-
-    /// Calculation of the product of the Hessian H(x) of a function `g` with a vector `p`
-    /// using central differences:
-    ///
-    /// `H(x)*p \approx (g(x + sqrt(EPS_F64) * p) - g(x - sqrt(EPS_F64) * p))/(2.0 * sqrt(EPS_F64))  \forall i`
-    ///
-    /// where `g` is a function which computes the gradient of some other function f and `e_i` is
-    /// the `i`th unit vector.
-    /// This requires 2 evaluations of `g`.
-    fn central_hessian_vec_prod(&self, g: &dyn Fn(&Self) -> Self::OperatorOutput, p: &Self)
-        -> Self;
-
-    /// Calculation of the Hessian using forward differences without knowledge of the gradient:
-    ///
-    /// `df/(dx_i dx_j) (x) \approx (f(x + sqrt(EPS_F64) * e_i + sqrt(EPS_F64) * e_j) - f(x + sqrt(EPS_F64) + e_i) - f(x + sqrt(EPS_F64) * e_j) + f(x))/EPS_F64  \forall i`
-    ///
-    /// where `e_i` and `e_j` are the `i`th and `j`th unit vector, respectively.
-    // /// For a parameter vector of length `n`, this requires `n*(n+1)/2` evaluations of `g`.
-    fn forward_hessian_nograd(&self, f: &dyn Fn(&Self) -> Self::Scalar) -> Self::Hessian;
-
-    /// Calculation of a sparse Hessian using forward differences without knowledge of the gradient:
-    ///
-    /// `df/(dx_i dx_j) (x) \approx (f(x + sqrt(EPS_F64) * e_i + sqrt(EPS_F64) * e_j) - f(x + sqrt(EPS_F64) + e_i) - f(x + sqrt(EPS_F64) * e_j) + f(x))/EPS_F64  \forall i`
-    ///
-    /// where `e_i` and `e_j` are the `i`th and `j`th unit vector, respectively.
-    /// The indices which are to be evaluated need to be provided via `indices`. Note that due to
-    /// the symmetry of the Hessian, an index `(a, b)` will also compute the value of the Hessian at
-    /// `(b, a)`.
-    // /// For a parameter vector of length `n`, this requires `n*(n+1)/2` evaluations of `g`.
-    fn forward_hessian_nograd_sparse(
-        &self,
-        f: &dyn Fn(&Self) -> Self::Scalar,
-        indices: Vec<[usize; 2]>,
-    ) -> Self::Hessian;
-}

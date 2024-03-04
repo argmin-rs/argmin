@@ -1,4 +1,4 @@
-// Copyright 2018-2020 argmin developers
+// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -44,6 +44,21 @@ where
 
 #[inline(always)]
 pub fn restore_symmetry_vec<F>(mut mat: Vec<Vec<F>>) -> Vec<Vec<F>>
+where
+    F: Float + FromPrimitive,
+{
+    for i in 0..mat.len() {
+        for j in (i + 1)..mat[i].len() {
+            let t = (mat[i][j] + mat[j][i]) / F::from_f64(2.0).unwrap();
+            mat[i][j] = t;
+            mat[j][i] = t;
+        }
+    }
+    mat
+}
+
+#[inline(always)]
+pub fn restore_symmetry_const<const N: usize, F>(mut mat: [[F; N]; N]) -> [[F; N]; N]
 where
     F: Float + FromPrimitive,
 {

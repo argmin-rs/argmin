@@ -1,4 +1,4 @@
-// Copyright 2018-2020 argmin developers
+// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -7,6 +7,7 @@
 
 use std::ops::AddAssign;
 
+use ndarray::Array1;
 use ndarray::Array2;
 use ndarray::ScalarOperand;
 use num::Float;
@@ -28,11 +29,11 @@ where
     let mut xt = x.clone();
     let rn = fx.len();
     let n = x.len();
-    let mut out = Array2::zeros((n, rn));
-    for i in 0..n {
-        let fx1 = mod_and_calc(&mut xt, fs, i, eps_sqrt);
-        for j in 0..rn {
-            out[(i, j)] = (fx1[j] - fx[j]) / eps_sqrt;
+    let mut out = Array2::zeros((rn, n));
+    for j in 0..n {
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt);
+        for i in 0..rn {
+            out[(i, j)] = (fx1[i] - fx[i]) / eps_sqrt;
         }
     }
     out
@@ -49,21 +50,25 @@ where
 
     let mut xt = x.clone();
 
-    // TODO: get rid of this! fx is only needed to calculate rn in order to be able to allocate the
-    // array for the jacobian.
-    // A question, many years after this comment was written: Shouldn't that be the same length as
-    // x anyways?
-    let fx = (fs)(x);
+    let comp = |(a, b): (&F, &F)| (*a - *b) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt);
+    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt);
+    let tmp = Array1::from_iter(fx1.iter().zip(fx2.iter()).map(comp));
 
-    let rn = fx.len();
+    let rn = tmp.len();
     let n = x.len();
 
-    let mut out = Array2::zeros((n, rn));
-    for i in 0..n {
-        let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt);
-        let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt);
-        for j in 0..rn {
-            out[(i, j)] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+    let mut out = Array2::zeros((rn, n));
+
+    for i in 0..rn {
+        out[(i, 0)] = tmp[i];
+    }
+
+    for j in 1..n {
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt);
+        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt);
+        for i in 0..rn {
+            out[(i, j)] = comp((&fx1[i], &fx2[i]));
         }
     }
     out
@@ -79,7 +84,6 @@ where
 {
     let eps_sqrt = F::epsilon().sqrt();
     let fx = (fs)(x);
-    // TODO: Why not use mod_and_calc?
     let x1 = x + &p.mapv(|pi| eps_sqrt * pi);
     let fx1 = (fs)(&x1);
     (fx1 - fx) / eps_sqrt
@@ -115,19 +119,19 @@ where
     let mut xt = x.clone();
     let mut out = ndarray::Array2::zeros((fx.len(), x.len()));
     for pert_item in pert.iter() {
-        for j in pert_item.x_idx.iter() {
-            xt[*j] += eps_sqrt;
+        for i in pert_item.x_idx.iter() {
+            xt[*i] += eps_sqrt;
         }
 
         let fx1 = (fs)(&xt);
 
-        for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j];
+        for i in pert_item.x_idx.iter() {
+            xt[*i] = x[*i];
         }
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
-            for j in pert_item.r_idx[k].iter() {
-                out[(*x_idx, *j)] = (fx1[*j] - fx[*j]) / eps_sqrt;
+            for i in pert_item.r_idx[k].iter() {
+                out[(*i, *x_idx)] = (fx1[*i] - fx[*i]) / eps_sqrt;
             }
         }
     }
@@ -146,30 +150,31 @@ where
 
     let mut out = ndarray::Array2::zeros((1, 1));
     let mut xt = x.clone();
-    for (i, pert_item) in pert.iter().enumerate() {
-        for j in pert_item.x_idx.iter() {
-            xt[*j] += eps_cbrt;
+    for (j, pert_item) in pert.iter().enumerate() {
+        for i in pert_item.x_idx.iter() {
+            xt[*i] += eps_cbrt;
         }
 
         let fx1 = (fs)(&xt);
 
-        for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j] - eps_cbrt;
+        for i in pert_item.x_idx.iter() {
+            xt[*i] = x[*i] - eps_cbrt;
         }
 
         let fx2 = (fs)(&xt);
 
-        for j in pert_item.x_idx.iter() {
-            xt[*j] = x[*j];
+        for i in pert_item.x_idx.iter() {
+            xt[*i] = x[*i];
         }
 
-        if i == 0 {
+        // TODO: Move this out of loop (probably compute iteration 0 prior to rest of loop)
+        if j == 0 {
             out = ndarray::Array2::zeros((fx1.len(), x.len()));
         }
 
         for (k, x_idx) in pert_item.x_idx.iter().enumerate() {
-            for j in pert_item.r_idx[k].iter() {
-                out[(*x_idx, *j)] = (fx1[*j] - fx2[*j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+            for i in pert_item.r_idx[k].iter() {
+                out[(*i, *x_idx)] = (fx1[*i] - fx2[*i]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
             }
         }
     }
@@ -198,12 +203,12 @@ mod tests {
 
     fn res1() -> Vec<Vec<f64>> {
         vec![
-            vec![-4.0, -6.0, 0.0, 0.0, 0.0, 0.0],
-            vec![6.0, 5.0, -6.0, 0.0, 0.0, 0.0],
-            vec![0.0, 6.0, 5.0, -6.0, 0.0, 0.0],
-            vec![0.0, 0.0, 6.0, 5.0, -6.0, 0.0],
-            vec![0.0, 0.0, 0.0, 6.0, 5.0, -6.0],
-            vec![0.0, 0.0, 0.0, 0.0, 6.0, 9.0],
+            vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
+            vec![-6.0, 5.0, 6.0, 0.0, 0.0, 0.0],
+            vec![0.0, -6.0, 5.0, 6.0, 0.0, 0.0],
+            vec![0.0, 0.0, -6.0, 5.0, 6.0, 0.0],
+            vec![0.0, 0.0, 0.0, -6.0, 5.0, 6.0],
+            vec![0.0, 0.0, 0.0, 0.0, -6.0, 9.0],
         ]
     }
 
