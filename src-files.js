@@ -7,6 +7,7 @@ var srcIndex = new Map(JSON.parse('[\
 ["argmin_observer_spectator",["",[],["lib.rs","observer.rs","sender.rs"]]],\
 ["argmin_testfunctions",["",[],["ackley.rs","beale.rs","booth.rs","bukin.rs","crossintray.rs","easom.rs","eggholder.rs","goldsteinprice.rs","himmelblau.rs","holdertable.rs","levy.rs","lib.rs","matyas.rs","mccorminck.rs","picheny.rs","rastrigin.rs","rosenbrock.rs","schaffer.rs","sphere.rs","styblinskitang.rs","threehumpcamel.rs","zero.rs"]]],\
 ["argmin_testfunctions_py",["",[],["lib.rs"]]],\
+["finitediff",["",[["array",[],["diff.rs","hessian.rs","jacobian.rs","mod.rs"]],["vec",[],["diff.rs","hessian.rs","jacobian.rs","mod.rs"]]],["lib.rs","pert.rs","utils.rs"]]],\
 ["spectator",["",[],["lib.rs","message.rs"]]]\
 ]'));
 createSrcSidebar();

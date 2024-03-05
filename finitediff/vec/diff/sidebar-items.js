@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["central_diff_vec","forward_diff_vec"]};

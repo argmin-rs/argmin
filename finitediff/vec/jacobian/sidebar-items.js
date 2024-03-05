@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["central_jacobian_pert_vec","central_jacobian_vec","central_jacobian_vec_prod_vec","forward_jacobian_pert_vec","forward_jacobian_vec","forward_jacobian_vec_prod_vec"]};

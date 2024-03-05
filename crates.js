@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["argmin","argmin_checkpointing_file","argmin_math","argmin_observer_paramwriter","argmin_observer_slog","argmin_observer_spectator","argmin_testfunctions","argmin_testfunctions_py","spectator"];
+window.ALL_CRATES = ["argmin","argmin_checkpointing_file","argmin_math","argmin_observer_paramwriter","argmin_observer_slog","argmin_observer_spectator","argmin_testfunctions","argmin_testfunctions_py","finitediff","spectator"];

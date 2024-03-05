@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This crate contains a wide range of methods for the calculation of gradients, Jacobians and Hessians using forward and central differences. The methods have been implemented for input vectors of the type `Vec&lt;f64&gt;` and `ndarray::Array1&lt;f64&gt;`. Central differences are more accurate but require more evaluations of the cost function and are therefore computationally more expensive."><title>finitediff - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="finitediff" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../finitediff/index.html">finitediff</a><span class="version">0.1.4</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#types">Type Aliases</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../finitediff/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">finitediff</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/finitediff/lib.rs.html#8-419">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This crate contains a wide range of methods for the calculation of gradients, Jacobians and
+Hessians using forward and central differences.
+The methods have been implemented for input vectors of the type <code>Vec&lt;f64&gt;</code> and
+<code>ndarray::Array1&lt;f64&gt;</code>.
+Central differences are more accurate but require more evaluations of the cost function and are
+therefore computationally more expensive.</p>
+<h2 id="references"><a href="#references">References</a></h2>
+<p>Jorge Nocedal and Stephen J. Wright (2006). Numerical Optimization.
+Springer. ISBN 0-387-30303-0.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<p>Add this to your <code>dependencies</code> section of <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+finitediff = &quot;0.1.4&quot;
+</code></pre></div>
+<p>To use the <code>FiniteDiff</code> trait implementations on the <code>ndarray</code> types, please activate the
+<code>ndarray</code> feature:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+finitediff = { version = &quot;0.1.4&quot;, features = [&quot;ndarray&quot;] }
+</code></pre></div><h2 id="examples"><a href="#examples">Examples</a></h2>
+<ul>
+<li><a href="#calculation-of-the-gradient">Calculation of the gradient</a>
+<ul>
+<li><a href="#for-vecf64">For <code>Vec&lt;f64&gt;</code></a></li>
+<li><a href="#for-ndarrayarray1f64">For <code>ndarray::Array1&lt;f64&gt;</code></a></li>
+</ul>
+</li>
+<li><a href="#calculation-of-the-jacobian">Calculation of the Jacobian</a>
+<ul>
+<li><a href="#full-jacobian">Full Jacobian</a></li>
+<li><a href="#product-of-the-jacobian-jx-with-a-vector-p">Product of the Jacobian <code>J(x)</code> with a vector <code>p</code></a></li>
+<li><a href="#sparse-jacobian">Sparse Jacobian</a></li>
+</ul>
+</li>
+<li><a href="#calculation-of-the-hessian">Calculation of the Hessian</a>
+<ul>
+<li><a href="#full-hessian">Full Hessian</a></li>
+<li><a href="#product-of-the-hessian-hx-with-a-vector-p">Product of the Hessian <code>H(x)</code> with a vector <code>p</code></a></li>
+<li><a href="#calculation-of-the-hessian-without-knowledge-of-the-gradient">Calculation of the Hessian without knowledge of the gradient</a></li>
+<li><a href="#calculation-of-the-sparse-hessian-without-knowledge-of-the-gradient">Calculation of the sparse Hessian without knowledge of the gradient</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="calculation-of-the-gradient"><a href="#calculation-of-the-gradient">Calculation of the gradient</a></h3>
+<p>This section illustrates the computation of a gradient of a function <code>f</code> at a point <code>x</code> of type
+<code>Vec&lt;f64&gt;</code>. Using forward differences requires <code>n+1</code> evaluations of the function <code>f</code> while
+central differences requires <code>2*n</code> evaluations.</p>
+<h4 id="for-vecf64"><a href="#for-vecf64">For <code>Vec&lt;f64&gt;</code></a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="comment">// Define function `f(x)`
+</span><span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; f64 {
+    <span class="comment">// ...
+</span>};
+
+<span class="comment">// Point at which gradient should be calculated
+</span><span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>];
+
+<span class="comment">// Calculate gradient of `f` at `x` using forward differences
+</span><span class="kw">let </span>g_forward = vec::forward_diff(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>grad_forward = g_forward(<span class="kw-2">&amp;</span>x);
+
+<span class="comment">// Calculate gradient of `f` at `x` using central differences
+</span><span class="kw">let </span>g_central = vec::central_diff(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>grad_central = g_central(<span class="kw-2">&amp;</span>x);</code></pre></div>
+<h4 id="for-ndarrayarray1f64"><a href="#for-ndarrayarray1f64">For <code>ndarray::Array1&lt;f64&gt;</code></a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ndarray::{array, Array1};
+<span class="kw">use </span>finitediff::ndarr;
+
+<span class="comment">// Define cost function `f(x)`
+</span><span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Array1&lt;f64&gt;| -&gt; f64 {
+    <span class="comment">// ...
+</span>};
+
+<span class="comment">// Point at which gradient should be calculated
+</span><span class="kw">let </span>x = <span class="macro">array!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>];
+
+<span class="comment">// Calculate gradient of `f` at `x` using forward differences
+</span><span class="kw">let </span>g_forward = ndarr::forward_diff(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>grad_forward = g_forward(<span class="kw-2">&amp;</span>x);
+
+<span class="comment">// Calculate gradient of `f` at `x` using central differences
+</span><span class="kw">let </span>g_central = ndarr::central_diff(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>grad_central = g_central(<span class="kw-2">&amp;</span>x);</code></pre></div>
+<h3 id="calculation-of-the-jacobian"><a href="#calculation-of-the-jacobian">Calculation of the Jacobian</a></h3>
+<p>Note that the same interface is also implemented for <code>ndarray::Array1&lt;f64&gt;</code> (not shown).</p>
+<h4 id="full-jacobian"><a href="#full-jacobian">Full Jacobian</a></h4>
+<p>The calculation of the full Jacobian requires <code>n+1</code> evaluations of the function <code>f</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+<span class="comment">// Using forward differences
+</span><span class="kw">let </span>j_forward = vec::forward_jacobian(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_forward = j_forward(<span class="kw-2">&amp;</span>x);
+
+<span class="comment">// Using central differences
+</span><span class="kw">let </span>j_central = vec::central_jacobian(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_central = j_central(<span class="kw-2">&amp;</span>x);
+</code></pre></div>
+<h4 id="product-of-the-jacobian-jx-with-a-vector-p"><a href="#product-of-the-jacobian-jx-with-a-vector-p">Product of the Jacobian <code>J(x)</code> with a vector <code>p</code></a></h4>
+<p>Directly computing <code>J(x)*p</code> can be much more efficient than computing <code>J(x)</code> first and then
+multiplying it with <code>p</code>. While computing the full Jacobian <code>J(x)</code> requires <code>n+1</code> evaluations of
+<code>f</code>, <code>J(x)*p</code> only requires <code>2</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+<span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>];
+
+<span class="comment">// using forward differences
+</span><span class="kw">let </span>j_forward = vec::forward_jacobian_vec_prod(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_forward = j_forward(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>p);
+
+<span class="comment">// using central differences
+</span><span class="kw">let </span>j_central = vec::central_jacobian_vec_prod(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_central = j_central(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>p);</code></pre></div>
+<h4 id="sparse-jacobian"><a href="#sparse-jacobian">Sparse Jacobian</a></h4>
+<p>If the Jacobian is sparse its structure can be exploited using perturbation vectors. See
+Nocedal &amp; Wright for details.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::{vec, PerturbationVector};
+
+<span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+<span class="kw">let </span>pert = <span class="macro">vec!</span>[
+    PerturbationVector::new()
+        .add(<span class="number">0</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>])
+        .add(<span class="number">3</span>, <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]),
+    PerturbationVector::new()
+        .add(<span class="number">1</span>, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>])
+        .add(<span class="number">4</span>, <span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]),
+    PerturbationVector::new()
+        .add(<span class="number">2</span>, <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+        .add(<span class="number">5</span>, <span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>]),
+];
+
+<span class="comment">// using forward differences
+</span><span class="kw">let </span>j_forward = vec::forward_jacobian_pert(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_forward = j_forward(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>pert);
+
+<span class="comment">// using central differences
+</span><span class="kw">let </span>j_central = vec::central_jacobian_pert(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>jacobian_central = j_central(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>pert);</code></pre></div>
+<h3 id="calculation-of-the-hessian"><a href="#calculation-of-the-hessian">Calculation of the Hessian</a></h3>
+<p>Note that the same interface is also implemented for <code>ndarray::Array1&lt;f64&gt;</code> (not shown).</p>
+<h4 id="full-hessian"><a href="#full-hessian">Full Hessian</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>g = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+<span class="comment">// using forward differences
+</span><span class="kw">let </span>h_forward = vec::forward_hessian(<span class="kw-2">&amp;</span>g);
+<span class="kw">let </span>hessian_forward = h_forward(<span class="kw-2">&amp;</span>x);
+
+<span class="comment">// using central differences
+</span><span class="kw">let </span>h_central = vec::central_hessian(<span class="kw-2">&amp;</span>g);
+<span class="kw">let </span>hessian_central = h_central(<span class="kw-2">&amp;</span>x);</code></pre></div>
+<h4 id="product-of-the-hessian-hx-with-a-vector-p"><a href="#product-of-the-hessian-hx-with-a-vector-p">Product of the Hessian <code>H(x)</code> with a vector <code>p</code></a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>g = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+<span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>];
+
+<span class="comment">// using forward differences
+</span><span class="kw">let </span>h_forward = vec::forward_hessian_vec_prod(<span class="kw-2">&amp;</span>g);
+<span class="kw">let </span>hessian_forward = h_forward(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>p);
+
+<span class="comment">// using forward differences
+</span><span class="kw">let </span>h_central = vec::central_hessian_vec_prod(<span class="kw-2">&amp;</span>g);
+<span class="kw">let </span>hessian_central = h_central(<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>p);</code></pre></div>
+<h4 id="calculation-of-the-hessian-without-knowledge-of-the-gradient"><a href="#calculation-of-the-hessian-without-knowledge-of-the-gradient">Calculation of the Hessian without knowledge of the gradient</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; f64 {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+<span class="kw">let </span>h = vec::forward_hessian_nograd(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>hessian = h(<span class="kw-2">&amp;</span>x);</code></pre></div>
+<h4 id="calculation-of-the-sparse-hessian-without-knowledge-of-the-gradient"><a href="#calculation-of-the-sparse-hessian-without-knowledge-of-the-gradient">Calculation of the sparse Hessian without knowledge of the gradient</a></h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>finitediff::vec;
+
+<span class="kw">let </span>f = |x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;| -&gt; f64 {
+    <span class="comment">// ...
+</span>};
+
+<span class="kw">let </span>x = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>];
+
+<span class="comment">// Indices at which the Hessian should be evaluated. All other
+// elements of the Hessian will be zero
+</span><span class="kw">let </span>indices = <span class="macro">vec!</span>[[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">3</span>, <span class="number">3</span>]];
+
+<span class="kw">let </span>h = vec::forward_hessian_nograd_sparse(<span class="kw-2">&amp;</span>f);
+<span class="kw">let </span>hessian = h(<span class="kw-2">&amp;</span>x, indices);</code></pre></div>
+</div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="array/index.html" title="mod finitediff::array">array</a></div></li><li><div class="item-name"><a class="mod" href="vec/index.html" title="mod finitediff::vec">vec</a></div></li></ul><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.PerturbationVector.html" title="struct finitediff::PerturbationVector">PerturbationVector</a></div><div class="desc docblock-short">Perturbation Vector for the accelerated computation of the Jacobian.</div></li></ul><h2 id="types" class="section-header"><a href="#types">Type Aliases</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.PerturbationVectors.html" title="type finitediff::PerturbationVectors">PerturbationVectors</a></div><div class="desc docblock-short">A collection of <code>PerturbationVector</code>s</div></li></ul></section></div></main></body></html>

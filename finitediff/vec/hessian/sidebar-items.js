@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["central_hessian_vec","central_hessian_vec_prod_vec","forward_hessian_nograd_sparse_vec","forward_hessian_nograd_vec","forward_hessian_vec","forward_hessian_vec_prod_vec"]};
