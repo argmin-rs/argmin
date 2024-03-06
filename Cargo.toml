@@ -5,6 +5,7 @@ members = [
     "crates/*",
     "examples/*",
     "python/argmin-testfunctions-py",
+    "python/finitediff-py",
 ]
 
 exclude = [
