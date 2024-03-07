@@ -26,11 +26,6 @@ targets = [
     # the actual valid features supported by the target architecture.
     #{ triple = "wasm32-unknown-unknown", features = ["atomics"] },
 ]
-exclude = [
-    # Excluded because it is only used as a dev-dependency for testing
-    # TODO: Remove the exclude as soon as the fix for https://github.com/EmbarkStudios/krates/issues/60 is available in the cargo-deny-action
-    "intel-mkl-src", # TODO: Delete as 
-]
 
 # This section is considered when running `cargo deny check advisories`
 # More documentation for the advisories section can be found here:
