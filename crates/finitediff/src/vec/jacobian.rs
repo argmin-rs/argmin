@@ -7,29 +7,36 @@
 
 use std::ops::AddAssign;
 
+use anyhow::Error;
 use num::{Float, FromPrimitive};
 
 use crate::pert::PerturbationVectors;
 use crate::utils::mod_and_calc;
 
-pub fn forward_jacobian_vec<F>(x: &Vec<F>, fs: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
+pub fn forward_jacobian_vec<F>(
+    x: &Vec<F>,
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let mut xt = x.clone();
     let eps_sqrt = F::epsilon().sqrt();
     let mut out: Vec<Vec<F>> = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx.len()];
     for j in 0..x.len() {
-        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt);
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt)?;
         for i in 0..fx.len() {
             out[i][j] = (fx1[i] - fx[i]) / eps_sqrt;
         }
     }
-    out
+    Ok(out)
 }
 
-pub fn central_jacobian_vec<F>(x: &[F], fs: &dyn Fn(&Vec<F>) -> Vec<F>) -> Vec<Vec<F>>
+pub fn central_jacobian_vec<F>(
+    x: &[F],
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -40,8 +47,8 @@ where
 
     // We need to compute first iteration here, in order to know which dimension the output
     // of `fs` has.
-    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt);
-    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt);
+    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt)?;
+    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt)?;
     let t0 = fx1.iter().zip(fx2.iter()).map(comp).collect::<Vec<F>>();
 
     // Now we can create the actual Jacobian
@@ -54,42 +61,47 @@ where
 
     // Fill in all the other columns
     for j in 1..x.len() {
-        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt);
-        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt);
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt)?;
+        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt)?;
         for i in 0..fx1.len() {
             out[i][j] = comp((&fx1[i], &fx2[i]));
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn forward_jacobian_vec_prod_vec<F>(
     x: &Vec<F>,
-    fs: &dyn Fn(&Vec<F>) -> Vec<F>,
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     p: &[F],
-) -> Vec<F>
+) -> Result<Vec<F>, Error>
 where
     F: Float,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let eps_sqrt = F::epsilon().sqrt();
     let x1 = x
         .iter()
         .zip(p.iter())
         .map(|(&xi, &pi)| xi + eps_sqrt * pi)
         .collect();
-    let fx1 = (fs)(&x1);
+    let fx1 = (fs)(&x1)?;
     fx1.iter()
         .zip(fx.iter())
-        .map(|(&a, &b)| (a - b) / eps_sqrt)
-        .collect::<Vec<F>>()
+        .map(|(&a, &b)| Ok((a - b) / eps_sqrt))
+        .collect::<Result<Vec<F>, Error>>()
 }
 
-pub fn central_jacobian_vec_prod_vec<F>(x: &[F], fs: &dyn Fn(&Vec<F>) -> Vec<F>, p: &[F]) -> Vec<F>
+pub fn central_jacobian_vec_prod_vec<F>(
+    x: &[F],
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    p: &[F],
+) -> Result<Vec<F>, Error>
 where
     F: Float + FromPrimitive,
 {
     let eps_cbrt = F::epsilon().cbrt();
+    // TODO: Do this in a single vec
     let x1 = x
         .iter()
         .zip(p.iter())
@@ -100,23 +112,23 @@ where
         .zip(p.iter())
         .map(|(&xi, &pi)| xi - eps_cbrt * pi)
         .collect();
-    let fx1 = (fs)(&x1);
-    let fx2 = (fs)(&x2);
+    let fx1 = (fs)(&x1)?;
+    let fx2 = (fs)(&x2)?;
     fx1.iter()
         .zip(fx2.iter())
-        .map(|(&a, &b)| (a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt))
-        .collect::<Vec<F>>()
+        .map(|(&a, &b)| Ok((a - b) / (F::from_f64(2.0).unwrap() * eps_cbrt)))
+        .collect::<Result<Vec<F>, Error>>()
 }
 
 pub fn forward_jacobian_pert_vec<F>(
     x: &Vec<F>,
-    fs: &dyn Fn(&Vec<F>) -> Vec<F>,
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     pert: &PerturbationVectors,
-) -> Vec<Vec<F>>
+) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let eps_sqrt = F::epsilon().sqrt();
     let mut xt = x.clone();
     let mut out = vec![vec![F::from_f64(0.0).unwrap(); x.len()]; fx.len()];
@@ -125,7 +137,7 @@ where
             xt[*i] += eps_sqrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for i in pert_item.x_idx.iter() {
             xt[*i] = x[*i];
@@ -137,14 +149,14 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_pert_vec<F>(
     x: &[F],
-    fs: &dyn Fn(&Vec<F>) -> Vec<F>,
+    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     pert: &PerturbationVectors,
-) -> Vec<Vec<F>>
+) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -156,13 +168,13 @@ where
             xt[*j] += eps_cbrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for j in pert_item.x_idx.iter() {
             xt[*j] = x[*j] - eps_cbrt;
         }
 
-        let fx2 = (fs)(&xt);
+        let fx2 = (fs)(&xt)?;
 
         for j in pert_item.x_idx.iter() {
             xt[*j] = x[*j];
@@ -179,7 +191,7 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -190,15 +202,15 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &Vec<f64>) -> Vec<f64> {
-        vec![
+    fn f(x: &Vec<f64>) -> Result<Vec<f64>, Error> {
+        Ok(vec![
             2.0 * (x[1].powi(3) - x[0].powi(2)),
             3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
             3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
             3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
             3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
             3.0 * (x[5].powi(3) - x[4].powi(2)),
-        ]
+        ])
     }
 
     fn res1() -> Vec<Vec<f64>> {
@@ -240,7 +252,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_vec_f64() {
-        let jacobian = forward_jacobian_vec(&x(), &f);
+        let jacobian = forward_jacobian_vec(&x(), &f).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -252,7 +264,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_vec_f64() {
-        let jacobian = central_jacobian_vec(&x(), &f);
+        let jacobian = central_jacobian_vec(&x(), &f).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -264,7 +276,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_vec_prod_vec_f64() {
-        let jacobian = forward_jacobian_vec_prod_vec(&x(), &f, &p());
+        let jacobian = forward_jacobian_vec_prod_vec(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -275,7 +287,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_vec_prod_vec_f64() {
-        let jacobian = central_jacobian_vec_prod_vec(&x(), &f, &p());
+        let jacobian = central_jacobian_vec_prod_vec(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -285,7 +297,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_pert_vec_f64() {
-        let jacobian = forward_jacobian_pert_vec(&x(), &f, &pert());
+        let jacobian = forward_jacobian_pert_vec(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -298,7 +310,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_pert_vec_f64() {
-        let jacobian = central_jacobian_pert_vec(&x(), &f, &pert());
+        let jacobian = central_jacobian_pert_vec(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);

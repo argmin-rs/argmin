@@ -7,39 +7,45 @@
 
 use std::ops::{Add, IndexMut};
 
+use anyhow::Error;
 use num::{Float, FromPrimitive};
 
 /// Panics when idx > x.len()
 #[inline(always)]
-pub fn mod_and_calc<F, C, T>(x: &mut C, f: &dyn Fn(&C) -> T, idx: usize, y: F) -> T
+pub fn mod_and_calc<F, C, T>(
+    x: &mut C,
+    f: &dyn Fn(&C) -> Result<T, Error>,
+    idx: usize,
+    y: F,
+) -> Result<T, Error>
 where
     F: Add<Output = F> + Copy,
     C: IndexMut<usize, Output = F>,
 {
     let xtmp = x[idx];
     x[idx] = xtmp + y;
-    let fx1 = (f)(x);
+    let fx1 = (f)(x)?;
     x[idx] = xtmp;
-    fx1
+    Ok(fx1)
 }
 
 /// Panics when idx > N
 #[inline(always)]
 pub fn mod_and_calc_const<const N: usize, F, T>(
     x: &mut [F; N],
-    f: &dyn Fn(&[F; N]) -> T,
+    f: &dyn Fn(&[F; N]) -> Result<T, Error>,
     idx: usize,
     y: F,
-) -> T
+) -> Result<T, Error>
 where
     F: Add<Output = F> + Copy,
 {
     assert!(idx < N);
     let xtmp = x[idx];
     x[idx] = xtmp + y;
-    let fx1 = (f)(x);
+    let fx1 = (f)(x)?;
     x[idx] = xtmp;
-    fx1
+    Ok(fx1)
 }
 
 #[inline(always)]

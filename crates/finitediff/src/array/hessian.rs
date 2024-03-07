@@ -7,36 +7,37 @@
 
 use std::ops::AddAssign;
 
+use anyhow::Error;
 use num::{Float, FromPrimitive};
 
 use crate::utils::{mod_and_calc, restore_symmetry_const, KV};
 
 pub fn forward_hessian_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> [F; N],
-) -> [[F; N]; N]
+    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive,
 {
     let eps_sqrt = F::epsilon().sqrt();
-    let fx = (grad)(x);
+    let fx = (grad)(x)?;
     let mut xt = *x;
     let mut out = [[F::from_f64(0.0).unwrap(); N]; N];
     for (i, o_item) in out.iter_mut().enumerate().take(N) {
-        let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt);
+        let fx1 = mod_and_calc(&mut xt, grad, i, eps_sqrt)?;
         for j in 0..N {
             o_item[j] = (fx1[j] - fx[j]) / eps_sqrt;
         }
     }
 
     // restore symmetry
-    restore_symmetry_const(out)
+    Ok(restore_symmetry_const(out))
 }
 
 pub fn central_hessian_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> [F; N],
-) -> [[F; N]; N]
+    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive,
 {
@@ -45,46 +46,46 @@ where
     let mut out = [[F::from_f64(0.0).unwrap(); N]; N];
 
     for (i, o_item) in out.iter_mut().enumerate().take(N) {
-        let fx1 = mod_and_calc(&mut xt, grad, i, eps_cbrt);
-        let fx2 = mod_and_calc(&mut xt, grad, i, -eps_cbrt);
+        let fx1 = mod_and_calc(&mut xt, grad, i, eps_cbrt)?;
+        let fx2 = mod_and_calc(&mut xt, grad, i, -eps_cbrt)?;
         for j in 0..N {
             o_item[j] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
         }
     }
 
     // restore symmetry
-    restore_symmetry_const(out)
+    Ok(restore_symmetry_const(out))
 }
 
 pub fn forward_hessian_vec_prod_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> [F; N],
+    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
     p: &[F; N],
-) -> [F; N]
+) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,
 {
     let eps_sqrt = F::epsilon().sqrt();
-    let fx = (grad)(x);
+    let fx = (grad)(x)?;
     let mut out = [F::from_f64(0.0).unwrap(); N];
 
     let mut x1 = *x;
     for i in 1..N {
         x1[i] = x[i] + p[i] * eps_sqrt;
     }
-    let fx1 = (grad)(&x1);
+    let fx1 = (grad)(&x1)?;
 
     for i in 0..N {
         out[i] = (fx1[i] - fx[i]) / eps_sqrt;
     }
-    out
+    Ok(out)
 }
 
 pub fn central_hessian_vec_prod_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> [F; N],
+    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
     p: &[F; N],
-) -> [F; N]
+) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,
 {
@@ -95,20 +96,20 @@ where
         x1[i] = x[i] + p[i] * eps_cbrt;
         x2[i] = x[i] - p[i] * eps_cbrt;
     }
-    let fx1 = (grad)(&x1);
-    let fx2 = (grad)(&x2);
+    let fx1 = (grad)(&x1)?;
+    let fx2 = (grad)(&x2)?;
 
     let mut out = [F::from_f64(0.0).unwrap(); N];
     for i in 0..N {
         out[i] = (fx1[i] - fx2[i]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
     }
-    out
+    Ok(out)
 }
 
 pub fn forward_hessian_nograd_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> F,
-) -> [[F; N]; N]
+    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -116,13 +117,13 @@ where
     let eps_nograd = F::from_f64(2.0).unwrap() * F::epsilon();
     let eps_sqrt_nograd = eps_nograd.sqrt();
 
-    let fx = (f)(x);
+    let fx = (f)(x)?;
     let mut xt = *x;
 
     // Precompute f(x + sqrt(EPS) * e_i) for all i
     let mut fxei = [F::from_f64(0.0).unwrap(); N];
     for (i, item) in fxei.iter_mut().enumerate().take(N) {
-        *item = mod_and_calc(&mut xt, f, i, eps_sqrt_nograd);
+        *item = mod_and_calc(&mut xt, f, i, eps_sqrt_nograd)?;
     }
 
     let mut out = [[F::from_f64(0.0).unwrap(); N]; N];
@@ -134,7 +135,7 @@ where
                 let xtj = xt[j];
                 xt[i] += eps_sqrt_nograd;
                 xt[j] += eps_sqrt_nograd;
-                let fxij = (f)(&xt);
+                let fxij = (f)(&xt)?;
                 xt[i] = xti;
                 xt[j] = xtj;
                 (fxij - fxei[i] - fxei[j] + fx) / eps_nograd
@@ -143,14 +144,14 @@ where
             out[j][i] = t;
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn forward_hessian_nograd_sparse_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> F,
+    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
     indices: Vec<[usize; 2]>,
-) -> [[F; N]; N]
+) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -158,7 +159,7 @@ where
     let eps_nograd = F::from_f64(2.0).unwrap() * F::epsilon();
     let eps_sqrt_nograd = eps_nograd.sqrt();
 
-    let fx = (f)(x);
+    let fx = (f)(x)?;
     let mut xt = *x;
 
     let mut idxs: Vec<usize> = indices
@@ -172,7 +173,7 @@ where
     let mut fxei = KV::new(idxs.len());
 
     for idx in idxs.iter() {
-        fxei.set(*idx, mod_and_calc(&mut xt, f, *idx, eps_sqrt_nograd));
+        fxei.set(*idx, mod_and_calc(&mut xt, f, *idx, eps_sqrt_nograd)?);
     }
 
     let mut out = [[F::from_f64(0.0).unwrap(); N]; N];
@@ -182,18 +183,18 @@ where
             let xtj = xt[j];
             xt[i] += eps_sqrt_nograd;
             xt[j] += eps_sqrt_nograd;
-            let fxij = (f)(&xt);
+            let fxij = (f)(&xt)?;
             xt[i] = xti;
             xt[j] = xtj;
 
-            let fxi = fxei.get(i).unwrap();
-            let fxj = fxei.get(j).unwrap();
+            let fxi = fxei.get(i).ok_or(anyhow::anyhow!("Bug?"))?;
+            let fxj = fxei.get(j).ok_or(anyhow::anyhow!("Bug?"))?;
             (fxij - fxi - fxj + fx) / eps_nograd
         };
         out[i][j] = t;
         out[j][i] = t;
     }
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -202,12 +203,12 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &[f64; 4]) -> f64 {
-        x[0] + x[1].powi(2) + x[2] * x[3].powi(2)
+    fn f(x: &[f64; 4]) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2) + x[2] * x[3].powi(2))
     }
 
-    fn g(x: &[f64; 4]) -> [f64; 4] {
-        [1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]]
+    fn g(x: &[f64; 4]) -> Result<[f64; 4], Error> {
+        Ok([1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]])
     }
 
     fn x() -> [f64; 4] {
@@ -233,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_vec_f64() {
-        let hessian = forward_hessian_const(&x(), &g);
+        let hessian = forward_hessian_const(&x(), &g).unwrap();
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -246,7 +247,7 @@ mod tests {
 
     #[test]
     fn test_central_hessian_vec_f64() {
-        let hessian = central_hessian_const(&x(), &g);
+        let hessian = central_hessian_const(&x(), &g).unwrap();
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -259,7 +260,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_vec_prod_vec_f64() {
-        let hessian = forward_hessian_vec_prod_const(&x(), &g, &p());
+        let hessian = forward_hessian_vec_prod_const(&x(), &g, &p()).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -270,7 +271,7 @@ mod tests {
 
     #[test]
     fn test_central_hessian_vec_prod_vec_f64() {
-        let hessian = central_hessian_vec_prod_const(&x(), &g, &p());
+        let hessian = central_hessian_vec_prod_const(&x(), &g, &p()).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -281,7 +282,7 @@ mod tests {
 
     #[test]
     fn test_forward_hessian_nograd_vec_f64() {
-        let hessian = forward_hessian_nograd_const(&x(), &f);
+        let hessian = forward_hessian_nograd_const(&x(), &f).unwrap();
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         for i in 0..4 {
@@ -294,7 +295,7 @@ mod tests {
     #[test]
     fn test_forward_hessian_nograd_sparse_vec_f64() {
         let indices = vec![[1, 1], [2, 3], [3, 3]];
-        let hessian = forward_hessian_nograd_sparse_const(&x(), &f, indices);
+        let hessian = forward_hessian_nograd_sparse_const(&x(), &f, indices).unwrap();
         let res = res1();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);

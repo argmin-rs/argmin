@@ -11,6 +11,11 @@ mod jacobian;
 
 use std::ops::AddAssign;
 
+use anyhow::Error;
+use ndarray::{Array1, Array2, ScalarOperand};
+use num::{Float, FromPrimitive};
+
+use crate::PerturbationVectors;
 pub use diff::{central_diff_ndarray, forward_diff_ndarray};
 pub use hessian::{
     central_hessian_ndarray, central_hessian_vec_prod_ndarray, forward_hessian_ndarray,
@@ -21,60 +26,60 @@ pub use jacobian::{
     central_jacobian_ndarray, central_jacobian_pert_ndarray, central_jacobian_vec_prod_ndarray,
     forward_jacobian_ndarray, forward_jacobian_pert_ndarray, forward_jacobian_vec_prod_ndarray,
 };
-use ndarray::{Array1, Array2, ScalarOperand};
-use num::{Float, FromPrimitive};
-
-use crate::PerturbationVectors;
 
 #[inline(always)]
-pub fn forward_diff<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array1<F>
+pub fn forward_diff<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> F,
+    Func: Fn(&Array1<F>) -> Result<F, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| forward_diff_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn central_diff<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array1<F>
+pub fn central_diff<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> F,
+    Func: Fn(&Array1<F>) -> Result<F, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| central_diff_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn forward_jacobian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array2<F>
+pub fn forward_jacobian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| forward_jacobian_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn central_jacobian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array2<F>
+pub fn central_jacobian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| central_jacobian_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn forward_jacobian_vec_prod<Func, F>(f: Func) -> impl Fn(&Array1<F>, &Array1<F>) -> Array1<F>
+pub fn forward_jacobian_vec_prod<Func, F>(
+    f: Func,
+) -> impl Fn(&Array1<F>, &Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + ScalarOperand,
 {
     move |p: &Array1<F>, v: &Array1<F>| forward_jacobian_vec_prod_ndarray(p, &f, v)
 }
 
 #[inline(always)]
-pub fn central_jacobian_vec_prod<Func, F>(f: Func) -> impl Fn(&Array1<F>, &Array1<F>) -> Array1<F>
+pub fn central_jacobian_vec_prod<Func, F>(
+    f: Func,
+) -> impl Fn(&Array1<F>, &Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + ScalarOperand,
 {
     move |p: &Array1<F>, v: &Array1<F>| central_jacobian_vec_prod_ndarray(p, &f, v)
@@ -83,9 +88,9 @@ where
 #[inline(always)]
 pub fn forward_jacobian_pert<Func, F>(
     f: Func,
-) -> impl Fn(&Array1<F>, &PerturbationVectors) -> Array2<F>
+) -> impl Fn(&Array1<F>, &PerturbationVectors) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
     move |p: &Array1<F>, pert: &PerturbationVectors| forward_jacobian_pert_ndarray(p, &f, pert)
@@ -94,54 +99,58 @@ where
 #[inline(always)]
 pub fn central_jacobian_pert<Func, F>(
     f: Func,
-) -> impl Fn(&Array1<F>, &PerturbationVectors) -> Array2<F>
+) -> impl Fn(&Array1<F>, &PerturbationVectors) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
     move |p: &Array1<F>, pert: &PerturbationVectors| central_jacobian_pert_ndarray(p, &f, pert)
 }
 
 #[inline(always)]
-pub fn forward_hessian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array2<F>
+pub fn forward_hessian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| forward_hessian_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn central_hessian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array2<F>
+pub fn central_hessian<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive,
 {
     move |p: &Array1<F>| central_hessian_ndarray(p, &f)
 }
 
 #[inline(always)]
-pub fn forward_hessian_vec_prod<Func, F>(f: Func) -> impl Fn(&Array1<F>, &Array1<F>) -> Array1<F>
+pub fn forward_hessian_vec_prod<Func, F>(
+    f: Func,
+) -> impl Fn(&Array1<F>, &Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + ScalarOperand,
 {
     move |p: &Array1<F>, v: &Array1<F>| forward_hessian_vec_prod_ndarray(p, &f, v)
 }
 
 #[inline(always)]
-pub fn central_hessian_vec_prod<Func, F>(f: Func) -> impl Fn(&Array1<F>, &Array1<F>) -> Array1<F>
+pub fn central_hessian_vec_prod<Func, F>(
+    f: Func,
+) -> impl Fn(&Array1<F>, &Array1<F>) -> Result<Array1<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> Array1<F>,
+    Func: Fn(&Array1<F>) -> Result<Array1<F>, Error>,
     F: Float + FromPrimitive + ScalarOperand,
 {
     move |p: &Array1<F>, v: &Array1<F>| central_hessian_vec_prod_ndarray(p, &f, v)
 }
 
 #[inline(always)]
-pub fn forward_hessian_nograd<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Array2<F>
+pub fn forward_hessian_nograd<Func, F>(f: Func) -> impl Fn(&Array1<F>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> F,
+    Func: Fn(&Array1<F>) -> Result<F, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
     move |p: &Array1<F>| forward_hessian_nograd_ndarray(p, &f)
@@ -150,9 +159,9 @@ where
 #[inline(always)]
 pub fn forward_hessian_nograd_sparse<Func, F>(
     f: Func,
-) -> impl Fn(&Array1<F>, Vec<[usize; 2]>) -> Array2<F>
+) -> impl Fn(&Array1<F>, Vec<[usize; 2]>) -> Result<Array2<F>, Error>
 where
-    Func: Fn(&Array1<F>) -> F,
+    Func: Fn(&Array1<F>) -> Result<F, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
     move |p: &Array1<F>, indices: Vec<[usize; 2]>| {
@@ -171,27 +180,27 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f1(x: &Array1<f64>) -> f64 {
-        x[0] + x[1].powi(2)
+    fn f1(x: &Array1<f64>) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2))
     }
 
-    fn f2(x: &Array1<f64>) -> Array1<f64> {
-        array![
+    fn f2(x: &Array1<f64>) -> Result<Array1<f64>, Error> {
+        Ok(array![
             2.0 * (x[1].powi(3) - x[0].powi(2)),
             3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
             3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
             3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
             3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
             3.0 * (x[5].powi(3) - x[4].powi(2)),
-        ]
+        ])
     }
 
-    fn f3(x: &Array1<f64>) -> f64 {
-        x[0] + x[1].powi(2) + x[2] * x[3].powi(2)
+    fn f3(x: &Array1<f64>) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2) + x[2] * x[3].powi(2))
     }
 
-    fn g(x: &Array1<f64>) -> Array1<f64> {
-        array![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]]
+    fn g(x: &Array1<f64>) -> Result<Array1<f64>, Error> {
+        Ok(array![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]])
     }
 
     fn x1() -> Array1<f64> {
@@ -255,7 +264,7 @@ mod tests {
     #[test]
     fn test_forward_diff_func() {
         let grad = forward_diff(f1);
-        let out = grad(&x1());
+        let out = grad(&x1()).unwrap();
         let res = [1.0, 2.0];
 
         for i in 0..2 {
@@ -264,7 +273,7 @@ mod tests {
 
         let p = array![1.0, 2.0];
         let grad = forward_diff(&f1);
-        let out = grad(&p);
+        let out = grad(&p).unwrap();
         let res = [1.0, 4.0];
 
         for i in 0..2 {
@@ -275,7 +284,7 @@ mod tests {
     #[test]
     fn test_central_diff_func() {
         let grad = central_diff(f1);
-        let out = grad(&x1());
+        let out = grad(&x1()).unwrap();
         let res = [1.0f64, 2.0];
 
         for i in 0..2 {
@@ -284,7 +293,7 @@ mod tests {
 
         let p = array![1.0f64, 2.0f64];
         let grad = central_diff(f1);
-        let out = grad(&p);
+        let out = grad(&p).unwrap();
         let res = [1.0f64, 4.0];
 
         for i in 0..2 {
@@ -295,7 +304,7 @@ mod tests {
     #[test]
     fn test_forward_jacobian_func() {
         let jacobian = forward_jacobian(&f2);
-        let out = jacobian(&x2());
+        let out = jacobian(&x2()).unwrap();
         let res = res1();
         // println!("{:?}", out);
         // println!("{:?}", res);
@@ -309,7 +318,7 @@ mod tests {
     #[test]
     fn test_central_jacobian_vec_f64_trait() {
         let jacobian = central_jacobian(&f2);
-        let out = jacobian(&x2());
+        let out = jacobian(&x2()).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -322,7 +331,7 @@ mod tests {
     #[test]
     fn test_forward_jacobian_vec_prod_vec_func() {
         let jacobian = forward_jacobian_vec_prod(&f2);
-        let out = jacobian(&x2(), &p1());
+        let out = jacobian(&x2(), &p1()).unwrap();
         let res = res3();
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -334,7 +343,7 @@ mod tests {
     #[test]
     fn test_central_jacobian_vec_prod_vec_func() {
         let jacobian = central_jacobian_vec_prod(&f2);
-        let out = jacobian(&x2(), &p1());
+        let out = jacobian(&x2(), &p1()).unwrap();
         let res = res3();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -345,7 +354,7 @@ mod tests {
     #[test]
     fn test_forward_jacobian_pert_func() {
         let jacobian = forward_jacobian_pert(&f2);
-        let out = jacobian(&x2(), &pert());
+        let out = jacobian(&x2(), &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -359,7 +368,7 @@ mod tests {
     #[test]
     fn test_central_jacobian_pert_func() {
         let jacobian = central_jacobian_pert(&f2);
-        let out = jacobian(&x2(), &pert());
+        let out = jacobian(&x2(), &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -373,7 +382,7 @@ mod tests {
     #[test]
     fn test_forward_hessian_func() {
         let hessian = forward_hessian(&g);
-        let out = hessian(&x3());
+        let out = hessian(&x3()).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -387,7 +396,7 @@ mod tests {
     #[test]
     fn test_central_hessian_func() {
         let hessian = central_hessian(&g);
-        let out = hessian(&x3());
+        let out = hessian(&x3()).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -401,7 +410,7 @@ mod tests {
     #[test]
     fn test_forward_hessian_vec_prod_func() {
         let hessian = forward_hessian_vec_prod(&g);
-        let out = hessian(&x3(), &p2());
+        let out = hessian(&x3(), &p2()).unwrap();
         let res = [0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -413,7 +422,7 @@ mod tests {
     #[test]
     fn test_central_hessian_vec_prod_func() {
         let hessian = central_hessian_vec_prod(&g);
-        let out = hessian(&x3(), &p2());
+        let out = hessian(&x3(), &p2()).unwrap();
         let res = [0.0, 6.0, 10.0, 18.0];
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -425,7 +434,7 @@ mod tests {
     #[test]
     fn test_forward_hessian_nograd_func() {
         let hessian = forward_hessian_nograd(&f3);
-        let out = hessian(&x3());
+        let out = hessian(&x3()).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -440,7 +449,7 @@ mod tests {
     fn test_forward_hessian_nograd_sparse_func() {
         let indices = vec![[1, 1], [2, 3], [3, 3]];
         let hessian = forward_hessian_nograd_sparse(&f3);
-        let out = hessian(&x3(), indices);
+        let out = hessian(&x3(), indices).unwrap();
         let res = res2();
         // println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);

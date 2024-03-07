@@ -7,42 +7,39 @@
 
 use std::ops::AddAssign;
 
-use ndarray::Array1;
-use ndarray::Array2;
-use ndarray::ScalarOperand;
-use num::Float;
-use num::FromPrimitive;
+use anyhow::Error;
+use ndarray::{Array1, Array2, ScalarOperand};
+use num::{Float, FromPrimitive};
 
-use crate::pert::PerturbationVectors;
-use crate::utils::mod_and_calc;
+use crate::{pert::PerturbationVectors, utils::mod_and_calc};
 
 pub fn forward_jacobian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
-) -> ndarray::Array2<F>
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float,
 {
     let eps_sqrt = F::epsilon().sqrt();
 
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let mut xt = x.clone();
     let rn = fx.len();
     let n = x.len();
     let mut out = Array2::zeros((rn, n));
     for j in 0..n {
-        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt);
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_sqrt)?;
         for i in 0..rn {
             out[(i, j)] = (fx1[i] - fx[i]) / eps_sqrt;
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
-) -> ndarray::Array2<F>
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -51,8 +48,8 @@ where
     let mut xt = x.clone();
 
     let comp = |(a, b): (&F, &F)| (*a - *b) / (F::from_f64(2.0).unwrap() * eps_cbrt);
-    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt);
-    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt);
+    let fx1 = mod_and_calc(&mut xt, fs, 0, eps_cbrt)?;
+    let fx2 = mod_and_calc(&mut xt, fs, 0, -eps_cbrt)?;
     let tmp = Array1::from_iter(fx1.iter().zip(fx2.iter()).map(comp));
 
     let rn = tmp.len();
@@ -65,57 +62,58 @@ where
     }
 
     for j in 1..n {
-        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt);
-        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt);
+        let fx1 = mod_and_calc(&mut xt, fs, j, eps_cbrt)?;
+        let fx2 = mod_and_calc(&mut xt, fs, j, -eps_cbrt)?;
         for i in 0..rn {
             out[(i, j)] = comp((&fx1[i], &fx2[i]));
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn forward_jacobian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
     p: &ndarray::Array1<F>,
-) -> ndarray::Array1<F>
+) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float + ScalarOperand,
 {
     let eps_sqrt = F::epsilon().sqrt();
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let x1 = x + &p.mapv(|pi| eps_sqrt * pi);
-    let fx1 = (fs)(&x1);
-    (fx1 - fx) / eps_sqrt
+    let fx1 = (fs)(&x1)?;
+    Ok((fx1 - fx) / eps_sqrt)
 }
 
 pub fn central_jacobian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
     p: &ndarray::Array1<F>,
-) -> ndarray::Array1<F>
+) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float + FromPrimitive + ScalarOperand,
 {
     let eps_cbrt = F::epsilon().sqrt();
+    // TODO: Do this in a single array!
     let x1 = x + &p.mapv(|pi| eps_cbrt * pi);
     let x2 = x + &p.mapv(|pi| -eps_cbrt * pi);
-    let fx1 = (fs)(&x1);
-    let fx2 = (fs)(&x2);
-    (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt)
+    let fx1 = (fs)(&x1)?;
+    let fx2 = (fs)(&x2)?;
+    Ok((fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt))
 }
 
 pub fn forward_jacobian_pert_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
     pert: &PerturbationVectors,
-) -> ndarray::Array2<F>
+) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + AddAssign,
 {
     let eps_sqrt = F::epsilon().sqrt();
 
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let mut xt = x.clone();
     let mut out = ndarray::Array2::zeros((fx.len(), x.len()));
     for pert_item in pert.iter() {
@@ -123,7 +121,7 @@ where
             xt[*i] += eps_sqrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for i in pert_item.x_idx.iter() {
             xt[*i] = x[*i];
@@ -135,14 +133,14 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_pert_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> ndarray::Array1<F>,
+    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
     pert: &PerturbationVectors,
-) -> ndarray::Array2<F>
+) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -155,13 +153,13 @@ where
             xt[*i] += eps_cbrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for i in pert_item.x_idx.iter() {
             xt[*i] = x[*i] - eps_cbrt;
         }
 
-        let fx2 = (fs)(&xt);
+        let fx2 = (fs)(&xt)?;
 
         for i in pert_item.x_idx.iter() {
             xt[*i] = x[*i];
@@ -178,7 +176,7 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -190,15 +188,15 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &Array1<f64>) -> Array1<f64> {
-        array![
+    fn f(x: &Array1<f64>) -> Result<Array1<f64>, Error> {
+        Ok(array![
             2.0 * (x[1].powi(3) - x[0].powi(2)),
             3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
             3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
             3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
             3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
             3.0 * (x[5].powi(3) - x[4].powi(2)),
-        ]
+        ])
     }
 
     fn res1() -> Vec<Vec<f64>> {
@@ -240,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_ndarray_f64() {
-        let jacobian = forward_jacobian_ndarray(&x(), &f);
+        let jacobian = forward_jacobian_ndarray(&x(), &f).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -252,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_ndarray_f64() {
-        let jacobian = central_jacobian_ndarray(&x(), &f);
+        let jacobian = central_jacobian_ndarray(&x(), &f).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -264,7 +262,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_vec_prod_ndarray_f64() {
-        let jacobian = forward_jacobian_vec_prod_ndarray(&x(), &f, &p());
+        let jacobian = forward_jacobian_vec_prod_ndarray(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -275,7 +273,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_vec_prod_ndarray_f64() {
-        let jacobian = central_jacobian_vec_prod_ndarray(&x(), &f, &p());
+        let jacobian = central_jacobian_vec_prod_ndarray(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -285,7 +283,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_pert_ndarray_f64() {
-        let jacobian = forward_jacobian_pert_ndarray(&x(), &f, &pert());
+        let jacobian = forward_jacobian_pert_ndarray(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -298,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_pert_ndarray_f64() {
-        let jacobian = central_jacobian_pert_ndarray(&x(), &f, &pert());
+        let jacobian = central_jacobian_pert_ndarray(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);

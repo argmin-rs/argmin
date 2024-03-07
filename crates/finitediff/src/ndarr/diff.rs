@@ -5,33 +5,34 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use anyhow::Error;
 use num::{Float, FromPrimitive};
 
 use crate::utils::*;
 
 pub fn forward_diff_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> F,
-) -> ndarray::Array1<F>
+    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float,
 {
     let eps_sqrt = F::epsilon().sqrt();
 
-    let fx = (f)(x);
+    let fx = (f)(x)?;
     let mut xt = x.clone();
     (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, f, i, eps_sqrt);
-            (fx1 - fx) / eps_sqrt
+            let fx1 = mod_and_calc(&mut xt, f, i, eps_sqrt)?;
+            Ok((fx1 - fx) / eps_sqrt)
         })
         .collect()
 }
 
 pub fn central_diff_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> F,
-) -> ndarray::Array1<F>
+    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -40,9 +41,9 @@ where
     let mut xt = x.clone();
     (0..x.len())
         .map(|i| {
-            let fx1 = mod_and_calc(&mut xt, f, i, eps_cbrt);
-            let fx2 = mod_and_calc(&mut xt, f, i, -eps_cbrt);
-            (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt)
+            let fx1 = mod_and_calc(&mut xt, f, i, eps_cbrt)?;
+            let fx2 = mod_and_calc(&mut xt, f, i, -eps_cbrt)?;
+            Ok((fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt))
         })
         .collect()
 }
@@ -53,15 +54,15 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &ndarray::Array1<f64>) -> f64 {
-        x[0] + x[1].powi(2)
+    fn f(x: &ndarray::Array1<f64>) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2))
     }
 
     #[test]
     fn test_forward_diff_ndarray_f64() {
         let p = ndarray::Array1::from(vec![1.0f64, 1.0f64]);
 
-        let grad = forward_diff_ndarray(&p, &f);
+        let grad = forward_diff_ndarray(&p, &f).unwrap();
         let res = vec![1.0f64, 2.0];
 
         (0..2)
@@ -69,7 +70,7 @@ mod tests {
             .count();
 
         let p = ndarray::Array1::from(vec![1.0f64, 2.0f64]);
-        let grad = forward_diff_ndarray(&p, &f);
+        let grad = forward_diff_ndarray(&p, &f).unwrap();
         let res = vec![1.0f64, 4.0];
 
         (0..2)
@@ -80,7 +81,7 @@ mod tests {
     fn test_central_diff_ndarray_f64() {
         let p = ndarray::Array1::from(vec![1.0f64, 1.0f64]);
 
-        let grad = central_diff_ndarray(&p, &f);
+        let grad = central_diff_ndarray(&p, &f).unwrap();
         let res = vec![1.0f64, 2.0];
 
         (0..2)
@@ -88,7 +89,7 @@ mod tests {
             .count();
 
         let p = ndarray::Array1::from(vec![1.0f64, 2.0f64]);
-        let grad = central_diff_ndarray(&p, &f);
+        let grad = central_diff_ndarray(&p, &f).unwrap();
         let res = vec![1.0f64, 4.0];
 
         (0..2)
