@@ -7,6 +7,7 @@
 
 use std::ops::AddAssign;
 
+use anyhow::Error;
 use num::{Float, FromPrimitive};
 
 use crate::pert::PerturbationVectors;
@@ -14,30 +15,30 @@ use crate::utils::{mod_and_calc, mod_and_calc_const};
 
 pub fn forward_jacobian_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
-) -> [[F; N]; M]
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let mut xt = *x;
     let eps_sqrt = F::epsilon().sqrt();
     let mut out = [[F::from_f64(0.0).unwrap(); N]; M];
 
     for i in 0..N {
-        let fx1 = mod_and_calc_const(&mut xt, fs, i, eps_sqrt);
+        let fx1 = mod_and_calc_const(&mut xt, fs, i, eps_sqrt)?;
 
         for j in 0..M {
             out[j][i] = (fx1[j] - fx[j]) / eps_sqrt;
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
-) -> [[F; N]; M]
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive,
 {
@@ -45,25 +46,25 @@ where
     let eps_cbrt = F::epsilon().cbrt();
     let mut out = [[F::from_f64(0.0).unwrap(); N]; M];
     for i in 0..M {
-        let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt);
-        let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt);
+        let fx1 = mod_and_calc(&mut xt, fs, i, eps_cbrt)?;
+        let fx2 = mod_and_calc(&mut xt, fs, i, -eps_cbrt)?;
 
         for j in 0..M {
             out[j][i] = (fx1[j] - fx2[j]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn forward_jacobian_vec_prod_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
     p: &[F; N],
-) -> [F; M]
+) -> Result<[F; M], Error>
 where
     F: Float + FromPrimitive,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let eps_sqrt = F::epsilon().sqrt();
     let mut x1 = [F::from_f64(0.0).unwrap(); N];
     x1.iter_mut()
@@ -71,7 +72,7 @@ where
         .map(|(i, o)| *o = x[i] + eps_sqrt * p[i])
         .count();
 
-    let fx1 = (fs)(&x1);
+    let fx1 = (fs)(&x1)?;
     let mut out = [F::from_f64(0.0).unwrap(); M];
     out.iter_mut()
         .enumerate()
@@ -79,14 +80,14 @@ where
             *o = (fx1[i] - fx[i]) / eps_sqrt;
         })
         .count();
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_vec_prod_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
     p: &[F; N],
-) -> [F; M]
+) -> Result<[F; M], Error>
 where
     F: Float + FromPrimitive,
 {
@@ -102,8 +103,8 @@ where
             *x2 = x[i] - tmp;
         })
         .count();
-    let fx1 = (fs)(&x1);
-    let fx2 = (fs)(&x2);
+    let fx1 = (fs)(&x1)?;
+    let fx2 = (fs)(&x2)?;
     let mut out = [F::from_f64(0.0).unwrap(); M];
     out.iter_mut()
         .enumerate()
@@ -111,18 +112,18 @@ where
             *o = (fx1[i] - fx2[i]) / (F::from_f64(2.0).unwrap() * eps_cbrt);
         })
         .count();
-    out
+    Ok(out)
 }
 
 pub fn forward_jacobian_pert_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
     pert: &PerturbationVectors,
-) -> [[F; N]; M]
+) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
-    let fx = (fs)(x);
+    let fx = (fs)(x)?;
     let eps_sqrt = F::epsilon().sqrt();
     let mut xt = *x;
     let mut out = [[F::from_f64(0.0).unwrap(); N]; M];
@@ -131,7 +132,7 @@ where
             xt[*j] += eps_sqrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for j in pert_item.x_idx.iter() {
             xt[*j] = x[*j];
@@ -143,14 +144,14 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 pub fn central_jacobian_pert_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> [F; M],
+    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
     pert: &PerturbationVectors,
-) -> [[F; N]; M]
+) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -162,13 +163,13 @@ where
             xt[*j] += eps_cbrt;
         }
 
-        let fx1 = (fs)(&xt);
+        let fx1 = (fs)(&xt)?;
 
         for j in pert_item.x_idx.iter() {
             xt[*j] = x[*j] - eps_cbrt;
         }
 
-        let fx2 = (fs)(&xt);
+        let fx2 = (fs)(&xt)?;
 
         for j in pert_item.x_idx.iter() {
             xt[*j] = x[*j];
@@ -180,7 +181,7 @@ where
             }
         }
     }
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -191,15 +192,15 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &[f64; 6]) -> [f64; 6] {
-        [
+    fn f(x: &[f64; 6]) -> Result<[f64; 6], Error> {
+        Ok([
             2.0 * (x[1].powi(3) - x[0].powi(2)),
             3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
             3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
             3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
             3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
             3.0 * (x[5].powi(3) - x[4].powi(2)),
-        ]
+        ])
     }
 
     fn res1() -> [[f64; 6]; 6] {
@@ -241,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_const_f64() {
-        let jacobian = forward_jacobian_const(&x(), &f);
+        let jacobian = forward_jacobian_const(&x(), &f).unwrap();
         let res = res1();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -253,7 +254,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_const_f64() {
-        let jacobian = central_jacobian_const(&x(), &f);
+        let jacobian = central_jacobian_const(&x(), &f).unwrap();
         let res = res1();
         println!("{:?}", jacobian);
         for i in 0..6 {
@@ -265,7 +266,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_vec_prod_const_f64() {
-        let jacobian = forward_jacobian_vec_prod_const(&x(), &f, &p());
+        let jacobian = forward_jacobian_vec_prod_const(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -276,7 +277,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_vec_prod_const_f64() {
-        let jacobian = central_jacobian_vec_prod_const(&x(), &f, &p());
+        let jacobian = central_jacobian_vec_prod_const(&x(), &f, &p()).unwrap();
         let res = res2();
         // println!("{:?}", jacobian);
         for i in 0..6 {
@@ -286,7 +287,7 @@ mod tests {
 
     #[test]
     fn test_forward_jacobian_pert_const_f64() {
-        let jacobian = forward_jacobian_pert_const(&x(), &f, &pert());
+        let jacobian = forward_jacobian_pert_const(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -299,7 +300,7 @@ mod tests {
 
     #[test]
     fn test_central_jacobian_pert_const_f64() {
-        let jacobian = central_jacobian_pert_const(&x(), &f, &pert());
+        let jacobian = central_jacobian_pert_const(&x(), &f, &pert()).unwrap();
         let res = res1();
         // println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);

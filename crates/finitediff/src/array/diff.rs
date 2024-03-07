@@ -5,30 +5,38 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+use anyhow::Error;
 use num::Float;
 use num::FromPrimitive;
 
 use crate::utils::mod_and_calc_const;
 
-pub fn forward_diff_const<const N: usize, F>(x: &[F; N], f: &dyn Fn(&[F; N]) -> F) -> [F; N]
+pub fn forward_diff_const<const N: usize, F>(
+    x: &[F; N],
+    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,
 {
-    let fx = (f)(x);
+    let fx = (f)(x)?;
     let mut xt = *x;
     let eps_sqrt = F::epsilon().sqrt();
     let mut out = [F::from_f64(0.0).unwrap(); N];
     out.iter_mut()
         .enumerate()
-        .map(|(i, o)| {
-            let fx1 = mod_and_calc_const(&mut xt, f, i, eps_sqrt);
+        .map(|(i, o)| -> Result<_, Error> {
+            let fx1 = mod_and_calc_const(&mut xt, f, i, eps_sqrt)?;
             *o = (fx1 - fx) / eps_sqrt;
+            Ok(())
         })
         .count();
-    out
+    Ok(out)
 }
 
-pub fn central_diff_const<const N: usize, F>(x: &[F; N], f: &dyn Fn(&[F; N]) -> F) -> [F; N]
+pub fn central_diff_const<const N: usize, F>(
+    x: &[F; N],
+    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,
 {
@@ -37,13 +45,14 @@ where
     let mut out = [F::from_f64(0.0).unwrap(); N];
     out.iter_mut()
         .enumerate()
-        .map(|(i, o)| {
-            let fx1 = mod_and_calc_const(&mut xt, f, i, eps_cbrt);
-            let fx2 = mod_and_calc_const(&mut xt, f, i, -eps_cbrt);
+        .map(|(i, o)| -> Result<_, Error> {
+            let fx1 = mod_and_calc_const(&mut xt, f, i, eps_cbrt)?;
+            let fx2 = mod_and_calc_const(&mut xt, f, i, -eps_cbrt)?;
             *o = (fx1 - fx2) / (F::from_f64(2.0).unwrap() * eps_cbrt);
+            Ok(())
         })
         .count();
-    out
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -52,18 +61,18 @@ mod tests {
 
     const COMP_ACC: f64 = 1e-6;
 
-    fn f(x: &[f64; 2]) -> f64 {
-        x[0] + x[1].powi(2)
+    fn f(x: &[f64; 2]) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2))
     }
 
-    fn f2(x: &[f64; 2]) -> f64 {
-        x[0] + x[1].powi(2)
+    fn f2(x: &[f64; 2]) -> Result<f64, Error> {
+        Ok(x[0] + x[1].powi(2))
     }
 
     #[test]
     fn test_forward_diff_const_f64() {
         let p = [1.0f64, 1.0f64];
-        let grad = forward_diff_const(&p, &f2);
+        let grad = forward_diff_const(&p, &f2).unwrap();
         let res = [1.0f64, 2.0];
 
         (0..2)
@@ -71,7 +80,7 @@ mod tests {
             .count();
 
         let p = [1.0f64, 2.0f64];
-        let grad = forward_diff_const(&p, &f2);
+        let grad = forward_diff_const(&p, &f2).unwrap();
         let res = [1.0f64, 4.0];
 
         (0..2)
@@ -82,7 +91,7 @@ mod tests {
     #[test]
     fn test_central_diff_vec_f64() {
         let p = [1.0f64, 1.0f64];
-        let grad = central_diff_const(&p, &f);
+        let grad = central_diff_const(&p, &f).unwrap();
         let res = [1.0f64, 2.0];
 
         (0..2)
@@ -90,7 +99,7 @@ mod tests {
             .count();
 
         let p = [1.0f64, 2.0f64];
-        let grad = central_diff_const(&p, &f);
+        let grad = central_diff_const(&p, &f).unwrap();
         let res = [1.0f64, 4.0];
 
         (0..2)
