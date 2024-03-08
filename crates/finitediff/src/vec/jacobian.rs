@@ -13,10 +13,9 @@ use num::{Float, FromPrimitive};
 use crate::pert::PerturbationVectors;
 use crate::utils::mod_and_calc;
 
-pub fn forward_jacobian_vec<F>(
-    x: &Vec<F>,
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
-) -> Result<Vec<Vec<F>>, Error>
+use super::OpFn;
+
+pub fn forward_jacobian_vec<F>(x: &Vec<F>, fs: OpFn<'_, F>) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -33,10 +32,7 @@ where
     Ok(out)
 }
 
-pub fn central_jacobian_vec<F>(
-    x: &[F],
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
-) -> Result<Vec<Vec<F>>, Error>
+pub fn central_jacobian_vec<F>(x: &[F], fs: OpFn<'_, F>) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -72,7 +68,7 @@ where
 
 pub fn forward_jacobian_vec_prod_vec<F>(
     x: &Vec<F>,
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    fs: OpFn<'_, F>,
     p: &[F],
 ) -> Result<Vec<F>, Error>
 where
@@ -92,11 +88,7 @@ where
         .collect::<Result<Vec<F>, Error>>()
 }
 
-pub fn central_jacobian_vec_prod_vec<F>(
-    x: &[F],
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
-    p: &[F],
-) -> Result<Vec<F>, Error>
+pub fn central_jacobian_vec_prod_vec<F>(x: &[F], fs: OpFn<'_, F>, p: &[F]) -> Result<Vec<F>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -122,7 +114,7 @@ where
 
 pub fn forward_jacobian_pert_vec<F>(
     x: &Vec<F>,
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    fs: OpFn<'_, F>,
     pert: &PerturbationVectors,
 ) -> Result<Vec<Vec<F>>, Error>
 where
@@ -154,7 +146,7 @@ where
 
 pub fn central_jacobian_pert_vec<F>(
     x: &[F],
-    fs: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    fs: OpFn<'_, F>,
     pert: &PerturbationVectors,
 ) -> Result<Vec<Vec<F>>, Error>
 where

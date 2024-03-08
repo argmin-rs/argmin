@@ -13,9 +13,11 @@ use num::{Float, FromPrimitive};
 
 use crate::{pert::PerturbationVectors, utils::mod_and_calc};
 
+use super::OpFn;
+
 pub fn forward_jacobian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
 ) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float,
@@ -38,7 +40,7 @@ where
 
 pub fn central_jacobian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
 ) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive,
@@ -73,7 +75,7 @@ where
 
 pub fn forward_jacobian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
     p: &ndarray::Array1<F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
@@ -88,7 +90,7 @@ where
 
 pub fn central_jacobian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
     p: &ndarray::Array1<F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
@@ -105,7 +107,7 @@ where
 
 pub fn forward_jacobian_pert_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
     pert: &PerturbationVectors,
 ) -> Result<ndarray::Array2<F>, Error>
 where
@@ -138,7 +140,7 @@ where
 
 pub fn central_jacobian_pert_ndarray<F>(
     x: &ndarray::Array1<F>,
-    fs: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    fs: OpFn<'_, F>,
     pert: &PerturbationVectors,
 ) -> Result<ndarray::Array2<F>, Error>
 where

@@ -11,10 +11,9 @@ use num::FromPrimitive;
 
 use crate::utils::mod_and_calc;
 
-pub fn forward_diff_vec<F>(
-    x: &Vec<F>,
-    f: &dyn Fn(&Vec<F>) -> Result<F, Error>,
-) -> Result<Vec<F>, Error>
+use super::CostFn;
+
+pub fn forward_diff_vec<F>(x: &Vec<F>, f: CostFn<'_, F>) -> Result<Vec<F>, Error>
 where
     F: Float,
 {
@@ -29,10 +28,7 @@ where
         .collect()
 }
 
-pub fn central_diff_vec<F>(
-    x: &[F],
-    f: &dyn Fn(&Vec<F>) -> Result<F, Error>,
-) -> Result<Vec<F>, Error>
+pub fn central_diff_vec<F>(x: &[F], f: CostFn<'_, F>) -> Result<Vec<F>, Error>
 where
     F: Float + FromPrimitive,
 {

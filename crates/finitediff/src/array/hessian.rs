@@ -12,9 +12,11 @@ use num::{Float, FromPrimitive};
 
 use crate::utils::{mod_and_calc, restore_symmetry_const, KV};
 
+use super::{CostFn, GradientFn};
+
 pub fn forward_hessian_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+    grad: GradientFn<'_, N, F>,
 ) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive,
@@ -36,7 +38,7 @@ where
 
 pub fn central_hessian_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+    grad: GradientFn<'_, N, F>,
 ) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive,
@@ -59,7 +61,7 @@ where
 
 pub fn forward_hessian_vec_prod_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+    grad: GradientFn<'_, N, F>,
     p: &[F; N],
 ) -> Result<[F; N], Error>
 where
@@ -83,7 +85,7 @@ where
 
 pub fn central_hessian_vec_prod_const<const N: usize, F>(
     x: &[F; N],
-    grad: &dyn Fn(&[F; N]) -> Result<[F; N], Error>,
+    grad: GradientFn<'_, N, F>,
     p: &[F; N],
 ) -> Result<[F; N], Error>
 where
@@ -108,7 +110,7 @@ where
 
 pub fn forward_hessian_nograd_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+    f: CostFn<'_, N, F>,
 ) -> Result<[[F; N]; N], Error>
 where
     F: Float + FromPrimitive + AddAssign,
@@ -149,7 +151,7 @@ where
 
 pub fn forward_hessian_nograd_sparse_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+    f: CostFn<'_, N, F>,
     indices: Vec<[usize; 2]>,
 ) -> Result<[[F; N]; N], Error>
 where
