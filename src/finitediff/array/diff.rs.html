@@ -99,6 +99,17 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -106,30 +117,40 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span>num::Float;
+</span><span class="kw">use </span>anyhow::Error;
+<span class="kw">use </span>num::Float;
 <span class="kw">use </span>num::FromPrimitive;
 
 <span class="kw">use </span><span class="kw">crate</span>::utils::mod_and_calc_const;
 
-<span class="kw">pub fn </span>forward_diff_const&lt;<span class="kw">const </span>N: usize, F&gt;(x: <span class="kw-2">&amp;</span>[F; N], f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; F) -&gt; [F; N]
+<span class="kw">use </span><span class="kw">super</span>::CostFn;
+
+<span class="kw">pub fn </span>forward_diff_const&lt;<span class="kw">const </span>N: usize, F&gt;(
+    x: <span class="kw-2">&amp;</span>[F; N],
+    f: CostFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[F; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
-    <span class="kw">let </span>fx = (f)(x);
+    <span class="kw">let </span>fx = (f)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = <span class="kw-2">*</span>x;
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
     <span class="kw">let </span><span class="kw-2">mut </span>out = [F::from_f64(<span class="number">0.0</span>).unwrap(); N];
     out.iter_mut()
         .enumerate()
-        .map(|(i, o)| {
-            <span class="kw">let </span>fx1 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt);
+        .map(|(i, o)| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, Error&gt; {
+            <span class="kw">let </span>fx1 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt)<span class="question-mark">?</span>;
             <span class="kw-2">*</span>o = (fx1 - fx) / eps_sqrt;
+            <span class="prelude-val">Ok</span>(())
         })
         .count();
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
-<span class="kw">pub fn </span>central_diff_const&lt;<span class="kw">const </span>N: usize, F&gt;(x: <span class="kw-2">&amp;</span>[F; N], f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; F) -&gt; [F; N]
+<span class="kw">pub fn </span>central_diff_const&lt;<span class="kw">const </span>N: usize, F&gt;(
+    x: <span class="kw-2">&amp;</span>[F; N],
+    f: CostFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[F; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
@@ -138,13 +159,14 @@
     <span class="kw">let </span><span class="kw-2">mut </span>out = [F::from_f64(<span class="number">0.0</span>).unwrap(); N];
     out.iter_mut()
         .enumerate()
-        .map(|(i, o)| {
-            <span class="kw">let </span>fx1 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, eps_cbrt);
-            <span class="kw">let </span>fx2 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, -eps_cbrt);
+        .map(|(i, o)| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, Error&gt; {
+            <span class="kw">let </span>fx1 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, eps_cbrt)<span class="question-mark">?</span>;
+            <span class="kw">let </span>fx2 = mod_and_calc_const(<span class="kw-2">&amp;mut </span>xt, f, i, -eps_cbrt)<span class="question-mark">?</span>;
             <span class="kw-2">*</span>o = (fx1 - fx2) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt);
+            <span class="prelude-val">Ok</span>(())
         })
         .count();
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="attr">#[cfg(test)]
@@ -153,18 +175,18 @@
 
     <span class="kw">const </span>COMP_ACC: f64 = <span class="number">1e-6</span>;
 
-    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>[f64; <span class="number">2</span>]) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>[f64; <span class="number">2</span>]) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>))
     }
 
-    <span class="kw">fn </span>f2(x: <span class="kw-2">&amp;</span>[f64; <span class="number">2</span>]) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f2(x: <span class="kw-2">&amp;</span>[f64; <span class="number">2</span>]) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>))
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_diff_const_f64() {
         <span class="kw">let </span>p = [<span class="number">1.0f64</span>, <span class="number">1.0f64</span>];
-        <span class="kw">let </span>grad = forward_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f2);
+        <span class="kw">let </span>grad = forward_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f2).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">2.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -172,7 +194,7 @@
             .count();
 
         <span class="kw">let </span>p = [<span class="number">1.0f64</span>, <span class="number">2.0f64</span>];
-        <span class="kw">let </span>grad = forward_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f2);
+        <span class="kw">let </span>grad = forward_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f2).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">4.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -183,7 +205,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_diff_vec_f64() {
         <span class="kw">let </span>p = [<span class="number">1.0f64</span>, <span class="number">1.0f64</span>];
-        <span class="kw">let </span>grad = central_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = central_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">2.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -191,7 +213,7 @@
             .count();
 
         <span class="kw">let </span>p = [<span class="number">1.0f64</span>, <span class="number">2.0f64</span>];
-        <span class="kw">let </span>grad = central_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = central_diff_const(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">4.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)

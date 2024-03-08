@@ -306,6 +306,9 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -315,36 +318,39 @@
 
 </span><span class="kw">use </span>std::ops::AddAssign;
 
+<span class="kw">use </span>anyhow::Error;
 <span class="kw">use </span>num::{Float, FromPrimitive};
 
 <span class="kw">use </span><span class="kw">crate</span>::utils::{mod_and_calc, restore_symmetry_const, KV};
 
+<span class="kw">use super</span>::{CostFn, GradientFn};
+
 <span class="kw">pub fn </span>forward_hessian_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    grad: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; [F; N],
-) -&gt; [[F; N]; N]
+    grad: GradientFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[[F; N]; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
-    <span class="kw">let </span>fx = (grad)(x);
+    <span class="kw">let </span>fx = (grad)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = <span class="kw-2">*</span>x;
     <span class="kw">let </span><span class="kw-2">mut </span>out = [[F::from_f64(<span class="number">0.0</span>).unwrap(); N]; N];
     <span class="kw">for </span>(i, o_item) <span class="kw">in </span>out.iter_mut().enumerate().take(N) {
-        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, eps_sqrt);
+        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, eps_sqrt)<span class="question-mark">?</span>;
         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N {
             o_item[j] = (fx1[j] - fx[j]) / eps_sqrt;
         }
     }
 
     <span class="comment">// restore symmetry
-    </span>restore_symmetry_const(out)
+    </span><span class="prelude-val">Ok</span>(restore_symmetry_const(out))
 }
 
 <span class="kw">pub fn </span>central_hessian_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    grad: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; [F; N],
-) -&gt; [[F; N]; N]
+    grad: GradientFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[[F; N]; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
@@ -353,46 +359,46 @@
     <span class="kw">let </span><span class="kw-2">mut </span>out = [[F::from_f64(<span class="number">0.0</span>).unwrap(); N]; N];
 
     <span class="kw">for </span>(i, o_item) <span class="kw">in </span>out.iter_mut().enumerate().take(N) {
-        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, eps_cbrt);
-        <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, -eps_cbrt);
+        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, eps_cbrt)<span class="question-mark">?</span>;
+        <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, grad, i, -eps_cbrt)<span class="question-mark">?</span>;
         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N {
             o_item[j] = (fx1[j] - fx2[j]) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt);
         }
     }
 
     <span class="comment">// restore symmetry
-    </span>restore_symmetry_const(out)
+    </span><span class="prelude-val">Ok</span>(restore_symmetry_const(out))
 }
 
 <span class="kw">pub fn </span>forward_hessian_vec_prod_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    grad: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; [F; N],
+    grad: GradientFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
     p: <span class="kw-2">&amp;</span>[F; N],
-) -&gt; [F; N]
+) -&gt; <span class="prelude-ty">Result</span>&lt;[F; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
-    <span class="kw">let </span>fx = (grad)(x);
+    <span class="kw">let </span>fx = (grad)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>out = [F::from_f64(<span class="number">0.0</span>).unwrap(); N];
 
     <span class="kw">let </span><span class="kw-2">mut </span>x1 = <span class="kw-2">*</span>x;
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..N {
         x1[i] = x[i] + p[i] * eps_sqrt;
     }
-    <span class="kw">let </span>fx1 = (grad)(<span class="kw-2">&amp;</span>x1);
+    <span class="kw">let </span>fx1 = (grad)(<span class="kw-2">&amp;</span>x1)<span class="question-mark">?</span>;
 
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..N {
         out[i] = (fx1[i] - fx[i]) / eps_sqrt;
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="kw">pub fn </span>central_hessian_vec_prod_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    grad: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; [F; N],
+    grad: GradientFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
     p: <span class="kw-2">&amp;</span>[F; N],
-) -&gt; [F; N]
+) -&gt; <span class="prelude-ty">Result</span>&lt;[F; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
@@ -403,20 +409,20 @@
         x1[i] = x[i] + p[i] * eps_cbrt;
         x2[i] = x[i] - p[i] * eps_cbrt;
     }
-    <span class="kw">let </span>fx1 = (grad)(<span class="kw-2">&amp;</span>x1);
-    <span class="kw">let </span>fx2 = (grad)(<span class="kw-2">&amp;</span>x2);
+    <span class="kw">let </span>fx1 = (grad)(<span class="kw-2">&amp;</span>x1)<span class="question-mark">?</span>;
+    <span class="kw">let </span>fx2 = (grad)(<span class="kw-2">&amp;</span>x2)<span class="question-mark">?</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>out = [F::from_f64(<span class="number">0.0</span>).unwrap(); N];
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..N {
         out[i] = (fx1[i] - fx2[i]) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt);
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="kw">pub fn </span>forward_hessian_nograd_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; F,
-) -&gt; [[F; N]; N]
+    f: CostFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[[F; N]; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive + AddAssign,
 {
@@ -424,13 +430,13 @@
     </span><span class="kw">let </span>eps_nograd = F::from_f64(<span class="number">2.0</span>).unwrap() * F::epsilon();
     <span class="kw">let </span>eps_sqrt_nograd = eps_nograd.sqrt();
 
-    <span class="kw">let </span>fx = (f)(x);
+    <span class="kw">let </span>fx = (f)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = <span class="kw-2">*</span>x;
 
     <span class="comment">// Precompute f(x + sqrt(EPS) * e_i) for all i
     </span><span class="kw">let </span><span class="kw-2">mut </span>fxei = [F::from_f64(<span class="number">0.0</span>).unwrap(); N];
     <span class="kw">for </span>(i, item) <span class="kw">in </span>fxei.iter_mut().enumerate().take(N) {
-        <span class="kw-2">*</span>item = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt_nograd);
+        <span class="kw-2">*</span>item = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt_nograd)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>out = [[F::from_f64(<span class="number">0.0</span>).unwrap(); N]; N];
@@ -442,7 +448,7 @@
                 <span class="kw">let </span>xtj = xt[j];
                 xt[i] += eps_sqrt_nograd;
                 xt[j] += eps_sqrt_nograd;
-                <span class="kw">let </span>fxij = (f)(<span class="kw-2">&amp;</span>xt);
+                <span class="kw">let </span>fxij = (f)(<span class="kw-2">&amp;</span>xt)<span class="question-mark">?</span>;
                 xt[i] = xti;
                 xt[j] = xtj;
                 (fxij - fxei[i] - fxei[j] + fx) / eps_nograd
@@ -451,14 +457,14 @@
             out[j][i] = t;
         }
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="kw">pub fn </span>forward_hessian_nograd_sparse_const&lt;<span class="kw">const </span>N: usize, F&gt;(
     x: <span class="kw-2">&amp;</span>[F; N],
-    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; F,
+    f: CostFn&lt;<span class="lifetime">'_</span>, N, F&gt;,
     indices: Vec&lt;[usize; <span class="number">2</span>]&gt;,
-) -&gt; [[F; N]; N]
+) -&gt; <span class="prelude-ty">Result</span>&lt;[[F; N]; N], Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive + AddAssign,
 {
@@ -466,7 +472,7 @@
     </span><span class="kw">let </span>eps_nograd = F::from_f64(<span class="number">2.0</span>).unwrap() * F::epsilon();
     <span class="kw">let </span>eps_sqrt_nograd = eps_nograd.sqrt();
 
-    <span class="kw">let </span>fx = (f)(x);
+    <span class="kw">let </span>fx = (f)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = <span class="kw-2">*</span>x;
 
     <span class="kw">let </span><span class="kw-2">mut </span>idxs: Vec&lt;usize&gt; = indices
@@ -480,7 +486,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fxei = KV::new(idxs.len());
 
     <span class="kw">for </span>idx <span class="kw">in </span>idxs.iter() {
-        fxei.set(<span class="kw-2">*</span>idx, mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, <span class="kw-2">*</span>idx, eps_sqrt_nograd));
+        fxei.set(<span class="kw-2">*</span>idx, mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, <span class="kw-2">*</span>idx, eps_sqrt_nograd)<span class="question-mark">?</span>);
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>out = [[F::from_f64(<span class="number">0.0</span>).unwrap(); N]; N];
@@ -490,18 +496,18 @@
             <span class="kw">let </span>xtj = xt[j];
             xt[i] += eps_sqrt_nograd;
             xt[j] += eps_sqrt_nograd;
-            <span class="kw">let </span>fxij = (f)(<span class="kw-2">&amp;</span>xt);
+            <span class="kw">let </span>fxij = (f)(<span class="kw-2">&amp;</span>xt)<span class="question-mark">?</span>;
             xt[i] = xti;
             xt[j] = xtj;
 
-            <span class="kw">let </span>fxi = fxei.get(i).unwrap();
-            <span class="kw">let </span>fxj = fxei.get(j).unwrap();
+            <span class="kw">let </span>fxi = fxei.get(i).ok_or(<span class="macro">anyhow::anyhow!</span>(<span class="string">"Bug?"</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>fxj = fxei.get(j).ok_or(<span class="macro">anyhow::anyhow!</span>(<span class="string">"Bug?"</span>))<span class="question-mark">?</span>;
             (fxij - fxi - fxj + fx) / eps_nograd
         };
         out[i][j] = t;
         out[j][i] = t;
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="attr">#[cfg(test)]
@@ -510,12 +516,12 @@
 
     <span class="kw">const </span>COMP_ACC: f64 = <span class="number">1e-6</span>;
 
-    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>[f64; <span class="number">4</span>]) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>) + x[<span class="number">2</span>] * x[<span class="number">3</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>[f64; <span class="number">4</span>]) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>) + x[<span class="number">2</span>] * x[<span class="number">3</span>].powi(<span class="number">2</span>))
     }
 
-    <span class="kw">fn </span>g(x: <span class="kw-2">&amp;</span>[f64; <span class="number">4</span>]) -&gt; [f64; <span class="number">4</span>] {
-        [<span class="number">1.0</span>, <span class="number">2.0 </span>* x[<span class="number">1</span>], x[<span class="number">3</span>].powi(<span class="number">2</span>), <span class="number">2.0 </span>* x[<span class="number">3</span>] * x[<span class="number">2</span>]]
+    <span class="kw">fn </span>g(x: <span class="kw-2">&amp;</span>[f64; <span class="number">4</span>]) -&gt; <span class="prelude-ty">Result</span>&lt;[f64; <span class="number">4</span>], Error&gt; {
+        <span class="prelude-val">Ok</span>([<span class="number">1.0</span>, <span class="number">2.0 </span>* x[<span class="number">1</span>], x[<span class="number">3</span>].powi(<span class="number">2</span>), <span class="number">2.0 </span>* x[<span class="number">3</span>] * x[<span class="number">2</span>]])
     }
 
     <span class="kw">fn </span>x() -&gt; [f64; <span class="number">4</span>] {
@@ -541,7 +547,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_vec_f64() {
-        <span class="kw">let </span>hessian = forward_hessian_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g);
+        <span class="kw">let </span>hessian = forward_hessian_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -554,7 +560,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_hessian_vec_f64() {
-        <span class="kw">let </span>hessian = central_hessian_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g);
+        <span class="kw">let </span>hessian = central_hessian_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -567,7 +573,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_vec_prod_vec_f64() {
-        <span class="kw">let </span>hessian = forward_hessian_vec_prod_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>p());
+        <span class="kw">let </span>hessian = forward_hessian_vec_prod_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>p()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -578,7 +584,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_hessian_vec_prod_vec_f64() {
-        <span class="kw">let </span>hessian = central_hessian_vec_prod_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>p());
+        <span class="kw">let </span>hessian = central_hessian_vec_prod_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>p()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -589,7 +595,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_nograd_vec_f64() {
-        <span class="kw">let </span>hessian = forward_hessian_nograd_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>hessian = forward_hessian_nograd_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
@@ -602,7 +608,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_nograd_sparse_vec_f64() {
         <span class="kw">let </span>indices = <span class="macro">vec!</span>[[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">3</span>, <span class="number">3</span>]];
-        <span class="kw">let </span>hessian = forward_hessian_nograd_sparse_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, indices);
+        <span class="kw">let </span>hessian = forward_hessian_nograd_sparse_const(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, indices).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);

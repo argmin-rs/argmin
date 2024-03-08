@@ -310,6 +310,10 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -319,29 +323,32 @@
 
 </span><span class="kw">use </span>std::ops::AddAssign;
 
+<span class="kw">use </span>anyhow::Error;
 <span class="kw">use </span>num::{Float, FromPrimitive};
 
 <span class="kw">use </span><span class="kw">crate</span>::pert::PerturbationVectors;
 <span class="kw">use </span><span class="kw">crate</span>::utils::mod_and_calc;
 
-<span class="kw">pub fn </span>forward_jacobian_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
+<span class="kw">use </span><span class="kw">super</span>::OpFn;
+
+<span class="kw">pub fn </span>forward_jacobian_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
-    <span class="kw">let </span>fx = (fs)(x);
+    <span class="kw">let </span>fx = (fs)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = x.clone();
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
     <span class="kw">let </span><span class="kw-2">mut </span>out: Vec&lt;Vec&lt;F&gt;&gt; = <span class="macro">vec!</span>[<span class="macro">vec!</span>[F::from_f64(<span class="number">0.0</span>).unwrap(); x.len()]; fx.len()];
     <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..x.len() {
-        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, eps_sqrt);
+        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, eps_sqrt)<span class="question-mark">?</span>;
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..fx.len() {
             out[i][j] = (fx1[i] - fx[i]) / eps_sqrt;
         }
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
-<span class="kw">pub fn </span>central_jacobian_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
+<span class="kw">pub fn </span>central_jacobian_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
@@ -352,8 +359,8 @@
 
     <span class="comment">// We need to compute first iteration here, in order to know which dimension the output
     // of `fs` has.
-    </span><span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, <span class="number">0</span>, eps_cbrt);
-    <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, <span class="number">0</span>, -eps_cbrt);
+    </span><span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, <span class="number">0</span>, eps_cbrt)<span class="question-mark">?</span>;
+    <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, <span class="number">0</span>, -eps_cbrt)<span class="question-mark">?</span>;
     <span class="kw">let </span>t0 = fx1.iter().zip(fx2.iter()).map(comp).collect::&lt;Vec&lt;F&gt;&gt;();
 
     <span class="comment">// Now we can create the actual Jacobian
@@ -366,43 +373,44 @@
 
     <span class="comment">// Fill in all the other columns
     </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">1</span>..x.len() {
-        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, eps_cbrt);
-        <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, -eps_cbrt);
+        <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, eps_cbrt)<span class="question-mark">?</span>;
+        <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, fs, j, -eps_cbrt)<span class="question-mark">?</span>;
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..fx1.len() {
             out[i][j] = comp((<span class="kw-2">&amp;</span>fx1[i], <span class="kw-2">&amp;</span>fx2[i]));
         }
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="kw">pub fn </span>forward_jacobian_vec_prod_vec&lt;F&gt;(
     x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;,
-    fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
+    fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
     p: <span class="kw-2">&amp;</span>[F],
-) -&gt; Vec&lt;F&gt;
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float,
 {
-    <span class="kw">let </span>fx = (fs)(x);
+    <span class="kw">let </span>fx = (fs)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
     <span class="kw">let </span>x1 = x
         .iter()
         .zip(p.iter())
         .map(|(<span class="kw-2">&amp;</span>xi, <span class="kw-2">&amp;</span>pi)| xi + eps_sqrt * pi)
         .collect();
-    <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>x1);
+    <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>x1)<span class="question-mark">?</span>;
     fx1.iter()
         .zip(fx.iter())
-        .map(|(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b)| (a - b) / eps_sqrt)
-        .collect::&lt;Vec&lt;F&gt;&gt;()
+        .map(|(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b)| <span class="prelude-val">Ok</span>((a - b) / eps_sqrt))
+        .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;&gt;()
 }
 
-<span class="kw">pub fn </span>central_jacobian_vec_prod_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;, p: <span class="kw-2">&amp;</span>[F]) -&gt; Vec&lt;F&gt;
+<span class="kw">pub fn </span>central_jacobian_vec_prod_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;, p: <span class="kw-2">&amp;</span>[F]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
     <span class="kw">let </span>eps_cbrt = F::epsilon().cbrt();
-    <span class="kw">let </span>x1 = x
+    <span class="comment">// TODO: Do this in a single vec
+    </span><span class="kw">let </span>x1 = x
         .iter()
         .zip(p.iter())
         .map(|(<span class="kw-2">&amp;</span>xi, <span class="kw-2">&amp;</span>pi)| xi + eps_cbrt * pi)
@@ -412,23 +420,23 @@
         .zip(p.iter())
         .map(|(<span class="kw-2">&amp;</span>xi, <span class="kw-2">&amp;</span>pi)| xi - eps_cbrt * pi)
         .collect();
-    <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>x1);
-    <span class="kw">let </span>fx2 = (fs)(<span class="kw-2">&amp;</span>x2);
+    <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>x1)<span class="question-mark">?</span>;
+    <span class="kw">let </span>fx2 = (fs)(<span class="kw-2">&amp;</span>x2)<span class="question-mark">?</span>;
     fx1.iter()
         .zip(fx2.iter())
-        .map(|(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b)| (a - b) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt))
-        .collect::&lt;Vec&lt;F&gt;&gt;()
+        .map(|(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b)| <span class="prelude-val">Ok</span>((a - b) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt)))
+        .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;&gt;()
 }
 
 <span class="kw">pub fn </span>forward_jacobian_pert_vec&lt;F&gt;(
     x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;,
-    fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
+    fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
     pert: <span class="kw-2">&amp;</span>PerturbationVectors,
-) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive + AddAssign,
 {
-    <span class="kw">let </span>fx = (fs)(x);
+    <span class="kw">let </span>fx = (fs)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
     <span class="kw">let </span><span class="kw-2">mut </span>xt = x.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="macro">vec!</span>[<span class="macro">vec!</span>[F::from_f64(<span class="number">0.0</span>).unwrap(); x.len()]; fx.len()];
@@ -437,7 +445,7 @@
             xt[<span class="kw-2">*</span>i] += eps_sqrt;
         }
 
-        <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>xt);
+        <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>xt)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>i <span class="kw">in </span>pert_item.x_idx.iter() {
             xt[<span class="kw-2">*</span>i] = x[<span class="kw-2">*</span>i];
@@ -449,14 +457,14 @@
             }
         }
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="kw">pub fn </span>central_jacobian_pert_vec&lt;F&gt;(
     x: <span class="kw-2">&amp;</span>[F],
-    fs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
+    fs: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
     pert: <span class="kw-2">&amp;</span>PerturbationVectors,
-) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive + AddAssign,
 {
@@ -468,13 +476,13 @@
             xt[<span class="kw-2">*</span>j] += eps_cbrt;
         }
 
-        <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>xt);
+        <span class="kw">let </span>fx1 = (fs)(<span class="kw-2">&amp;</span>xt)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>j <span class="kw">in </span>pert_item.x_idx.iter() {
             xt[<span class="kw-2">*</span>j] = x[<span class="kw-2">*</span>j] - eps_cbrt;
         }
 
-        <span class="kw">let </span>fx2 = (fs)(<span class="kw-2">&amp;</span>xt);
+        <span class="kw">let </span>fx2 = (fs)(<span class="kw-2">&amp;</span>xt)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>j <span class="kw">in </span>pert_item.x_idx.iter() {
             xt[<span class="kw-2">*</span>j] = x[<span class="kw-2">*</span>j];
@@ -491,7 +499,7 @@
             }
         }
     }
-    out
+    <span class="prelude-val">Ok</span>(out)
 }
 
 <span class="attr">#[cfg(test)]
@@ -502,15 +510,15 @@
 
     <span class="kw">const </span>COMP_ACC: f64 = <span class="number">1e-6</span>;
 
-    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; Vec&lt;f64&gt; {
-        <span class="macro">vec!</span>[
+    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;f64&gt;, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
             <span class="number">2.0 </span>* (x[<span class="number">1</span>].powi(<span class="number">3</span>) - x[<span class="number">0</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">1</span>].powi(<span class="number">3</span>) - x[<span class="number">0</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">2</span>].powi(<span class="number">3</span>) - x[<span class="number">1</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">2</span>].powi(<span class="number">3</span>) - x[<span class="number">1</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">3</span>].powi(<span class="number">3</span>) - x[<span class="number">2</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">3</span>].powi(<span class="number">3</span>) - x[<span class="number">2</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">4</span>].powi(<span class="number">3</span>) - x[<span class="number">3</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">4</span>].powi(<span class="number">3</span>) - x[<span class="number">3</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">5</span>].powi(<span class="number">3</span>) - x[<span class="number">4</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">5</span>].powi(<span class="number">3</span>) - x[<span class="number">4</span>].powi(<span class="number">2</span>)),
-        ]
+        ])
     }
 
     <span class="kw">fn </span>res1() -&gt; Vec&lt;Vec&lt;f64&gt;&gt; {
@@ -552,7 +560,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_vec_f64() {
-        <span class="kw">let </span>jacobian = forward_jacobian_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>jacobian = forward_jacobian_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("{:?}", jacobian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -564,7 +572,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_vec_f64() {
-        <span class="kw">let </span>jacobian = central_jacobian_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>jacobian = central_jacobian_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("{:?}", jacobian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -576,7 +584,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_vec_prod_vec_f64() {
-        <span class="kw">let </span>jacobian = forward_jacobian_vec_prod_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>p());
+        <span class="kw">let </span>jacobian = forward_jacobian_vec_prod_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>p()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -587,7 +595,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_vec_prod_vec_f64() {
-        <span class="kw">let </span>jacobian = central_jacobian_vec_prod_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>p());
+        <span class="kw">let </span>jacobian = central_jacobian_vec_prod_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>p()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("{:?}", jacobian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -597,7 +605,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_pert_vec_f64() {
-        <span class="kw">let </span>jacobian = forward_jacobian_pert_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>pert());
+        <span class="kw">let </span>jacobian = forward_jacobian_pert_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>pert()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -610,7 +618,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_pert_vec_f64() {
-        <span class="kw">let </span>jacobian = central_jacobian_pert_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>pert());
+        <span class="kw">let </span>jacobian = central_jacobian_pert_vec(<span class="kw-2">&amp;</span>x(), <span class="kw-2">&amp;</span>f, <span class="kw-2">&amp;</span>pert()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);

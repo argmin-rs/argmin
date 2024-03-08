@@ -124,6 +124,12 @@
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -133,39 +139,45 @@
 
 </span><span class="kw">use </span>std::ops::{Add, IndexMut};
 
+<span class="kw">use </span>anyhow::Error;
 <span class="kw">use </span>num::{Float, FromPrimitive};
 
 <span class="doccomment">/// Panics when idx &gt; x.len()
 </span><span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>mod_and_calc&lt;F, C, T&gt;(x: <span class="kw-2">&amp;mut </span>C, f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>C) -&gt; T, idx: usize, y: F) -&gt; T
+</span><span class="kw">pub fn </span>mod_and_calc&lt;F, C, T&gt;(
+    x: <span class="kw-2">&amp;mut </span>C,
+    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>C) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;,
+    idx: usize,
+    y: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;
 <span class="kw">where
     </span>F: Add&lt;Output = F&gt; + Copy,
     C: IndexMut&lt;usize, Output = F&gt;,
 {
     <span class="kw">let </span>xtmp = x[idx];
     x[idx] = xtmp + y;
-    <span class="kw">let </span>fx1 = (f)(x);
+    <span class="kw">let </span>fx1 = (f)(x)<span class="question-mark">?</span>;
     x[idx] = xtmp;
-    fx1
+    <span class="prelude-val">Ok</span>(fx1)
 }
 
 <span class="doccomment">/// Panics when idx &gt; N
 </span><span class="attr">#[inline(always)]
 </span><span class="kw">pub fn </span>mod_and_calc_const&lt;<span class="kw">const </span>N: usize, F, T&gt;(
     x: <span class="kw-2">&amp;mut </span>[F; N],
-    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; T,
+    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>[F; N]) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;,
     idx: usize,
     y: F,
-) -&gt; T
+) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt;
 <span class="kw">where
     </span>F: Add&lt;Output = F&gt; + Copy,
 {
     <span class="macro">assert!</span>(idx &lt; N);
     <span class="kw">let </span>xtmp = x[idx];
     x[idx] = xtmp + y;
-    <span class="kw">let </span>fx1 = (f)(x);
+    <span class="kw">let </span>fx1 = (f)(x)<span class="question-mark">?</span>;
     x[idx] = xtmp;
-    fx1
+    <span class="prelude-val">Ok</span>(fx1)
 }
 
 <span class="attr">#[inline(always)]

@@ -418,6 +418,33 @@
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
 <a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -479,12 +506,13 @@
 //! ### For `Vec&lt;f64&gt;`
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
 //! // Define function `f(x)`
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; f64 {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;f64, anyhow::Error&gt; {
 //!     // ...
-//! #     x[0] + x[1].powi(2)
+//! #     Ok(x[0] + x[1].powi(2))
 //! };
 //!
 //! // Point at which gradient should be calculated
@@ -492,11 +520,11 @@
 //!
 //! // Calculate gradient of `f` at `x` using forward differences
 //! let g_forward = vec::forward_diff(&amp;f);
-//! let grad_forward = g_forward(&amp;x);
+//! let grad_forward = g_forward(&amp;x)?;
 //!
 //! // Calculate gradient of `f` at `x` using central differences
 //! let g_central = vec::central_diff(&amp;f);
-//! let grad_central = g_central(&amp;x);
+//! let grad_central = g_central(&amp;x)?;
 //! #
 //! #  // Desired solution
 //! #  let res = vec![1.0f64, 2.0];
@@ -506,20 +534,23 @@
 //! #      assert!((res[i] - grad_forward[i]).abs() &lt; 1e-6);
 //! #      assert!((res[i] - grad_central[i]).abs() &lt; 1e-6);
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### For `ndarray::Array1&lt;f64&gt;`
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! # #[cfg(feature = "ndarray")]
 //! # {
 //! use ndarray::{array, Array1};
 //! use finitediff::ndarr;
 //!
 //! // Define cost function `f(x)`
-//! let f = |x: &amp;Array1&lt;f64&gt;| -&gt; f64 {
+//! let f = |x: &amp;Array1&lt;f64&gt;| -&gt; Result&lt;f64, anyhow::Error&gt; {
 //!     // ...
-//! #     x[0] + x[1].powi(2)
+//! #     Ok(x[0] + x[1].powi(2))
 //! };
 //!
 //! // Point at which gradient should be calculated
@@ -527,11 +558,11 @@
 //!
 //! // Calculate gradient of `f` at `x` using forward differences
 //! let g_forward = ndarr::forward_diff(&amp;f);
-//! let grad_forward = g_forward(&amp;x);
+//! let grad_forward = g_forward(&amp;x)?;
 //!
 //! // Calculate gradient of `f` at `x` using central differences
 //! let g_central = ndarr::central_diff(&amp;f);
-//! let grad_central = g_central(&amp;x);
+//! let grad_central = g_central(&amp;x)?;
 //! #
 //! #  // Desired solution
 //! #  let res = vec![1.0f64, 2.0];
@@ -541,6 +572,8 @@
 //! #      assert!((res[i] - grad_forward[i]).abs() &lt; 1e-6);
 //! #      assert!((res[i] - grad_central[i]).abs() &lt; 1e-6);
 //! #  }
+//! # }
+//! # Ok(())
 //! # }
 //! ```
 //!
@@ -553,29 +586,30 @@
 //! The calculation of the full Jacobian requires `n+1` evaluations of the function `f`.
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;Vec&lt;f64&gt;, anyhow::Error&gt; {
 //!     // ...
-//! #      vec![
+//! #      Ok(vec![
 //! #          2.0 * (x[1].powi(3) - x[0].powi(2)),
 //! #          3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
 //! #          3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
 //! #          3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
 //! #          3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
 //! #          3.0 * (x[5].powi(3) - x[4].powi(2)),
-//! #      ]
+//! #      ])
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
 //!
 //! // Using forward differences
 //! let j_forward = vec::forward_jacobian(&amp;f);
-//! let jacobian_forward = j_forward(&amp;x);
+//! let jacobian_forward = j_forward(&amp;x)?;
 //!
 //! // Using central differences
 //! let j_central = vec::central_jacobian(&amp;f);
-//! let jacobian_central = j_central(&amp;x);
+//! let jacobian_central = j_central(&amp;x)?;
 //!
 //! #  let res = vec![
 //! #      vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
@@ -593,6 +627,8 @@
 //! #          assert!((res[i][j] - jacobian_central[i][j]).abs() &lt; 1e-6);
 //! #      }
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### Product of the Jacobian `J(x)` with a vector `p`
@@ -602,18 +638,19 @@
 //! `f`, `J(x)*p` only requires `2`.
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;Vec&lt;f64&gt;, anyhow::Error&gt; {
 //!     // ...
-//! #      vec![
+//! #      Ok(vec![
 //! #          2.0 * (x[1].powi(3) - x[0].powi(2)),
 //! #          3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
 //! #          3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
 //! #          3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
 //! #          3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
 //! #          3.0 * (x[5].powi(3) - x[4].powi(2)),
-//! #      ]
+//! #      ])
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
@@ -621,11 +658,11 @@
 //!
 //! // using forward differences
 //! let j_forward = vec::forward_jacobian_vec_prod(&amp;f);
-//! let jacobian_forward = j_forward(&amp;x, &amp;p);
+//! let jacobian_forward = j_forward(&amp;x, &amp;p)?;
 //!
 //! // using central differences
 //! let j_central = vec::central_jacobian_vec_prod(&amp;f);
-//! let jacobian_central = j_central(&amp;x, &amp;p);
+//! let jacobian_central = j_central(&amp;x, &amp;p)?;
 //! #
 //! #  let res = vec![8.0, 22.0, 27.0, 32.0, 37.0, 24.0];
 //! #
@@ -634,6 +671,8 @@
 //! #      assert!((res[i] - jacobian_forward[i]).abs() &lt; 11.0*1e-6);
 //! #      assert!((res[i] - jacobian_central[i]).abs() &lt; 11.0*1e-6);
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### Sparse Jacobian
@@ -642,18 +681,19 @@
 //! Nocedal &amp; Wright for details.
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::{vec, PerturbationVector};
 //!
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;Vec&lt;f64&gt;, anyhow::Error&gt; {
 //!     // ...
-//! #      vec![
+//! #      Ok(vec![
 //! #          2.0 * (x[1].powi(3) - x[0].powi(2)),
 //! #          3.0 * (x[1].powi(3) - x[0].powi(2)) + 2.0 * (x[2].powi(3) - x[1].powi(2)),
 //! #          3.0 * (x[2].powi(3) - x[1].powi(2)) + 2.0 * (x[3].powi(3) - x[2].powi(2)),
 //! #          3.0 * (x[3].powi(3) - x[2].powi(2)) + 2.0 * (x[4].powi(3) - x[3].powi(2)),
 //! #          3.0 * (x[4].powi(3) - x[3].powi(2)) + 2.0 * (x[5].powi(3) - x[4].powi(2)),
 //! #          3.0 * (x[5].powi(3) - x[4].powi(2)),
-//! #      ]
+//! #      ])
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0, 1.0, 1.0];
@@ -672,11 +712,11 @@
 //!
 //! // using forward differences
 //! let j_forward = vec::forward_jacobian_pert(&amp;f);
-//! let jacobian_forward = j_forward(&amp;x, &amp;pert);
+//! let jacobian_forward = j_forward(&amp;x, &amp;pert)?;
 //!
 //! // using central differences
 //! let j_central = vec::central_jacobian_pert(&amp;f);
-//! let jacobian_central = j_central(&amp;x, &amp;pert);
+//! let jacobian_central = j_central(&amp;x, &amp;pert)?;
 //! #
 //! #  let res = vec![
 //! #      vec![-4.0, 6.0, 0.0, 0.0, 0.0, 0.0],
@@ -694,6 +734,8 @@
 //! #          assert!((res[i][j] - jacobian_central[i][j]).abs() &lt; 1e-6);
 //! #      }
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ## Calculation of the Hessian
@@ -703,22 +745,23 @@
 //! ### Full Hessian
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let g = |x: &amp;Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+//! let g = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;Vec&lt;f64&gt;, anyhow::Error&gt; {
 //!     // ...
-//! #     vec![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]]
+//! #     Ok(vec![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]])
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
 //!
 //! // using forward differences
 //! let h_forward = vec::forward_hessian(&amp;g);
-//! let hessian_forward = h_forward(&amp;x);
+//! let hessian_forward = h_forward(&amp;x)?;
 //!
 //! // using central differences
 //! let h_central = vec::central_hessian(&amp;g);
-//! let hessian_central = h_central(&amp;x);
+//! let hessian_central = h_central(&amp;x)?;
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -734,16 +777,19 @@
 //! #          assert!((res[i][j] - hessian_central[i][j]).abs() &lt; 1e-6);
 //! #      }
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### Product of the Hessian `H(x)` with a vector `p`
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let g = |x: &amp;Vec&lt;f64&gt;| -&gt; Vec&lt;f64&gt; {
+//! let g = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;Vec&lt;f64&gt;, anyhow::Error&gt; {
 //!     // ...
-//! #     vec![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]]
+//! #     Ok(vec![1.0, 2.0 * x[1], x[3].powi(2), 2.0 * x[3] * x[2]])
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
@@ -751,11 +797,11 @@
 //!
 //! // using forward differences
 //! let h_forward = vec::forward_hessian_vec_prod(&amp;g);
-//! let hessian_forward = h_forward(&amp;x, &amp;p);
+//! let hessian_forward = h_forward(&amp;x, &amp;p)?;
 //!
 //! // using forward differences
 //! let h_central = vec::central_hessian_vec_prod(&amp;g);
-//! let hessian_central = h_central(&amp;x, &amp;p);
+//! let hessian_central = h_central(&amp;x, &amp;p)?;
 //! #
 //! #  let res = vec![0.0, 6.0, 10.0, 18.0];
 //! #
@@ -763,22 +809,25 @@
 //! #      assert!((res[i] - hessian_forward[i]).abs() &lt; 1e-6);
 //! #      assert!((res[i] - hessian_central[i]).abs() &lt; 1e-6);
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### Calculation of the Hessian without knowledge of the gradient
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; f64 {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;f64, anyhow::Error&gt; {
 //!     // ...
-//! #     x[0] + x[1].powi(2) + x[2] * x[3].powi(2)
+//! #     Ok(x[0] + x[1].powi(2) + x[2] * x[3].powi(2))
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
 //!
 //! let h = vec::forward_hessian_nograd(&amp;f);
-//! let hessian = h(&amp;x);
+//! let hessian = h(&amp;x)?;
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -793,16 +842,19 @@
 //! #          assert!((res[i][j] - hessian[i][j]).abs() &lt; 1e-6)
 //! #      }
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 //!
 //! ### Calculation of the sparse Hessian without knowledge of the gradient
 //!
 //! ```rust
+//! # fn main() -&gt; Result&lt;(), anyhow::Error&gt; {
 //! use finitediff::vec;
 //!
-//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; f64 {
+//! let f = |x: &amp;Vec&lt;f64&gt;| -&gt; Result&lt;f64, anyhow::Error&gt; {
 //!     // ...
-//! #     x[0] + x[1].powi(2) + x[2] * x[3].powi(2)
+//! #     Ok(x[0] + x[1].powi(2) + x[2] * x[3].powi(2))
 //! };
 //!
 //! let x = vec![1.0f64, 1.0, 1.0, 1.0];
@@ -812,7 +864,7 @@
 //! let indices = vec![[1, 1], [2, 3], [3, 3]];
 //!
 //! let h = vec::forward_hessian_nograd_sparse(&amp;f);
-//! let hessian = h(&amp;x, indices);
+//! let hessian = h(&amp;x, indices)?;
 //! #
 //! #  let res = vec![
 //! #      vec![0.0, 0.0, 0.0, 0.0],
@@ -827,6 +879,8 @@
 //! #          assert!((res[i][j] - hessian[i][j]).abs() &lt; 1e-6)
 //! #      }
 //! #  }
+//! # Ok(())
+//! # }
 //! ```
 
 </span><span class="kw">pub mod </span>array;

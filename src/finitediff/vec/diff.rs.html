@@ -89,6 +89,9 @@
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -96,37 +99,40 @@
 // http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-</span><span class="kw">use </span>num::Float;
+</span><span class="kw">use </span>anyhow::Error;
+<span class="kw">use </span>num::Float;
 <span class="kw">use </span>num::FromPrimitive;
 
 <span class="kw">use </span><span class="kw">crate</span>::utils::mod_and_calc;
 
-<span class="kw">pub fn </span>forward_diff_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F) -&gt; Vec&lt;F&gt;
+<span class="kw">use </span><span class="kw">super</span>::CostFn;
+
+<span class="kw">pub fn </span>forward_diff_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float,
 {
-    <span class="kw">let </span>fx = (f)(x);
+    <span class="kw">let </span>fx = (f)(x)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>xt = x.clone();
     <span class="kw">let </span>eps_sqrt = F::epsilon().sqrt();
     (<span class="number">0</span>..x.len())
-        .map(|i| {
-            <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt);
-            (fx1 - fx) / eps_sqrt
+        .map(|i| -&gt; <span class="prelude-ty">Result</span>&lt;F, Error&gt; {
+            <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_sqrt)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>((fx1 - fx) / eps_sqrt)
         })
         .collect()
 }
 
-<span class="kw">pub fn </span>central_diff_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F) -&gt; Vec&lt;F&gt;
+<span class="kw">pub fn </span>central_diff_vec&lt;F&gt;(x: <span class="kw-2">&amp;</span>[F], f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;
 <span class="kw">where
     </span>F: Float + FromPrimitive,
 {
     <span class="kw">let </span><span class="kw-2">mut </span>xt = x.to_owned();
     <span class="kw">let </span>eps_cbrt = F::epsilon().cbrt();
     (<span class="number">0</span>..x.len())
-        .map(|i| {
-            <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_cbrt);
-            <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, -eps_cbrt);
-            (fx1 - fx2) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt)
+        .map(|i| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, Error&gt; {
+            <span class="kw">let </span>fx1 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, eps_cbrt)<span class="question-mark">?</span>;
+            <span class="kw">let </span>fx2 = mod_and_calc(<span class="kw-2">&amp;mut </span>xt, f, i, -eps_cbrt)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>((fx1 - fx2) / (F::from_f64(<span class="number">2.0</span>).unwrap() * eps_cbrt))
         })
         .collect()
 }
@@ -137,14 +143,14 @@
 
     <span class="kw">const </span>COMP_ACC: f64 = <span class="number">1e-6</span>;
 
-    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>))
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_diff_vec_f64() {
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0f64</span>];
-        <span class="kw">let </span>grad = forward_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = forward_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">2.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -152,7 +158,7 @@
             .count();
 
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0f64</span>];
-        <span class="kw">let </span>grad = forward_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = forward_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">4.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -163,7 +169,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_diff_vec_f64() {
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">1.0f64</span>];
-        <span class="kw">let </span>grad = central_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = central_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">2.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)
@@ -171,7 +177,7 @@
             .count();
 
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0f64</span>];
-        <span class="kw">let </span>grad = central_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f);
+        <span class="kw">let </span>grad = central_diff_vec(<span class="kw-2">&amp;</span>p, <span class="kw-2">&amp;</span>f).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">4.0</span>];
 
         (<span class="number">0</span>..<span class="number">2</span>)

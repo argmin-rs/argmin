@@ -445,6 +445,15 @@
 <a href="#444" id="444">444</a>
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -458,6 +467,10 @@
 
 <span class="kw">use </span>std::ops::AddAssign;
 
+<span class="kw">use </span>anyhow::Error;
+<span class="kw">use </span>num::{Float, FromPrimitive};
+
+<span class="kw">use </span><span class="kw">crate</span>::PerturbationVectors;
 <span class="kw">use </span>diff::{central_diff_vec, forward_diff_vec};
 <span class="kw">use </span>hessian::{
     central_hessian_vec, central_hessian_vec_prod_vec, forward_hessian_nograd_sparse_vec,
@@ -467,140 +480,145 @@
     central_jacobian_pert_vec, central_jacobian_vec, central_jacobian_vec_prod_vec,
     forward_jacobian_pert_vec, forward_jacobian_vec, forward_jacobian_vec_prod_vec,
 };
-<span class="kw">use </span>num::{Float, FromPrimitive};
 
-<span class="kw">use </span><span class="kw">crate</span>::PerturbationVectors;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>CostFn&lt;<span class="lifetime">'a</span>, F&gt; = <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;F, Error&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>GradientFn&lt;<span class="lifetime">'a</span>, F&gt; = <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>OpFn&lt;<span class="lifetime">'a</span>, F&gt; = <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt;;
 
-<span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_diff&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F,
-    F: Float + FromPrimitive,
+<span class="comment">// pub trait GradientImpl&lt;'a, F&gt;: Fn(&amp;Vec&lt;F&gt;) -&gt; Result&lt;Vec&lt;F&gt;, Error&gt; + 'a {}
+// impl&lt;'a, F, T: Fn(&amp;Vec&lt;F&gt;) -&gt; Result&lt;Vec&lt;F&gt;, Error&gt; + 'a&gt; GradientImpl&lt;'a, F&gt; for T {}
+// pub fn forward_diff&lt;F&gt;(f: CostFn&lt;'_, F&gt;) -&gt; impl GradientImpl&lt;'_, F&gt; { .. }
+
+</span><span class="attr">#[inline(always)]
+</span><span class="kw">pub fn </span>forward_diff&lt;F&gt;(f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_diff_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_diff_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_diff&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>central_diff&lt;F&gt;(f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_diff_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_diff_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_jacobian&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>forward_jacobian&lt;F&gt;(f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_jacobian_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_jacobian_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_jacobian&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>central_jacobian&lt;F&gt;(f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_jacobian_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_jacobian_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_jacobian_vec_prod&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>forward_jacobian_vec_prod&lt;F&gt;(
+    f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_jacobian_vec_prod_vec(p, <span class="kw-2">&amp;</span>f, v)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_jacobian_vec_prod_vec(p, f, v)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_jacobian_vec_prod&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>central_jacobian_vec_prod&lt;F&gt;(
+    f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_jacobian_vec_prod_vec(p, <span class="kw-2">&amp;</span>f, v)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_jacobian_vec_prod_vec(p, f, v)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_jacobian_pert&lt;Func, F&gt;(
-    f: Func,
-) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>PerturbationVectors) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive + AddAssign,
+</span><span class="kw">pub fn </span>forward_jacobian_pert&lt;F&gt;(
+    f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>PerturbationVectors) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive + AddAssign,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, pert: <span class="kw-2">&amp;</span>PerturbationVectors| forward_jacobian_pert_vec(p, <span class="kw-2">&amp;</span>f, pert)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, pert: <span class="kw-2">&amp;</span>PerturbationVectors| forward_jacobian_pert_vec(p, f, pert)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_jacobian_pert&lt;Func, F&gt;(
-    f: Func,
-) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>PerturbationVectors) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive + AddAssign,
+</span><span class="kw">pub fn </span>central_jacobian_pert&lt;F&gt;(
+    f: OpFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>PerturbationVectors) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive + AddAssign,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, pert: <span class="kw-2">&amp;</span>PerturbationVectors| central_jacobian_pert_vec(p, <span class="kw-2">&amp;</span>f, pert)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, pert: <span class="kw-2">&amp;</span>PerturbationVectors| central_jacobian_pert_vec(p, f, pert)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_hessian&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>forward_hessian&lt;F&gt;(
+    f: GradientFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_hessian&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>central_hessian&lt;F&gt;(
+    f: GradientFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_hessian_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_hessian_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_hessian_vec_prod&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>forward_hessian_vec_prod&lt;F&gt;(
+    f: GradientFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_vec_prod_vec(p, <span class="kw-2">&amp;</span>f, v)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_vec_prod_vec(p, f, v)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>central_hessian_vec_prod&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;F&gt;,
-    F: Float + FromPrimitive,
+</span><span class="kw">pub fn </span>central_hessian_vec_prod&lt;F&gt;(
+    f: GradientFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, <span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;F&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_hessian_vec_prod_vec(p, <span class="kw-2">&amp;</span>f, v)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, v: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| central_hessian_vec_prod_vec(p, f, v)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_hessian_nograd&lt;Func, F&gt;(f: Func) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F,
-    F: Float + FromPrimitive + AddAssign,
+</span><span class="kw">pub fn </span>forward_hessian_nograd&lt;F&gt;(
+    f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive + AddAssign,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_nograd_vec(p, <span class="kw-2">&amp;</span>f)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;| forward_hessian_nograd_vec(p, f)
 }
 
 <span class="attr">#[inline(always)]
-</span><span class="kw">pub fn </span>forward_hessian_nograd_sparse&lt;Func, F&gt;(
-    f: Func,
-) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, Vec&lt;[usize; <span class="number">2</span>]&gt;) -&gt; Vec&lt;Vec&lt;F&gt;&gt;
-<span class="kw">where
-    </span>Func: Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;) -&gt; F,
-    F: Float + FromPrimitive + AddAssign,
+</span><span class="kw">pub fn </span>forward_hessian_nograd_sparse&lt;F&gt;(
+    f: CostFn&lt;<span class="lifetime">'_</span>, F&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>Vec&lt;F&gt;, Vec&lt;[usize; <span class="number">2</span>]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;F&gt;&gt;, Error&gt; + <span class="lifetime">'_
+</span><span class="kw">where
+    </span>F: Float + FromPrimitive + AddAssign,
 {
-    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, indices: Vec&lt;[usize; <span class="number">2</span>]&gt;| forward_hessian_nograd_sparse_vec(p, <span class="kw-2">&amp;</span>f, indices)
+    <span class="kw">move </span>|p: <span class="kw-2">&amp;</span>Vec&lt;F&gt;, indices: Vec&lt;[usize; <span class="number">2</span>]&gt;| forward_hessian_nograd_sparse_vec(p, f, indices)
 }
 
 <span class="attr">#[cfg(test)]
@@ -611,27 +629,27 @@
 
     <span class="kw">const </span>COMP_ACC: f64 = <span class="number">1e-6</span>;
 
-    <span class="kw">fn </span>f1(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f1(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>))
     }
 
-    <span class="kw">fn </span>f2(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; Vec&lt;f64&gt; {
-        <span class="macro">vec!</span>[
+    <span class="kw">fn </span>f2(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;f64&gt;, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[
             <span class="number">2.0 </span>* (x[<span class="number">1</span>].powi(<span class="number">3</span>) - x[<span class="number">0</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">1</span>].powi(<span class="number">3</span>) - x[<span class="number">0</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">2</span>].powi(<span class="number">3</span>) - x[<span class="number">1</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">2</span>].powi(<span class="number">3</span>) - x[<span class="number">1</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">3</span>].powi(<span class="number">3</span>) - x[<span class="number">2</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">3</span>].powi(<span class="number">3</span>) - x[<span class="number">2</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">4</span>].powi(<span class="number">3</span>) - x[<span class="number">3</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">4</span>].powi(<span class="number">3</span>) - x[<span class="number">3</span>].powi(<span class="number">2</span>)) + <span class="number">2.0 </span>* (x[<span class="number">5</span>].powi(<span class="number">3</span>) - x[<span class="number">4</span>].powi(<span class="number">2</span>)),
             <span class="number">3.0 </span>* (x[<span class="number">5</span>].powi(<span class="number">3</span>) - x[<span class="number">4</span>].powi(<span class="number">2</span>)),
-        ]
+        ])
     }
 
-    <span class="kw">fn </span>f3(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; f64 {
-        x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>) + x[<span class="number">2</span>] * x[<span class="number">3</span>].powi(<span class="number">2</span>)
+    <span class="kw">fn </span>f3(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;f64, Error&gt; {
+        <span class="prelude-val">Ok</span>(x[<span class="number">0</span>] + x[<span class="number">1</span>].powi(<span class="number">2</span>) + x[<span class="number">2</span>] * x[<span class="number">3</span>].powi(<span class="number">2</span>))
     }
 
-    <span class="kw">fn </span>g(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; Vec&lt;f64&gt; {
-        <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0 </span>* x[<span class="number">1</span>], x[<span class="number">3</span>].powi(<span class="number">2</span>), <span class="number">2.0 </span>* x[<span class="number">3</span>] * x[<span class="number">2</span>]]
+    <span class="kw">fn </span>g(x: <span class="kw-2">&amp;</span>Vec&lt;f64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;f64&gt;, Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0 </span>* x[<span class="number">1</span>], x[<span class="number">3</span>].powi(<span class="number">2</span>), <span class="number">2.0 </span>* x[<span class="number">3</span>] * x[<span class="number">2</span>]])
     }
 
     <span class="kw">fn </span>x1() -&gt; Vec&lt;f64&gt; {
@@ -694,8 +712,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_diff_func() {
-        <span class="kw">let </span>grad = forward_diff(f1);
-        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>x1());
+        <span class="kw">let </span>grad = forward_diff(<span class="kw-2">&amp;</span>f1);
+        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>x1()).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0</span>, <span class="number">2.0</span>];
 
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
@@ -704,7 +722,7 @@
 
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>];
         <span class="kw">let </span>grad = forward_diff(<span class="kw-2">&amp;</span>f1);
-        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>p);
+        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>p).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0</span>, <span class="number">4.0</span>];
 
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
@@ -714,8 +732,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_diff_func() {
-        <span class="kw">let </span>grad = central_diff(f1);
-        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>x1());
+        <span class="kw">let </span>grad = central_diff(<span class="kw-2">&amp;</span>f1);
+        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>x1()).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">2.0</span>];
 
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
@@ -723,8 +741,8 @@
         }
 
         <span class="kw">let </span>p = <span class="macro">vec!</span>[<span class="number">1.0f64</span>, <span class="number">2.0f64</span>];
-        <span class="kw">let </span>grad = central_diff(f1);
-        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>p);
+        <span class="kw">let </span>grad = central_diff(<span class="kw-2">&amp;</span>f1);
+        <span class="kw">let </span>out = grad(<span class="kw-2">&amp;</span>p).unwrap();
         <span class="kw">let </span>res = [<span class="number">1.0f64</span>, <span class="number">4.0</span>];
 
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
@@ -735,7 +753,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_func() {
         <span class="kw">let </span>jacobian = forward_jacobian(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("{:?}", out);
         // println!("{:?}", res);
@@ -749,7 +767,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_vec_f64_trait() {
         <span class="kw">let </span>jacobian = central_jacobian(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("{:?}", jacobian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -762,7 +780,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_vec_prod_vec_func() {
         <span class="kw">let </span>jacobian = forward_jacobian_vec_prod(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>p1());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>p1()).unwrap();
         <span class="kw">let </span>res = res3();
         <span class="comment">// println!("{:?}", jacobian);
         // the accuracy for this is pretty bad!!
@@ -774,7 +792,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_vec_prod_vec_func() {
         <span class="kw">let </span>jacobian = central_jacobian_vec_prod(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>p1());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>p1()).unwrap();
         <span class="kw">let </span>res = res3();
         <span class="comment">// println!("{:?}", jacobian);
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -785,7 +803,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_jacobian_pert_func() {
         <span class="kw">let </span>jacobian = forward_jacobian_pert(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>pert());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>pert()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -799,7 +817,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_jacobian_pert_func() {
         <span class="kw">let </span>jacobian = central_jacobian_pert(<span class="kw-2">&amp;</span>f2);
-        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>pert());
+        <span class="kw">let </span>out = jacobian(<span class="kw-2">&amp;</span>x2(), <span class="kw-2">&amp;</span>pert()).unwrap();
         <span class="kw">let </span>res = res1();
         <span class="comment">// println!("jacobian:\n{:?}", jacobian);
         // println!("res:\n{:?}", res);
@@ -813,7 +831,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_func() {
         <span class="kw">let </span>hessian = forward_hessian(<span class="kw-2">&amp;</span>g);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3());
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -827,7 +845,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_hessian_func() {
         <span class="kw">let </span>hessian = central_hessian(<span class="kw-2">&amp;</span>g);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3());
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -841,7 +859,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_vec_prod_func() {
         <span class="kw">let </span>hessian = forward_hessian_vec_prod(<span class="kw-2">&amp;</span>g);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), <span class="kw-2">&amp;</span>p2());
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), <span class="kw-2">&amp;</span>p2()).unwrap();
         <span class="kw">let </span>res = [<span class="number">0.0</span>, <span class="number">6.0</span>, <span class="number">10.0</span>, <span class="number">18.0</span>];
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -853,7 +871,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_central_hessian_vec_prod_func() {
         <span class="kw">let </span>hessian = central_hessian_vec_prod(<span class="kw-2">&amp;</span>g);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), <span class="kw-2">&amp;</span>p2());
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), <span class="kw-2">&amp;</span>p2()).unwrap();
         <span class="kw">let </span>res = [<span class="number">0.0</span>, <span class="number">6.0</span>, <span class="number">10.0</span>, <span class="number">18.0</span>];
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -865,7 +883,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_forward_hessian_nograd_func() {
         <span class="kw">let </span>hessian = forward_hessian_nograd(<span class="kw-2">&amp;</span>f3);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3());
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3()).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
@@ -880,7 +898,7 @@
     </span><span class="kw">fn </span>test_forward_hessian_nograd_sparse_func() {
         <span class="kw">let </span>indices = <span class="macro">vec!</span>[[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">3</span>, <span class="number">3</span>]];
         <span class="kw">let </span>hessian = forward_hessian_nograd_sparse(<span class="kw-2">&amp;</span>f3);
-        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), indices);
+        <span class="kw">let </span>out = hessian(<span class="kw-2">&amp;</span>x3(), indices).unwrap();
         <span class="kw">let </span>res = res2();
         <span class="comment">// println!("hessian:\n{:#?}", hessian);
         // println!("diff:\n{:#?}", diff);
