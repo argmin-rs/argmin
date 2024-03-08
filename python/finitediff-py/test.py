@@ -56,6 +56,7 @@ j = central_jacobian(op)
 x = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 print(j(x))
 
+
 # class NotCallable:
 #     pass
 

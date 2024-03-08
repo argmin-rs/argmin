@@ -21,4 +21,5 @@ crate-type = ["cdylib"]
 [dependencies]
 finitediff_rust = { package = "finitediff", version = "0.1.4", path = "../../crates/finitediff", features = ["ndarray"] }
 numpy = "0.20.0"
-pyo3 = { version = "0.20.0", features = ["extension-module"] }
+pyo3 = { version = "0.20.0", features = ["extension-module", "anyhow"] }
+anyhow = "1.0"

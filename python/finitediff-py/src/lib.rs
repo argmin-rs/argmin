@@ -1,11 +1,28 @@
+use anyhow::Error;
 use finitediff_rust::ndarr;
-use numpy::ndarray::Array1;
-use numpy::{IntoPyArray, PyArray1, PyArray2};
+use numpy::{ndarray::Array1, IntoPyArray, PyArray1, PyArray2};
 use pyo3::{
     exceptions::PyTypeError,
     prelude::*,
     types::{PyCFunction, PyDict, PyTuple},
 };
+
+fn process_args(args: &PyTuple) -> PyResult<Array1<f64>> {
+    Ok(args
+        .get_item(0)
+        .map_err(|_| PyErr::new::<PyTypeError, _>("Insufficient number of arguments"))?
+        .downcast::<PyArray1<f64>>()?
+        .to_owned_array())
+}
+
+macro_rules! not_callable {
+    ($py:ident, $f:ident) => {
+        Err(PyErr::new::<PyTypeError, _>(format!(
+            "object {} not callable",
+            $f.as_ref($py).get_type()
+        )))
+    };
+}
 
 /// Forward diff
 #[pyfunction]
@@ -17,24 +34,16 @@ fn forward_diff<'py>(py: Python<'py>, f: Py<PyAny>) -> PyResult<&'py PyCFunction
             None,
             move |args: &PyTuple, _kwargs: Option<&PyDict>| -> PyResult<Py<PyArray1<f64>>> {
                 Python::with_gil(|py| {
-                    let out = (ndarr::forward_diff(|x: &Array1<f64>| -> f64 {
+                    let out = (ndarr::forward_diff(&|x: &Array1<f64>| -> Result<f64, Error> {
                         let x = PyArray1::from_array(py, x);
-                        f.call(py, (x,), None).unwrap().extract(py).unwrap()
-                    }))(
-                        &args
-                            .get_item(0)?
-                            .downcast::<PyArray1<f64>>()?
-                            .to_owned_array(),
-                    );
+                        Ok(f.call(py, (x,), None)?.extract(py)?)
+                    }))(&process_args(args)?)?;
                     Ok(out.into_pyarray(py).into())
                 })
             },
         )
     } else {
-        Err(PyErr::new::<PyTypeError, _>(format!(
-            "object {} not callable",
-            f.as_ref(py).get_type()
-        )))
+        not_callable!(py, f)
     }
 }
 
@@ -48,24 +57,16 @@ fn central_diff<'py>(py: Python<'py>, f: Py<PyAny>) -> PyResult<&'py PyCFunction
             None,
             move |args: &PyTuple, _kwargs: Option<&PyDict>| -> PyResult<Py<PyArray1<f64>>> {
                 Python::with_gil(|py| {
-                    let out = (ndarr::central_diff(|x: &Array1<f64>| -> f64 {
+                    let out = (ndarr::central_diff(&|x: &Array1<f64>| -> Result<f64, Error> {
                         let x = PyArray1::from_array(py, x);
-                        f.call(py, (x,), None).unwrap().extract(py).unwrap()
-                    }))(
-                        &args
-                            .get_item(0)?
-                            .downcast::<PyArray1<f64>>()?
-                            .to_owned_array(),
-                    );
+                        Ok(f.call(py, (x,), None)?.extract(py)?)
+                    }))(&process_args(args)?)?;
                     Ok(out.into_pyarray(py).into())
                 })
             },
         )
     } else {
-        Err(PyErr::new::<PyTypeError, _>(format!(
-            "object {} not callable",
-            f.as_ref(py).get_type()
-        )))
+        not_callable!(py, f)
     }
 }
 
@@ -79,28 +80,20 @@ fn forward_jacobian<'py>(py: Python<'py>, f: Py<PyAny>) -> PyResult<&'py PyCFunc
             None,
             move |args: &PyTuple, _kwargs: Option<&PyDict>| -> PyResult<Py<PyArray2<f64>>> {
                 Python::with_gil(|py| {
-                    let out = (ndarr::forward_jacobian(|x: &Array1<f64>| -> Array1<f64> {
-                        let x = PyArray1::from_array(py, x);
-                        f.call(py, (x,), None)
-                            .unwrap()
-                            .extract::<&PyArray1<f64>>(py)
-                            .unwrap()
-                            .to_owned_array()
-                    }))(
-                        &args
-                            .get_item(0)?
-                            .downcast::<PyArray1<f64>>()?
-                            .to_owned_array(),
-                    );
+                    let out = (ndarr::forward_jacobian(
+                        &|x: &Array1<f64>| -> Result<Array1<f64>, Error> {
+                            let x = PyArray1::from_array(py, x);
+                            Ok(f.call(py, (x,), None)?
+                                .extract::<&PyArray1<f64>>(py)?
+                                .to_owned_array())
+                        },
+                    ))(&process_args(args)?)?;
                     Ok(out.into_pyarray(py).into())
                 })
             },
         )
     } else {
-        Err(PyErr::new::<PyTypeError, _>(format!(
-            "object {} not callable",
-            f.as_ref(py).get_type()
-        )))
+        not_callable!(py, f)
     }
 }
 
@@ -114,28 +107,20 @@ fn central_jacobian<'py>(py: Python<'py>, f: Py<PyAny>) -> PyResult<&'py PyCFunc
             None,
             move |args: &PyTuple, _kwargs: Option<&PyDict>| -> PyResult<Py<PyArray2<f64>>> {
                 Python::with_gil(|py| {
-                    let out = (ndarr::central_jacobian(|x: &Array1<f64>| -> Array1<f64> {
-                        let x = PyArray1::from_array(py, x);
-                        f.call(py, (x,), None)
-                            .unwrap()
-                            .extract::<&PyArray1<f64>>(py)
-                            .unwrap()
-                            .to_owned_array()
-                    }))(
-                        &args
-                            .get_item(0)?
-                            .downcast::<PyArray1<f64>>()?
-                            .to_owned_array(),
-                    );
+                    let out = (ndarr::central_jacobian(
+                        &|x: &Array1<f64>| -> Result<Array1<f64>, Error> {
+                            let x = PyArray1::from_array(py, x);
+                            Ok(f.call(py, (x,), None)?
+                                .extract::<&PyArray1<f64>>(py)?
+                                .to_owned_array())
+                        },
+                    ))(&process_args(args)?)?;
                     Ok(out.into_pyarray(py).into())
                 })
             },
         )
     } else {
-        Err(PyErr::new::<PyTypeError, _>(format!(
-            "object {} not callable",
-            f.as_ref(py).get_type()
-        )))
+        not_callable!(py, f)
     }
 }
 
