@@ -14,9 +14,12 @@ use num::{Float, FromPrimitive};
 
 use crate::utils::{mod_and_calc, restore_symmetry_ndarray, KV};
 
+use super::CostFn;
+use super::GradientFn;
+
 pub fn forward_hessian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    grad: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    grad: GradientFn<'_, F>,
 ) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive,
@@ -40,7 +43,7 @@ where
 
 pub fn central_hessian_ndarray<F>(
     x: &ndarray::Array1<F>,
-    grad: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    grad: GradientFn<'_, F>,
 ) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive,
@@ -66,7 +69,7 @@ where
 
 pub fn forward_hessian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    grad: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    grad: GradientFn<'_, F>,
     p: &ndarray::Array1<F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
@@ -82,7 +85,7 @@ where
 
 pub fn central_hessian_vec_prod_ndarray<F>(
     x: &ndarray::Array1<F>,
-    grad: &dyn Fn(&ndarray::Array1<F>) -> Result<ndarray::Array1<F>, Error>,
+    grad: GradientFn<'_, F>,
     p: &ndarray::Array1<F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
@@ -99,7 +102,7 @@ where
 
 pub fn forward_hessian_nograd_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+    f: CostFn<'_, F>,
 ) -> Result<ndarray::Array2<F>, Error>
 where
     F: Float + FromPrimitive + AddAssign,
@@ -139,7 +142,7 @@ where
 
 pub fn forward_hessian_nograd_sparse_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+    f: CostFn<'_, F>,
     indices: Vec<[usize; 2]>,
 ) -> Result<ndarray::Array2<F>, Error>
 where

@@ -13,9 +13,11 @@ use num::{Float, FromPrimitive};
 use crate::pert::PerturbationVectors;
 use crate::utils::{mod_and_calc, mod_and_calc_const};
 
+use super::OpFn;
+
 pub fn forward_jacobian_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
 ) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive,
@@ -37,7 +39,7 @@ where
 
 pub fn central_jacobian_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
 ) -> Result<[[F; N]; M], Error>
 where
     F: Float + FromPrimitive,
@@ -58,7 +60,7 @@ where
 
 pub fn forward_jacobian_vec_prod_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
     p: &[F; N],
 ) -> Result<[F; M], Error>
 where
@@ -85,7 +87,7 @@ where
 
 pub fn central_jacobian_vec_prod_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
     p: &[F; N],
 ) -> Result<[F; M], Error>
 where
@@ -117,7 +119,7 @@ where
 
 pub fn forward_jacobian_pert_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
     pert: &PerturbationVectors,
 ) -> Result<[[F; N]; M], Error>
 where
@@ -149,7 +151,7 @@ where
 
 pub fn central_jacobian_pert_const<const N: usize, const M: usize, F>(
     x: &[F; N],
-    fs: &dyn Fn(&[F; N]) -> Result<[F; M], Error>,
+    fs: OpFn<'_, N, M, F>,
     pert: &PerturbationVectors,
 ) -> Result<[[F; N]; M], Error>
 where

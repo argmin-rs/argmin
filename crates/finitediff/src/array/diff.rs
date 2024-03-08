@@ -11,9 +11,11 @@ use num::FromPrimitive;
 
 use crate::utils::mod_and_calc_const;
 
+use super::CostFn;
+
 pub fn forward_diff_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+    f: CostFn<'_, N, F>,
 ) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,
@@ -35,7 +37,7 @@ where
 
 pub fn central_diff_const<const N: usize, F>(
     x: &[F; N],
-    f: &dyn Fn(&[F; N]) -> Result<F, Error>,
+    f: CostFn<'_, N, F>,
 ) -> Result<[F; N], Error>
 where
     F: Float + FromPrimitive,

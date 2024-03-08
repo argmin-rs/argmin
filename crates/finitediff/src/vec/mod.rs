@@ -25,144 +25,144 @@ use jacobian::{
     forward_jacobian_pert_vec, forward_jacobian_vec, forward_jacobian_vec_prod_vec,
 };
 
+pub(crate) type CostFn<'a, F> = &'a dyn Fn(&Vec<F>) -> Result<F, Error>;
+pub(crate) type GradientFn<'a, F> = &'a dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>;
+pub(crate) type OpFn<'a, F> = &'a dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>;
+
+// pub trait GradientImpl<'a, F>: Fn(&Vec<F>) -> Result<Vec<F>, Error> + 'a {}
+// impl<'a, F, T: Fn(&Vec<F>) -> Result<Vec<F>, Error> + 'a> GradientImpl<'a, F> for T {}
+// pub fn forward_diff<F>(f: CostFn<'_, F>) -> impl GradientImpl<'_, F> { .. }
+
 #[inline(always)]
-pub fn forward_diff<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<F>, Error>
+pub fn forward_diff<F>(f: CostFn<'_, F>) -> impl Fn(&Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<F, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| forward_diff_vec(p, &f)
+    move |p: &Vec<F>| forward_diff_vec(p, f)
 }
 
 #[inline(always)]
-pub fn central_diff<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<F>, Error>
+pub fn central_diff<F>(f: CostFn<'_, F>) -> impl Fn(&Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<F, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| central_diff_vec(p, &f)
+    move |p: &Vec<F>| central_diff_vec(p, f)
 }
 
 #[inline(always)]
-pub fn forward_jacobian<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_jacobian<F>(f: OpFn<'_, F>) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| forward_jacobian_vec(p, &f)
+    move |p: &Vec<F>| forward_jacobian_vec(p, f)
 }
 
 #[inline(always)]
-pub fn central_jacobian<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error>
+pub fn central_jacobian<F>(f: OpFn<'_, F>) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| central_jacobian_vec(p, &f)
+    move |p: &Vec<F>| central_jacobian_vec(p, f)
 }
 
 #[inline(always)]
-pub fn forward_jacobian_vec_prod<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error>
+pub fn forward_jacobian_vec_prod<F>(
+    f: OpFn<'_, F>,
+) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>, v: &Vec<F>| forward_jacobian_vec_prod_vec(p, &f, v)
+    move |p: &Vec<F>, v: &Vec<F>| forward_jacobian_vec_prod_vec(p, f, v)
 }
 
 #[inline(always)]
-pub fn central_jacobian_vec_prod<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error>
+pub fn central_jacobian_vec_prod<F>(
+    f: OpFn<'_, F>,
+) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>, v: &Vec<F>| central_jacobian_vec_prod_vec(p, &f, v)
+    move |p: &Vec<F>, v: &Vec<F>| central_jacobian_vec_prod_vec(p, f, v)
 }
 
 #[inline(always)]
-pub fn forward_jacobian_pert<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &PerturbationVectors) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_jacobian_pert<F>(
+    f: OpFn<'_, F>,
+) -> impl Fn(&Vec<F>, &PerturbationVectors) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
-    move |p: &Vec<F>, pert: &PerturbationVectors| forward_jacobian_pert_vec(p, &f, pert)
+    move |p: &Vec<F>, pert: &PerturbationVectors| forward_jacobian_pert_vec(p, f, pert)
 }
 
 #[inline(always)]
-pub fn central_jacobian_pert<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &PerturbationVectors) -> Result<Vec<Vec<F>>, Error>
+pub fn central_jacobian_pert<F>(
+    f: OpFn<'_, F>,
+) -> impl Fn(&Vec<F>, &PerturbationVectors) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
-    move |p: &Vec<F>, pert: &PerturbationVectors| central_jacobian_pert_vec(p, &f, pert)
+    move |p: &Vec<F>, pert: &PerturbationVectors| central_jacobian_pert_vec(p, f, pert)
 }
 
 #[inline(always)]
-pub fn forward_hessian<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_hessian<F>(
+    f: GradientFn<'_, F>,
+) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| forward_hessian_vec(p, &f)
+    move |p: &Vec<F>| forward_hessian_vec(p, f)
 }
 
 #[inline(always)]
-pub fn central_hessian<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error>
+pub fn central_hessian<F>(
+    f: GradientFn<'_, F>,
+) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>| central_hessian_vec(p, &f)
+    move |p: &Vec<F>| central_hessian_vec(p, f)
 }
 
 #[inline(always)]
-pub fn forward_hessian_vec_prod<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error>
+pub fn forward_hessian_vec_prod<F>(
+    f: GradientFn<'_, F>,
+) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>, v: &Vec<F>| forward_hessian_vec_prod_vec(p, &f, v)
+    move |p: &Vec<F>, v: &Vec<F>| forward_hessian_vec_prod_vec(p, f, v)
 }
 
 #[inline(always)]
-pub fn central_hessian_vec_prod<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error>
+pub fn central_hessian_vec_prod<F>(
+    f: GradientFn<'_, F>,
+) -> impl Fn(&Vec<F>, &Vec<F>) -> Result<Vec<F>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<Vec<F>, Error>,
     F: Float + FromPrimitive,
 {
-    move |p: &Vec<F>, v: &Vec<F>| central_hessian_vec_prod_vec(p, &f, v)
+    move |p: &Vec<F>, v: &Vec<F>| central_hessian_vec_prod_vec(p, f, v)
 }
 
 #[inline(always)]
-pub fn forward_hessian_nograd<Func, F>(f: Func) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_hessian_nograd<F>(
+    f: CostFn<'_, F>,
+) -> impl Fn(&Vec<F>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<F, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
-    move |p: &Vec<F>| forward_hessian_nograd_vec(p, &f)
+    move |p: &Vec<F>| forward_hessian_nograd_vec(p, f)
 }
 
 #[inline(always)]
-pub fn forward_hessian_nograd_sparse<Func, F>(
-    f: Func,
-) -> impl Fn(&Vec<F>, Vec<[usize; 2]>) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_hessian_nograd_sparse<F>(
+    f: CostFn<'_, F>,
+) -> impl Fn(&Vec<F>, Vec<[usize; 2]>) -> Result<Vec<Vec<F>>, Error> + '_
 where
-    Func: Fn(&Vec<F>) -> Result<F, Error>,
     F: Float + FromPrimitive + AddAssign,
 {
-    move |p: &Vec<F>, indices: Vec<[usize; 2]>| forward_hessian_nograd_sparse_vec(p, &f, indices)
+    move |p: &Vec<F>, indices: Vec<[usize; 2]>| forward_hessian_nograd_sparse_vec(p, f, indices)
 }
 
 #[cfg(test)]
@@ -256,7 +256,7 @@ mod tests {
 
     #[test]
     fn test_forward_diff_func() {
-        let grad = forward_diff(f1);
+        let grad = forward_diff(&f1);
         let out = grad(&x1()).unwrap();
         let res = [1.0, 2.0];
 
@@ -276,7 +276,7 @@ mod tests {
 
     #[test]
     fn test_central_diff_func() {
-        let grad = central_diff(f1);
+        let grad = central_diff(&f1);
         let out = grad(&x1()).unwrap();
         let res = [1.0f64, 2.0];
 
@@ -285,7 +285,7 @@ mod tests {
         }
 
         let p = vec![1.0f64, 2.0f64];
-        let grad = central_diff(f1);
+        let grad = central_diff(&f1);
         let out = grad(&p).unwrap();
         let res = [1.0f64, 4.0];
 

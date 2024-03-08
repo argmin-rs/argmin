@@ -12,10 +12,9 @@ use num::{Float, FromPrimitive};
 
 use crate::utils::{mod_and_calc, restore_symmetry_vec, KV};
 
-pub fn forward_hessian_vec<F>(
-    x: &Vec<F>,
-    grad: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
-) -> Result<Vec<Vec<F>>, Error>
+use super::{CostFn, GradientFn};
+
+pub fn forward_hessian_vec<F>(x: &Vec<F>, grad: GradientFn<'_, F>) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -37,10 +36,7 @@ where
     Ok(restore_symmetry_vec(out))
 }
 
-pub fn central_hessian_vec<F>(
-    x: &[F],
-    grad: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
-) -> Result<Vec<Vec<F>>, Error>
+pub fn central_hessian_vec<F>(x: &[F], grad: GradientFn<'_, F>) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive,
 {
@@ -64,7 +60,7 @@ where
 
 pub fn forward_hessian_vec_prod_vec<F>(
     x: &Vec<F>,
-    grad: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    grad: GradientFn<'_, F>,
     p: &[F],
 ) -> Result<Vec<F>, Error>
 where
@@ -89,7 +85,7 @@ where
 
 pub fn central_hessian_vec_prod_vec<F>(
     x: &[F],
-    grad: &dyn Fn(&Vec<F>) -> Result<Vec<F>, Error>,
+    grad: GradientFn<'_, F>,
     p: &[F],
 ) -> Result<Vec<F>, Error>
 where
@@ -118,10 +114,7 @@ where
     Ok(out)
 }
 
-pub fn forward_hessian_nograd_vec<F>(
-    x: &Vec<F>,
-    f: &dyn Fn(&Vec<F>) -> Result<F, Error>,
-) -> Result<Vec<Vec<F>>, Error>
+pub fn forward_hessian_nograd_vec<F>(x: &Vec<F>, f: CostFn<'_, F>) -> Result<Vec<Vec<F>>, Error>
 where
     F: Float + FromPrimitive + AddAssign,
 {
@@ -161,7 +154,7 @@ where
 
 pub fn forward_hessian_nograd_sparse_vec<F>(
     x: &Vec<F>,
-    f: &dyn Fn(&Vec<F>) -> Result<F, Error>,
+    f: CostFn<'_, F>,
     indices: Vec<[usize; 2]>,
 ) -> Result<Vec<Vec<F>>, Error>
 where

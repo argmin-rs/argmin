@@ -10,9 +10,11 @@ use num::{Float, FromPrimitive};
 
 use crate::utils::*;
 
+use super::CostFn;
+
 pub fn forward_diff_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+    f: CostFn<'_, F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float,
@@ -31,7 +33,7 @@ where
 
 pub fn central_diff_ndarray<F>(
     x: &ndarray::Array1<F>,
-    f: &dyn Fn(&ndarray::Array1<F>) -> Result<F, Error>,
+    f: CostFn<'_, F>,
 ) -> Result<ndarray::Array1<F>, Error>
 where
     F: Float + FromPrimitive,
