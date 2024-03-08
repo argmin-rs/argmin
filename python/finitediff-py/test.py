@@ -5,6 +5,11 @@ from finitediff import (
     central_jacobian,
     forward_jacobian_vec_prod,
     central_jacobian_vec_prod,
+    forward_hessian,
+    central_hessian,
+    forward_hessian_vec_prod,
+    central_hessian_vec_prod,
+    forward_hessian_nograd,
 )
 import numpy as np
 
@@ -73,6 +78,36 @@ x = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 p = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 print(j(x, p))
 
+
+def f(x):
+    return x[0] + x[1] ** 2 + x[2] * x[3] ** 2
+
+
+def g(x):
+    return np.array([1.0, 2.0 * x[1], x[3] ** 2, 2.0 * x[3] * x[2]])
+
+
+h = forward_hessian(g)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+print(h(x))
+
+h = central_hessian(g)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+print(h(x))
+
+h = forward_hessian_vec_prod(g)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+p = np.array([2.0, 3.0, 4.0, 5.0])
+print(h(x, p))
+
+h = central_hessian_vec_prod(g)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+p = np.array([2.0, 3.0, 4.0, 5.0])
+print(h(x, p))
+
+h = forward_hessian_nograd(f)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+print(h(x))
 # class NotCallable:
 #     pass
 
