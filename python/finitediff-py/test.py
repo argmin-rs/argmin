@@ -1,4 +1,11 @@
-from finitediff import forward_diff, central_diff, forward_jacobian, central_jacobian
+from finitediff import (
+    forward_diff,
+    central_diff,
+    forward_jacobian,
+    central_jacobian,
+    forward_jacobian_vec_prod,
+    central_jacobian_vec_prod,
+)
 import numpy as np
 
 
@@ -56,6 +63,15 @@ j = central_jacobian(op)
 x = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 print(j(x))
 
+j = forward_jacobian_vec_prod(op)
+x = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+p = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+print(j(x, p))
+
+j = central_jacobian_vec_prod(op)
+x = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+p = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+print(j(x, p))
 
 # class NotCallable:
 #     pass
