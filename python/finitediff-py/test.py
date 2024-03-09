@@ -10,6 +10,7 @@ from finitediff import (
     forward_hessian_vec_prod,
     central_hessian_vec_prod,
     forward_hessian_nograd,
+    forward_hessian_nograd_sparse,
 )
 import numpy as np
 
@@ -108,6 +109,13 @@ print(h(x, p))
 h = forward_hessian_nograd(f)
 x = np.array([1.0, 1.0, 1.0, 1.0])
 print(h(x))
+
+h = forward_hessian_nograd_sparse(f)
+x = np.array([1.0, 1.0, 1.0, 1.0])
+indices = [[1, 1], [2, 3], [3, 3]]
+print(h(x, indices))
+
+
 # class NotCallable:
 #     pass
 
