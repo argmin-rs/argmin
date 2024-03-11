@@ -82,6 +82,8 @@ pub struct IterState<P, G, J, H, R, F> {
     pub max_iters: u64,
     /// Evaluation counts
     pub counts: HashMap<String, u64>,
+    /// Update evaluation counts?
+    pub counting_enabled: bool,
     /// Time required so far
     pub time: Option<instant::Duration>,
     /// Status of optimization execution
@@ -1040,6 +1042,7 @@ where
             last_best_iter: 0,
             max_iters: std::u64::MAX,
             counts: HashMap::new(),
+            counting_enabled: false,
             time: Some(instant::Duration::new(0, 0)),
             termination_status: TerminationStatus::NotTerminated,
         }
@@ -1339,7 +1342,7 @@ where
     /// ```
     /// # use std::collections::HashMap;
     /// # use argmin::core::{Problem, IterState, State, ArgminFloat};
-    /// # let mut state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
+    /// # let mut state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new().counting(true);
     /// # assert_eq!(state.counts, HashMap::new());
     /// # state.counts.insert("test2".to_string(), 10u64);
     /// #
@@ -1356,9 +1359,11 @@ where
     /// # assert_eq!(state.counts, hm);
     /// ```
     fn func_counts<O>(&mut self, problem: &Problem<O>) {
-        for (k, &v) in problem.counts.iter() {
-            let count = self.counts.entry(k.to_string()).or_insert(0);
-            *count = v
+        if self.counting_enabled {
+            for (k, &v) in problem.counts.iter() {
+                let count = self.counts.entry(k.to_string()).or_insert(0);
+                *count = v
+            }
         }
     }
 
