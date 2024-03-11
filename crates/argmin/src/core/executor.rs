@@ -69,7 +69,7 @@ where
             checkpoint: None,
             timeout: None,
             ctrlc: true,
-            timer: true,
+            timer: false,
         }
     }
 
@@ -383,9 +383,9 @@ where
         self
     }
 
-    /// Enables or disables timing of individual iterations (default: enabled).
+    /// Enables or disables timing of individual iterations (default: false).
     ///
-    /// Setting this to false will silently be ignored in case a timeout is set.
+    /// In case a timeout is set, this will automatically be set to true.
     ///
     /// # Example
     ///
@@ -768,7 +768,7 @@ mod tests {
         let problem = TestProblem::new();
         let timeout = std::time::Duration::from_secs(2);
 
-        let executor = Executor::new(problem, solver);
+        let executor = Executor::new(problem, solver).timer(true);
         assert!(executor.timer);
         assert!(executor.timeout.is_none());
 
