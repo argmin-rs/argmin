@@ -971,6 +971,20 @@ where
     pub fn take_prev_residuals(&mut self) -> Option<R> {
         self.prev_residuals.take()
     }
+
+    /// Overrides state of counting function executions (default: false)
+    /// ```
+    /// # use argmin::core::{IterState, State};
+    /// # let mut state: IterState<(), (), (), (), Vec<f64>, f64> = IterState::new();
+    /// # assert!(!state.counting_enabled);
+    /// let state = state.counting(true);
+    /// # assert!(state.counting_enabled);
+    /// ```
+    #[must_use]
+    pub fn counting(mut self, mode: bool) -> Self {
+        self.counting_enabled = mode;
+        self
+    }
 }
 
 impl<P, G, J, H, R, F> State for IterState<P, G, J, H, R, F>
