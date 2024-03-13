@@ -231,7 +231,7 @@ mod tests {
         let cost = TestFunc {};
         let solver = BrentOpt::new(-10., 10.);
         let res = Executor::new(cost, solver)
-            .configure(|state| state.max_iters(13))
+            .configure(|state| state.counting(true).max_iters(13))
             .run()
             .unwrap();
         assert_eq!(

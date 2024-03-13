@@ -161,7 +161,12 @@ fn test_lbfgs_func_count() {
     let linesearch = MoreThuenteLineSearch::new();
     let solver = LBFGS::new(linesearch, 10);
     let res = Executor::new(cost.clone(), solver)
-        .configure(|config| config.param(cost.param_init.clone()).max_iters(100))
+        .configure(|config| {
+            config
+                .param(cost.param_init.clone())
+                .max_iters(100)
+                .counting(true)
+        })
         .run()
         .unwrap();
 
