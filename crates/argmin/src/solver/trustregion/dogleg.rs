@@ -65,7 +65,9 @@ where
     H: ArgminInv<H> + ArgminDot<P, P>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Dogleg";
+    fn name(&self) -> &str {
+        "Dogleg"
+    }
 
     fn next_iter(
         &mut self,

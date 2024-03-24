@@ -289,7 +289,9 @@ where
     F: ArgminFloat,
     R: Rng,
 {
-    const NAME: &'static str = "Particle Swarm Optimization";
+    fn name(&self) -> &str {
+        "Particle Swarm Optimization"
+    }
 
     fn init(
         &mut self,

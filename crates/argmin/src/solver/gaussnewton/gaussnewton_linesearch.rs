@@ -96,7 +96,9 @@ where
     F: ArgminFloat,
     R: Clone,
 {
-    const NAME: &'static str = "Gauss-Newton method with line search";
+    fn name(&self) -> &str {
+        "Gauss-Newton method with line search"
+    }
 
     fn next_iter(
         &mut self,

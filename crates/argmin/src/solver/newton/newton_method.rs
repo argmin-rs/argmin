@@ -91,7 +91,9 @@ where
     H: ArgminInv<H> + ArgminDot<G, P>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "Newton method";
+    fn name(&self) -> &str {
+        "Newton method"
+    }
 
     fn next_iter(
         &mut self,
