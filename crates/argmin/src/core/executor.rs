@@ -10,7 +10,6 @@ use crate::core::observers::{Observe, ObserverMode, Observers};
 use crate::core::{
     Error, OptimizationResult, Problem, Solver, State, TerminationReason, TerminationStatus, KV,
 };
-use instant;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 

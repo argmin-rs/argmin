@@ -305,7 +305,6 @@ mod tests {
     use crate::core::test_utils::TestProblem;
     use crate::core::{ArgminError, State};
     use crate::solver::trustregion::{CauchyPoint, Steihaug};
-    use crate::test_trait_impl;
 
     test_trait_impl!(trustregion, TrustRegion<Steihaug<TestProblem, f64>, f64>);
 

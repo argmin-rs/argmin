@@ -217,7 +217,6 @@ where
 mod tests {
     use super::*;
     use crate::core::{ArgminError, State};
-    use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
     #[derive(Clone)]

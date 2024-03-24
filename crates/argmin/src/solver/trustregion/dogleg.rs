@@ -169,7 +169,6 @@ mod tests {
     use super::*;
     #[cfg(feature = "_ndarrayl")]
     use crate::core::ArgminError;
-    use crate::test_trait_impl;
 
     test_trait_impl!(dogleg, Dogleg<f64>);
 

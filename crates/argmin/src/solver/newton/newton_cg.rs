@@ -247,13 +247,11 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::let_unit_value)]
 mod tests {
-    #![allow(clippy::let_unit_value)]
-
     use super::*;
     use crate::core::{test_utils::TestProblem, ArgminError};
     use crate::solver::linesearch::MoreThuenteLineSearch;
-    use crate::test_trait_impl;
 
     test_trait_impl!(
         newton_cg,

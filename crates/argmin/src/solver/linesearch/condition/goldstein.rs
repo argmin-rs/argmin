@@ -71,9 +71,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::assert_error;
     use crate::core::ArgminError;
-    use crate::test_trait_impl;
 
     test_trait_impl!(goldstein, GoldsteinCondition<f64>);
 

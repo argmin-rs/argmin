@@ -230,9 +230,8 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::let_unit_value)]
 mod tests {
-    #![allow(clippy::let_unit_value)]
-
     use super::*;
     use crate::core::test_utils::TestProblem;
     use crate::core::ArgminError;
@@ -240,7 +239,6 @@ mod tests {
     use crate::solver::linesearch::{
         condition::ArmijoCondition, BacktrackingLineSearch, MoreThuenteLineSearch,
     };
-    use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
     #[derive(Eq, PartialEq, Clone, Copy, Debug)]

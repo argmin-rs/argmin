@@ -255,9 +255,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::assert_error;
-    use crate::core::{test_utils::TestProblem, ArgminError, Executor, State};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError, Executor};
     use approx::assert_relative_eq;
     use num_traits::Float;
 

@@ -332,7 +332,6 @@ mod tests {
     use super::*;
     use crate::core::test_utils::TestProblem;
     use crate::core::ArgminError;
-    use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
     test_trait_impl!(steihaug, Steihaug<TestProblem, f64>);
