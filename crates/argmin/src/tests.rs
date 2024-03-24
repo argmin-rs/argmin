@@ -9,7 +9,6 @@
 
 use approx::assert_relative_eq;
 use ndarray::prelude::*;
-use ndarray::{Array1, Array2};
 
 use crate::core::{CostFunction, Error, Executor, Gradient, Hessian, State};
 use crate::solver::gradientdescent::SteepestDescent;

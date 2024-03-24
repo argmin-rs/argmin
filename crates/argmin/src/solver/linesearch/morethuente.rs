@@ -16,7 +16,6 @@ use crate::core::{
 use argmin_math::{ArgminDot, ArgminScaledAdd};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// # More-Thuente line search
 ///
@@ -721,8 +720,7 @@ fn cstep<F: ArgminFloat>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError};
 
     test_trait_impl!(morethuente, MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>);
 

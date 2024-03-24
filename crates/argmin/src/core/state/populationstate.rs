@@ -6,7 +6,6 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::core::{ArgminFloat, Problem, State, TerminationReason, TerminationStatus};
-use instant;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

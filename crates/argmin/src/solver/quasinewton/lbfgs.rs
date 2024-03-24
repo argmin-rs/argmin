@@ -517,10 +517,9 @@ mod tests {
     use super::*;
     use crate::core::{
         test_utils::{TestProblem, TestSparseProblem},
-        ArgminError, IterState, State,
+        ArgminError,
     };
     use crate::solver::linesearch::MoreThuenteLineSearch;
-    use crate::test_trait_impl;
 
     test_trait_impl!(
         lbfgs,

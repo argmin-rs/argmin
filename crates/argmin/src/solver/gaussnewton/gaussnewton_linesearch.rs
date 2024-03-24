@@ -219,15 +219,13 @@ where
 }
 
 #[cfg(test)]
+#[allow(clippy::let_unit_value)]
 mod tests {
-    #![allow(clippy::let_unit_value)]
-
     use super::*;
     use crate::core::ArgminError;
     #[cfg(feature = "_ndarrayl")]
-    use crate::core::{IterState, State};
+    use crate::core::State;
     use crate::solver::linesearch::{condition::ArmijoCondition, BacktrackingLineSearch};
-    use crate::{assert_error, test_trait_impl};
     #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 
