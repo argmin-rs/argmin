@@ -9,7 +9,6 @@ use crate::core::{ArgminFloat, Error, Gradient, Hessian, IterState, Problem, Sol
 use argmin_math::{ArgminDot, ArgminInv, ArgminScaledSub};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 
 /// # Newton's method
 ///
@@ -119,7 +118,6 @@ mod tests {
     use crate::core::ArgminError;
     #[cfg(feature = "_ndarrayl")]
     use crate::core::Executor;
-    use crate::test_trait_impl;
     #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 

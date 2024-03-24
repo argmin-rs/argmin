@@ -349,9 +349,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, State};
+    use crate::core::{test_utils::TestProblem, ArgminError, State};
     use crate::solver::trustregion::CauchyPoint;
-    use crate::test_trait_impl;
 
     test_trait_impl!(sr1, SR1TrustRegion<CauchyPoint<f64>, f64>);
 

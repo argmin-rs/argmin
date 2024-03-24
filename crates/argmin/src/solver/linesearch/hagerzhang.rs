@@ -641,8 +641,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem, State};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError, State};
 
     test_trait_impl!(hagerzhang, HagerZhangLineSearch<Vec<f64>, Vec<f64>, f64>);
 

@@ -188,7 +188,6 @@ mod tests {
     use crate::core::ArgminError;
     #[cfg(feature = "_ndarrayl")]
     use crate::core::Executor;
-    use crate::test_trait_impl;
     #[cfg(feature = "_ndarrayl")]
     use approx::assert_relative_eq;
 

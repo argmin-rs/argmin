@@ -154,8 +154,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, Problem};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError};
     use approx::assert_relative_eq;
 
     test_trait_impl!(conjugate_gradient, ConjugateGradient<Vec<f64>, f64>);

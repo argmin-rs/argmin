@@ -181,7 +181,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_trait_impl;
 
     test_trait_impl!(brent, BrentRoot<f64>);
 }

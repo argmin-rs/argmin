@@ -210,7 +210,6 @@ where
 mod tests {
     use super::*;
     use crate::core::{Executor, TerminationStatus};
-    use crate::test_trait_impl;
     use approx::assert_relative_eq;
 
     test_trait_impl!(brent, BrentOpt<f64>);

@@ -255,7 +255,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_trait_impl;
 
     test_trait_impl!(fletcher_reeves, FletcherReeves);
     test_trait_impl!(polak_ribiere, PolakRibiere);

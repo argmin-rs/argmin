@@ -92,8 +92,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, Problem, State};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError, State};
     use approx::assert_relative_eq;
 
     test_trait_impl!(landweber, Landweber<f64>);

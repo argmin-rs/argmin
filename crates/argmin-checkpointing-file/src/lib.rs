@@ -41,7 +41,6 @@
 pub use argmin::core::checkpointing::{Checkpoint, CheckpointingFrequency};
 use argmin::core::Error;
 use serde::{de::DeserializeOwned, Serialize};
-use std::default::Default;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::path::PathBuf;

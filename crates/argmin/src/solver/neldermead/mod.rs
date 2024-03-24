@@ -433,8 +433,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{test_utils::TestProblem, ArgminError, IterState, State};
-    use crate::test_trait_impl;
+    use crate::core::{test_utils::TestProblem, ArgminError, State};
     use approx::assert_relative_eq;
 
     test_trait_impl!(nelder_mead, NelderMead<TestProblem, f64>);
