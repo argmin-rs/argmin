@@ -180,7 +180,8 @@ where
                 let kv = kv.unwrap_or(kv![]);
 
                 // Observe after init
-                self.observers.observe_init(S::NAME, &state, &kv)?;
+                self.observers
+                    .observe_init(self.solver.name(), &state, &kv)?;
             }
 
             state.func_counts(&self.problem);
@@ -681,7 +682,9 @@ mod tests {
             P: Clone,
             F: ArgminFloat,
         {
-            const NAME: &'static str = "OptimizationAlgorithm";
+            fn name(&self) -> &str {
+                "OptimizationAlgorithm"
+            }
 
             // Only resets internal_state to 1
             fn init(

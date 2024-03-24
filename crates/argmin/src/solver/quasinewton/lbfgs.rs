@@ -333,7 +333,9 @@ where
         + Solver<LineSearchProblem<O, P, G, F>, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
-    const NAME: &'static str = "L-BFGS";
+    fn name(&self) -> &str {
+        "L-BFGS"
+    }
 
     fn init(
         &mut self,

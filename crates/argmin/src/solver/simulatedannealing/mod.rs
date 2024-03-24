@@ -442,7 +442,9 @@ where
     F: ArgminFloat,
     R: Rng,
 {
-    const NAME: &'static str = "Simulated Annealing";
+    fn name(&self) -> &str {
+        "Simulated Annealing"
+    }
     fn init(
         &mut self,
         problem: &mut Problem<O>,

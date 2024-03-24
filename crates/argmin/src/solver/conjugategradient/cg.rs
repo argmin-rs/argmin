@@ -91,7 +91,9 @@ where
     R: ArgminMul<F, R> + ArgminMul<F, P> + ArgminConj + ArgminDot<R, F> + ArgminScaledAdd<P, F, R>,
     F: ArgminFloat + ArgminL2Norm<F>,
 {
-    const NAME: &'static str = "Conjugate Gradient";
+    fn name(&self) -> &str {
+        "Conjugate Gradient"
+    }
 
     fn init(
         &mut self,

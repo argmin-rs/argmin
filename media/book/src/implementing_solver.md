@@ -98,7 +98,7 @@ where
     F: ArgminFloat,
 {
     // This gives the solver a name which will be used for logging
-    const NAME: &'static str = "Landweber";
+    fn name(&self) -> &str { "Landweber" }
 
     // Defines the computations performed in a single iteration.
     fn next_iter(
