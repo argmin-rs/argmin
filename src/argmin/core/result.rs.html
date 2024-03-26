@@ -332,7 +332,7 @@
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
         <span class="macro">writeln!</span>(f, <span class="string">"OptimizationResult:"</span>)<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(f, <span class="string">"    Solver:        {}"</span>, S::NAME)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">"    Solver:        {}"</span>, <span class="self">self</span>.solver.name())<span class="question-mark">?</span>;
         <span class="macro">writeln!</span>(
             f,
             <span class="string">"    param (best):  {}"</span>,

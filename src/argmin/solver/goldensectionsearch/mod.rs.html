@@ -499,6 +499,8 @@
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -640,7 +642,9 @@
     </span>O: CostFunction&lt;Param = F, Output = F&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Golden-section search"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"Golden-section search"
+    </span>}
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

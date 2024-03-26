@@ -933,6 +933,8 @@
 <a href="#931" id="931">931</a>
 <a href="#932" id="932">932</a>
 <a href="#933" id="933">933</a>
+<a href="#934" id="934">934</a>
+<a href="#935" id="935">935</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1437,7 +1439,9 @@
     G: Clone + ArgminDot&lt;G, F&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Hager-Zhang line search"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"Hager-Zhang line search"
+    </span>}
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

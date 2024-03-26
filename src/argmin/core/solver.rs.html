@@ -152,7 +152,7 @@
 ///     P: Clone,
 ///     F: ArgminFloat
 /// {
-///     const NAME: &amp;'static str = "OptimizationAlgorithm";
+///     fn name(&amp;self) -&gt; &amp;str { "OptimizationAlgorithm" }
 ///
 ///     fn init(
 ///         &amp;mut self,
@@ -183,7 +183,7 @@
 /// ```
 </span><span class="kw">pub trait </span>Solver&lt;O, I: State&gt; {
     <span class="doccomment">/// Name of the solver. Mainly used in [Observers](`crate::core::observers::Observe`).
-    </span><span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str;
+    </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
 
     <span class="doccomment">/// Initializes the algorithm.
     ///

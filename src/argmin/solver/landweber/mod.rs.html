@@ -136,6 +136,8 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -207,7 +209,9 @@
     P: Clone + ArgminScaledSub&lt;G, F, P&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Landweber"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"Landweber"
+    </span>}
 
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

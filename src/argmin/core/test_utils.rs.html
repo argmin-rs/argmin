@@ -339,6 +339,8 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -668,7 +670,9 @@
 }
 
 <span class="kw">impl</span>&lt;O&gt; Solver&lt;O, IterState&lt;Vec&lt;f64&gt;, (), (), (), (), f64&gt;&gt; <span class="kw">for </span>TestSolver {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"TestSolver"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"TestSolver"
+    </span>}
 
     <span class="kw">fn </span>next_iter(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

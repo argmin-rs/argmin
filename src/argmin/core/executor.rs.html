@@ -788,6 +788,9 @@
 <a href="#786" id="786">786</a>
 <a href="#787" id="787">787</a>
 <a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -969,7 +972,8 @@
                 <span class="kw">let </span>kv = kv.unwrap_or(<span class="macro">kv!</span>[]);
 
                 <span class="comment">// Observe after init
-                </span><span class="self">self</span>.observers.observe_init(S::NAME, <span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span>kv)<span class="question-mark">?</span>;
+                </span><span class="self">self</span>.observers
+                    .observe_init(<span class="self">self</span>.solver.name(), <span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span>kv)<span class="question-mark">?</span>;
             }
 
             state.func_counts(<span class="kw-2">&amp;</span><span class="self">self</span>.problem);
@@ -1470,7 +1474,9 @@
             P: Clone,
             F: ArgminFloat,
         {
-            <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"OptimizationAlgorithm"</span>;
+            <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+                <span class="string">"OptimizationAlgorithm"
+            </span>}
 
             <span class="comment">// Only resets internal_state to 1
             </span><span class="kw">fn </span>init(

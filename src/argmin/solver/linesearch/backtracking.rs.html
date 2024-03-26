@@ -710,6 +710,8 @@
 <a href="#708" id="708">708</a>
 <a href="#709" id="709">709</a>
 <a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -895,7 +897,9 @@
     L: LineSearchCondition&lt;G, G, F&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Backtracking line search"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"Backtracking line search"
+    </span>}
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

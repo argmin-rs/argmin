@@ -409,6 +409,8 @@
 <a href="#407" id="407">407</a>
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -515,7 +517,9 @@
     L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"DFP"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"DFP"
+    </span>}
 
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

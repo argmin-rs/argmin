@@ -881,6 +881,8 @@
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
 <a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -1325,7 +1327,9 @@
     F: ArgminFloat,
     R: Rng,
 {
-    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Simulated Annealing"</span>;
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">"Simulated Annealing"
+    </span>}
     <span class="kw">fn </span>init(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         problem: <span class="kw-2">&amp;mut </span>Problem&lt;O&gt;,
