@@ -640,7 +640,12 @@ mod tests {
         ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
-            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
+            .configure(|config| {
+                config
+                    .counting(true)
+                    .param(ls.init_param.clone().unwrap())
+                    .max_iters(10)
+            })
             .run();
         assert!(data.is_ok());
 
@@ -689,7 +694,12 @@ mod tests {
         ls.search_direction(vec![2.0f64, 0.0]);
 
         let data = Executor::new(prob, ls.clone())
-            .configure(|config| config.param(ls.init_param.clone().unwrap()).max_iters(10))
+            .configure(|config| {
+                config
+                    .counting(true)
+                    .param(ls.init_param.clone().unwrap())
+                    .max_iters(10)
+            })
             .run();
         assert!(data.is_ok());
 
