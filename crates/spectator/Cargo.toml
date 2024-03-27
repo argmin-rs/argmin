@@ -23,7 +23,7 @@ dashmap = { version = "5.4", features = ["serde"], optional = true }
 eframe = { version = "0.26", features = ["ron", "persistence"], optional = true }
 egui_dock = { version = "0.11", optional = true }
 egui_extras = { version = "0.26", optional = true }
-egui_plot = { version = "0.26", optional = true }
+egui_plot = { version = "0.27", optional = true }
 itertools = { version = "0.12", optional = true }
 rmp-serde = "1.1.1"
 serde = { version = "1.0", features = ["derive"] }
