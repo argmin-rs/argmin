@@ -11,7 +11,7 @@ default_language = "en"
 compile_sass = true
 
 # Whether to generate a feed file for the site
-generate_feed = true
+generate_feeds = true
 
 # When set to "true", the generated HTML files are minified.
 minify_html = true
