@@ -7,10 +7,10 @@
 
 use rand::{distributions::uniform::SampleUniform, Rng};
 
-use crate::ArgminRandom;
+use crate::{Allocator, ArgminRandom};
 
 use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim, Scalar},
+    base::{dimension::Dim, Scalar},
     DefaultAllocator, OMatrix,
 };
 

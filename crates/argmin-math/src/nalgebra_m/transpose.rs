@@ -8,10 +8,10 @@
 // Note: This is not really the preferred way I think. Maybe this should also be implemented for
 // ArrayViews, which would probably make it more efficient.
 
-use crate::ArgminTranspose;
+use crate::{Allocator, ArgminTranspose};
 
 use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim, storage::Storage, Scalar},
+    base::{dimension::Dim, storage::Storage, Scalar},
     DefaultAllocator, Matrix, OMatrix,
 };
 
