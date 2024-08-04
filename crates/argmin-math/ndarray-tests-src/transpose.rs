@@ -29,7 +29,7 @@ mod tests {
                     let target = array![1 as $t, 4 as $t];
                     let res = <Array1<$t> as ArgminTranspose<Array1<$t>>>::t(a);
                     for i in 0..2 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -48,7 +48,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminTranspose<Array2<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -69,7 +69,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminTranspose<Array2<$t>>>::t(a);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(i, j)] as f64, res[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

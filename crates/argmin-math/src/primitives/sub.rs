@@ -54,7 +54,7 @@ mod tests {
                     let a = 50 as $t;
                     let b = 8 as $t;
                     let res = <$t as ArgminSub<$t, $t>>::sub(&a, &b);
-                    assert_relative_eq!(42 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(42 as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };

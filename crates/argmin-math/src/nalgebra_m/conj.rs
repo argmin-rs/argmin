@@ -50,8 +50,8 @@ mod tests {
                     );
                     let res = <Vector3<Complex<$t>> as ArgminConj>::conj(&a);
                     for i in 0..3 {
-                        assert_relative_eq!(b[i].re, res[i].re, epsilon = std::$t::EPSILON);
-                        assert_relative_eq!(b[i].im, res[i].im, epsilon = std::$t::EPSILON);
+                        assert_relative_eq!(b[i].re, res[i].re, epsilon = $t::EPSILON);
+                        assert_relative_eq!(b[i].im, res[i].im, epsilon = $t::EPSILON);
                     }
                 }
             }
@@ -63,7 +63,7 @@ mod tests {
                     let b = Vector3::new(1 as $t, 4 as $t, 8 as $t);
                     let res = <Vector3<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
-                        assert_relative_eq!(b[i], res[i], epsilon = std::$t::EPSILON);
+                        assert_relative_eq!(b[i], res[i], epsilon = $t::EPSILON);
                     }
                 }
             }

@@ -219,7 +219,7 @@ mod tests {
     fn test_rastrigin_a_derivative_optimum() {
         let derivative = rastrigin_a_derivative(&[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 10.0);
         for elem in derivative {
-            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
+            assert_relative_eq!(elem, 0.0, epsilon = f64::EPSILON);
         }
     }
 
@@ -228,7 +228,7 @@ mod tests {
         let derivative =
             rastrigin_a_derivative_const(&[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 10.0);
         for elem in derivative {
-            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
+            assert_relative_eq!(elem, 0.0, epsilon = f64::EPSILON);
         }
     }
 

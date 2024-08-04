@@ -40,7 +40,7 @@ mod tests {
                     let a = Vector2::new(4 as $t, 3 as $t);
                     let res = <Vector2<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert_relative_eq!(target as $t, res as $t, epsilon = std::$t::EPSILON);
+                    assert_relative_eq!(target as $t, res as $t, epsilon = $t::EPSILON);
                 }
             }
         };
@@ -54,7 +54,7 @@ mod tests {
                     let a = Vector2::new(-4 as $t, -3 as $t);
                     let res = <Vector2<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert_relative_eq!(target as $t, res as $t, epsilon = std::$t::EPSILON);
+                    assert_relative_eq!(target as $t, res as $t, epsilon = $t::EPSILON);
                 }
             }
         };

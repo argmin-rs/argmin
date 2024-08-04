@@ -67,7 +67,7 @@ where
             beta: F::nan(),
             linesearch,
             beta_method,
-            restart_iter: std::u64::MAX,
+            restart_iter: u64::MAX,
             restart_orthogonality: None,
         }
     }
@@ -275,7 +275,7 @@ mod tests {
         assert!(beta.is_nan());
         assert_eq!(linesearch, linesearch);
         assert_eq!(beta_method, beta_method);
-        assert_eq!(restart_iter, std::u64::MAX);
+        assert_eq!(restart_iter, u64::MAX);
         assert!(restart_orthogonality.is_none());
     }
 
@@ -285,7 +285,7 @@ mod tests {
         let beta_method = ();
         let nlcg: NonlinearConjugateGradient<Vec<f64>, _, _, f64> =
             NonlinearConjugateGradient::new(linesearch, beta_method);
-        assert_eq!(nlcg.restart_iter, std::u64::MAX);
+        assert_eq!(nlcg.restart_iter, u64::MAX);
         let nlcg = nlcg.restart_iters(100);
         assert_eq!(nlcg.restart_iter, 100);
     }

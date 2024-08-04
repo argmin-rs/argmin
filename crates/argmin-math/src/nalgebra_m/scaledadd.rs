@@ -23,7 +23,7 @@ mod tests {
                     let res = <Vector3<$t> as ArgminScaledAdd<Vector3<$t>, $t, Vector3<$t>>>::scaled_add(&a, &b, &c);
                     let target = Vector3::new(9 as $t, 12 as $t, 15 as $t);
                     for i in 0..3 {
-                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -59,7 +59,7 @@ mod tests {
                     let res = <Vector3<$t> as ArgminScaledAdd<Vector3<$t>, Vector3<$t>, Vector3<$t>>>::scaled_add(&a, &b, &c);
                     let target = Vector3::new(13 as $t, 12 as $t, 9 as $t);
                     for i in 0..3 {
-                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(res[i] as f64, target[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -119,7 +119,7 @@ mod tests {
                     );
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -144,7 +144,7 @@ mod tests {
                     );
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, target[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

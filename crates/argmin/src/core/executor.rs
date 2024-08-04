@@ -542,7 +542,7 @@ mod tests {
         );
 
         let new_param = vec![1.0, 1.0];
-        let new_cost = std::f64::NEG_INFINITY;
+        let new_cost = f64::NEG_INFINITY;
         executor.state = Some(
             executor
                 .state
@@ -578,7 +578,7 @@ mod tests {
             .unwrap()
             .clone();
         let new_param = vec![6.0, 6.0];
-        let new_cost = std::f64::INFINITY;
+        let new_cost = f64::INFINITY;
         executor.state = Some(
             executor
                 .state

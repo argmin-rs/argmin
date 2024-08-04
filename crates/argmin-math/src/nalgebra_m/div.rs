@@ -82,7 +82,7 @@ mod tests {
                     let target = Vector3::new(2 as $t, 8 as $t, 4 as $t);
                     let res = <Vector3<$t> as ArgminDiv<$t, Vector3<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -95,7 +95,7 @@ mod tests {
                     let target = Vector3::new(16 as $t, 8 as $t, 4 as $t);
                     let res = <$t as ArgminDiv<Vector3<$t>, Vector3<$t>>>::div(&b, &a);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -108,7 +108,7 @@ mod tests {
                     let target = Vector3::new(2 as $t, 3 as $t, 2 as $t);
                     let res = <Vector3<$t> as ArgminDiv<Vector3<$t>, Vector3<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -161,7 +161,7 @@ mod tests {
                     let res = <Matrix2x3<$t> as ArgminDiv<Matrix2x3<$t>, Matrix2x3<$t>>>::div(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

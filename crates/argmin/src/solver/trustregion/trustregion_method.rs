@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn test_with_radius() {
         // correct parameters
-        for radius in [std::f64::EPSILON, 1e-2, 1.0, 2.0, 10.0, 100.0] {
+        for radius in [f64::EPSILON, 1e-2, 1.0, 2.0, 10.0, 100.0] {
             let cp: CauchyPoint<f64> = CauchyPoint::new();
             let tr: TrustRegion<_, f64> = TrustRegion::new(cp);
             let res = tr.with_radius(radius);
@@ -358,13 +358,7 @@ mod tests {
     #[test]
     fn test_with_eta() {
         // correct parameters
-        for eta in [
-            0.0,
-            std::f64::EPSILON,
-            1e-2,
-            0.125,
-            0.25 - std::f64::EPSILON,
-        ] {
+        for eta in [0.0, f64::EPSILON, 1e-2, 0.125, 0.25 - f64::EPSILON] {
             let cp: CauchyPoint<f64> = CauchyPoint::new();
             let tr: TrustRegion<_, f64> = TrustRegion::new(cp);
             let res = tr.with_eta(eta);

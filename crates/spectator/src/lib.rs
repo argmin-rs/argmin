@@ -47,7 +47,7 @@
 //! ## Library
 //!
 //! This crate can also be used as a library and exposes the [`Message`] type used to encode data
-//! sent to specator and [`DEFAULT_PORT`] which defines the default port used by spectator.
+//! sent to spectator and [`DEFAULT_PORT`] which defines the default port used by spectator.
 //!
 //! # License
 //!

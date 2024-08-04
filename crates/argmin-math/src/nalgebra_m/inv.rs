@@ -60,7 +60,7 @@ mod tests {
                     let res = <Matrix2<$t> as ArgminInv<Matrix2<$t>>>::inv(&a).unwrap();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = std::$t::EPSILON);
+                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = $t::EPSILON);
                         }
                     }
                 }

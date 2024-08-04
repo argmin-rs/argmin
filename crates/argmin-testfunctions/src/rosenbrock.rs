@@ -245,24 +245,16 @@ mod tests {
 
     #[test]
     fn test_rosenbrock_optimum() {
-        assert_relative_eq!(
-            rosenbrock(&[1.0_f32, 1.0_f32]),
-            0.0,
-            epsilon = std::f32::EPSILON
-        );
-        assert_relative_eq!(rosenbrock(&[1.0, 1.0]), 0.0, epsilon = std::f64::EPSILON);
-        assert_relative_eq!(
-            rosenbrock(&[1.0, 1.0, 1.0]),
-            0.0,
-            epsilon = std::f64::EPSILON
-        );
+        assert_relative_eq!(rosenbrock(&[1.0_f32, 1.0_f32]), 0.0, epsilon = f32::EPSILON);
+        assert_relative_eq!(rosenbrock(&[1.0, 1.0]), 0.0, epsilon = f64::EPSILON);
+        assert_relative_eq!(rosenbrock(&[1.0, 1.0, 1.0]), 0.0, epsilon = f64::EPSILON);
     }
 
     #[test]
     fn test_rosenbrock_derivative_optimum() {
         let derivative = rosenbrock_derivative(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]);
         for elem in derivative {
-            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
+            assert_relative_eq!(elem, 0.0, epsilon = f64::EPSILON);
         }
     }
 
@@ -270,7 +262,7 @@ mod tests {
     fn test_rosenbrock_derivative_const_optimum() {
         let derivative = rosenbrock_derivative_const(&[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]);
         for elem in derivative {
-            assert_relative_eq!(elem, 0.0, epsilon = std::f64::EPSILON);
+            assert_relative_eq!(elem, 0.0, epsilon = f64::EPSILON);
         }
     }
 

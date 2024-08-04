@@ -25,7 +25,7 @@ mod tests {
                     let target = array![2 as $t, 8 as $t, 4 as $t];
                     let res = <Array1<$t> as ArgminDiv<$t, Array1<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -38,7 +38,7 @@ mod tests {
                     let target = array![16 as $t, 8 as $t, 4 as $t];
                     let res = <$t as ArgminDiv<Array1<$t>, Array1<$t>>>::div(&b, &a);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -51,7 +51,7 @@ mod tests {
                     let target = array![2 as $t, 3 as $t, 2 as $t];
                     let res = <Array1<$t> as ArgminDiv<Array1<$t>, Array1<$t>>>::div(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -104,7 +104,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminDiv<Array2<$t>, Array2<$t>>>::div(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

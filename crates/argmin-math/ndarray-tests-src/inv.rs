@@ -31,7 +31,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminInv<Array2<$t>>>::inv(&a).unwrap();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = std::$t::EPSILON.sqrt());
+                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = $t::EPSILON.sqrt());
                         }
                     }
                 }
@@ -43,7 +43,7 @@ mod tests {
                     let a = 2.0;
                     let target = 0.5;
                     let res = <$t as ArgminInv<$t>>::inv(&a).unwrap();
-                    assert_relative_eq!(res as f64, target as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(res as f64, target as f64, epsilon = f64::EPSILON);
                 }
             }
         };

@@ -79,7 +79,7 @@ mod tests {
                 #[test]
                 fn [<test_zero_ $t>]() {
                     let a = <$t as ArgminZero>::zero();
-                    assert_relative_eq!(0 as f64, a as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -87,8 +87,8 @@ mod tests {
                 #[test]
                 fn [<test_zero_complex_ $t>]() {
                     let a = <Complex<$t> as ArgminZero>::zero();
-                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = std::f64::EPSILON);
-                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -96,7 +96,7 @@ mod tests {
                 #[test]
                 fn [<test_zero_like_ $t>]() {
                     let a = (42 as $t).zero_like();
-                    assert_relative_eq!(0 as f64, a as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -104,8 +104,8 @@ mod tests {
                 #[test]
                 fn [<test_zero_like_complex_ $t>]() {
                     let a = Complex::new(42 as $t, 12 as $t).zero_like();
-                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = std::f64::EPSILON);
-                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.re as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(0 as f64, a.im as f64, epsilon = f64::EPSILON);
                 }
             }
         };

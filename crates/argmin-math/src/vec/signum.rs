@@ -74,7 +74,7 @@ mod tests {
                     for i in 0..4 {
                         let tmp = y[i] - res[i];
                         let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                        assert!(norm < std::f64::EPSILON);
+                        assert!(norm < f64::EPSILON);
                     }
                 }
             }
@@ -87,7 +87,7 @@ mod tests {
                     let res = <Vec<$t> as ArgminSignum>::signum(x);
                     for i in 0..3 {
                         let diff = (y[i] - res[i]).abs() as f64;
-                        assert!(diff < std::f64::EPSILON);
+                        assert!(diff < f64::EPSILON);
                     }
                 }
             }

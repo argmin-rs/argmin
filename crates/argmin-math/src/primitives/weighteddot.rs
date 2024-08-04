@@ -39,7 +39,7 @@ mod tests_vec {
                         vec![4 as $t, 9 as $t, 2 as $t],
                     ];
                     let res: $t = a.weighted_dot(&w, &b);
-                    assert_relative_eq!(100 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(100 as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };
@@ -77,7 +77,7 @@ mod tests_ndarray {
                         [4 as $t, 9 as $t, 2 as $t],
                     ];
                     let res: $t = a.weighted_dot(&w, &b);
-                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
+                    assert!((((res - 100 as $t) as f64).abs()) < f64::EPSILON);
                 }
             }
         };
@@ -115,7 +115,7 @@ mod tests_nalgebra {
                         4 as $t, 9 as $t, 2 as $t,
                     );
                     let res: $t = a.weighted_dot(&w, &b);
-                    assert!((((res - 100 as $t) as f64).abs()) < std::f64::EPSILON);
+                    assert!((((res - 100 as $t) as f64).abs()) < f64::EPSILON);
                 }
             }
         };

@@ -270,7 +270,7 @@ mod tests {
         let NewtonCG { tol: t, .. }: NewtonCG<MoreThuenteLineSearch<Vec<f64>, Vec<f64>, f64>, f64> =
             NewtonCG::new(linesearch).with_tolerance(tol1).unwrap();
 
-        assert!((t - tol1).abs() < std::f64::EPSILON);
+        assert!((t - tol1).abs() < f64::EPSILON);
     }
 
     #[test]

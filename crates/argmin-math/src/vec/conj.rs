@@ -65,7 +65,7 @@ mod tests {
                     for i in 0..3 {
                         let tmp = b[i] - res[i];
                         let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                        assert!(norm  < std::f64::EPSILON);
+                        assert!(norm  < f64::EPSILON);
                     }
                 }
             }
@@ -78,7 +78,7 @@ mod tests {
                     let res = <Vec<$t> as ArgminConj>::conj(&a);
                     for i in 0..3 {
                         let diff = (b[i] as f64 - res[i] as f64).abs();
-                        assert!(diff  < std::f64::EPSILON);
+                        assert!(diff  < f64::EPSILON);
                     }
                 }
             }
@@ -115,7 +115,7 @@ mod tests {
                         for j in 0..3 {
                             let tmp = b[i][j] - res[i][j];
                             let norm = ((tmp.re * tmp.re + tmp.im * tmp.im) as f64).sqrt();
-                            assert!(norm  < std::f64::EPSILON);
+                            assert!(norm  < f64::EPSILON);
                         }
                     }
                 }

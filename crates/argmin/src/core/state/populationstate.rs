@@ -172,7 +172,7 @@ where
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
     /// # let state: PopulationState<Vec<f64>, f64> = PopulationState::new();
-    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// # assert_eq!(state.max_iters, u64::MAX);
     /// let state = state.max_iters(1000);
     /// # assert_eq!(state.max_iters, 1000);
     /// ```
@@ -249,7 +249,7 @@ where
     /// ```
     /// # use argmin::core::{PopulationState, State, ArgminFloat};
     /// # let mut state: PopulationState<Vec<f64>, f64> = PopulationState::new();
-    /// # assert_eq!(state.target_cost.to_ne_bytes(), std::f64::NEG_INFINITY.to_ne_bytes());
+    /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
     /// # state.target_cost = 0.0;
     /// let target_cost = state.get_target_cost();
     /// # assert_eq!(target_cost.to_ne_bytes(), 0.0f64.to_ne_bytes());
@@ -478,7 +478,7 @@ where
     /// # assert!(state.population.is_none());
     /// # assert_eq!(state.iter, 0);
     /// # assert_eq!(state.last_best_iter, 0);
-    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// # assert_eq!(state.max_iters, u64::MAX);
     /// # assert_eq!(state.counts.len(), 0);
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
     /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
@@ -497,7 +497,7 @@ where
             population: None,
             iter: 0,
             last_best_iter: 0,
-            max_iters: std::u64::MAX,
+            max_iters: u64::MAX,
             counts: HashMap::new(),
             counting_enabled: false,
             time: Some(instant::Duration::new(0, 0)),

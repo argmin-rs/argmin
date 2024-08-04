@@ -25,7 +25,7 @@ mod tests {
                     let target = array![35 as $t, 38 as $t, 42 as $t];
                     let res = <Array1<$t> as ArgminSub<$t, Array1<$t>>>::sub(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -38,7 +38,7 @@ mod tests {
                     let target = array![33 as $t, 30 as $t, 26 as $t];
                     let res = <$t as ArgminSub<Array1<$t>, Array1<$t>>>::sub(&b, &a);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -51,7 +51,7 @@ mod tests {
                     let target = array![40 as $t, 34 as $t, 26 as $t];
                     let res = <Array1<$t> as ArgminSub<Array1<$t>, Array1<$t>>>::sub(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -104,7 +104,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminSub<Array2<$t>, Array2<$t>>>::sub(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -125,7 +125,7 @@ mod tests {
                     let res = <Array2<$t> as ArgminSub<$t, Array2<$t>>>::sub(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
