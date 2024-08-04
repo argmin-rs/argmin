@@ -82,12 +82,12 @@ mod tests {
         assert_relative_eq!(
             mccorminck(&[-0.54719_f32, -1.54719_f32]),
             -1.9132228,
-            epsilon = std::f32::EPSILON
+            epsilon = f32::EPSILON
         );
         assert_relative_eq!(
             mccorminck(&[-0.54719_f64, -1.54719_f64]),
             -1.9132229544882274,
-            epsilon = std::f32::EPSILON.into()
+            epsilon = f32::EPSILON.into()
         );
 
         let deriv = mccorminck_derivative(&[-0.54719_f64, -1.54719_f64]);

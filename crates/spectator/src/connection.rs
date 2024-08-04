@@ -77,7 +77,6 @@ async fn handle_connection(
                                 storage.runs.insert(
                                     name.clone(),
                                     Run {
-                                        name: name.clone(),
                                         solver,
                                         settings,
                                         selected,
@@ -86,8 +85,8 @@ async fn handle_connection(
                                         target_cost,
                                         curr_iter: 0,
                                         best_iter: 0,
-                                        curr_cost: std::f64::INFINITY,
-                                        curr_best_cost: std::f64::INFINITY,
+                                        curr_cost: f64::INFINITY,
+                                        curr_best_cost: f64::INFINITY,
                                         time: Duration::new(0, 0),
                                         termination_status: TerminationStatus::NotTerminated,
                                         metrics: HashMap::new(),

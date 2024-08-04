@@ -109,7 +109,7 @@ mod tests {
                     let target = vec![2 as $t, 8 as $t, 16 as $t];
                     let res = <Vec<$t> as ArgminMul<$t, Vec<$t>>>::mul(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -125,8 +125,8 @@ mod tests {
                     let target = vec![a[0] * b, a[1] * b];
                     let res = <Vec<Complex<$t>> as ArgminMul<Complex<$t>, Vec<Complex<$t>>>>::mul(&a, &b);
                     for i in 0..2 {
-                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = std::f64::EPSILON);
-                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -139,7 +139,7 @@ mod tests {
                     let target = vec![2 as $t, 8 as $t, 16 as $t];
                     let res = <$t as ArgminMul<Vec<$t>, Vec<$t>>>::mul(&b, &a);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -155,8 +155,8 @@ mod tests {
                     let target = vec![a[0] * b, a[1] * b];
                     let res = <Complex<$t> as ArgminMul<Vec<Complex<$t>>, Vec<Complex<$t>>>>::mul(&b, &a);
                     for i in 0..2 {
-                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = std::f64::EPSILON);
-                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -169,7 +169,7 @@ mod tests {
                     let target = vec![2 as $t, 12 as $t, 32 as $t];
                     let res = <Vec<$t> as ArgminMul<Vec<$t>, Vec<$t>>>::mul(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i] as f64, res[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -188,8 +188,8 @@ mod tests {
                     let target = vec![a[0]*b[0], a[1]*b[1]];
                     let res = <Vec<Complex<$t>> as ArgminMul<Vec<Complex<$t>>, Vec<Complex<$t>>>>::mul(&a, &b);
                     for i in 0..2 {
-                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = std::f64::EPSILON);
-                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target[i].re as f64, res[i].re as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target[i].im as f64, res[i].im as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -242,7 +242,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminMul<Vec<Vec<$t>>, Vec<Vec<$t>>>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -269,8 +269,8 @@ mod tests {
                     let res = <Vec<Vec<Complex<$t>>> as ArgminMul<Vec<Vec<Complex<$t>>>, Vec<Vec<Complex<$t>>>>>::mul(&a, &b);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = std::f64::EPSILON);
-                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -335,7 +335,7 @@ mod tests {
                     let res = <Vec<Vec<$t>> as ArgminMul<$t, Vec<Vec<$t>>>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -358,8 +358,8 @@ mod tests {
                     let res = <Vec<Vec<Complex<$t>>> as ArgminMul<Complex<$t>, Vec<Vec<Complex<$t>>>>>::mul(&a, &b);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = std::f64::EPSILON);
-                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -380,7 +380,7 @@ mod tests {
                     let res = <$t as ArgminMul<Vec<Vec<$t>>, Vec<Vec<$t>>>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i] as f64, res[j][i] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -403,8 +403,8 @@ mod tests {
                     let res = <Complex<$t> as ArgminMul<Vec<Vec<Complex<$t>>>, Vec<Vec<Complex<$t>>>>>::mul(&b, &a);
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = std::f64::EPSILON);
-                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[j][i].re as f64, res[j][i].re as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target[j][i].im as f64, res[j][i].im as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

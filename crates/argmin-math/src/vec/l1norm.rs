@@ -76,7 +76,7 @@ mod tests {
                     let a = vec![4 as $t, 3 as $t];
                     let res = <Vec<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -86,7 +86,7 @@ mod tests {
                     let a = vec![Complex::new(4 as $t, 2 as $t), Complex::new(3 as $t, 4 as $t)];
                     let res = <Vec<Complex<$t>> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = a[0].l1_norm() + a[1].l1_norm();
-                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };
@@ -100,7 +100,7 @@ mod tests {
                     let a = vec![-4 as $t, -3 as $t];
                     let res = <Vec<$t> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = 7 as $t;
-                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -110,7 +110,7 @@ mod tests {
                     let a = vec![Complex::new(-4 as $t, -2 as $t), Complex::new(-3 as $t, -4 as $t)];
                     let res = <Vec<Complex<$t>> as ArgminL1Norm<$t>>::l1_norm(&a);
                     let target = a[0].l1_norm() + a[1].l1_norm();
-                    assert_relative_eq!(target as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(target as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };

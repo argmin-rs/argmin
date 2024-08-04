@@ -41,7 +41,7 @@ mod tests {
                     let b = Vector3::new(1 as $t, -1 as $t, -1 as $t);
                     let res = <Vector3<$t> as ArgminSignum>::signum(a);
                     for i in 0..3 {
-                        assert_relative_eq!(b[i], res[i], epsilon = std::$t::EPSILON);
+                        assert_relative_eq!(b[i], res[i], epsilon = $t::EPSILON);
                     }
                 }
             }
@@ -60,7 +60,7 @@ mod tests {
                     let res = b.signum();
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)], res[(j, i)], epsilon = std::$t::EPSILON);
+                            assert_relative_eq!(target[(j, i)], res[(j, i)], epsilon = $t::EPSILON);
                         }
                     }
                 }

@@ -119,7 +119,7 @@ impl<P, F> LinearProgramState<P, F> {
     /// ```
     /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
     /// # let state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
-    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// # assert_eq!(state.max_iters, u64::MAX);
     /// let state = state.max_iters(1000);
     /// # assert_eq!(state.max_iters, 1000);
     /// ```
@@ -201,7 +201,7 @@ where
     /// # assert_eq!(state.target_cost.to_ne_bytes(), f64::NEG_INFINITY.to_ne_bytes());
     /// # assert_eq!(state.iter, 0);
     /// # assert_eq!(state.last_best_iter, 0);
-    /// # assert_eq!(state.max_iters, std::u64::MAX);
+    /// # assert_eq!(state.max_iters, u64::MAX);
     /// # assert_eq!(state.counts, HashMap::new());
     /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
     /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
@@ -219,7 +219,7 @@ where
             target_cost: Self::Float::neg_infinity(),
             iter: 0,
             last_best_iter: 0,
-            max_iters: std::u64::MAX,
+            max_iters: u64::MAX,
             counts: HashMap::new(),
             counting_enabled: false,
             time: Some(instant::Duration::new(0, 0)),

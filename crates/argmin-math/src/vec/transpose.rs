@@ -73,7 +73,7 @@ mod tests {
                     let res = a.t();
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ mod tests {
                     let res = a.t();
                     for i in 0..2 {
                         for j in 0..3 {
-                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target[i][j] as f64, res[i][j] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

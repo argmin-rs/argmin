@@ -77,8 +77,8 @@ mod tests {
                     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
                     let random = Vector3::<$t>::rand_from_range(&a, &b, &mut rng);
                     for i in 0..3 {
-                        assert!((random[i] as f64 - a[i] as f64).abs() < std::f64::EPSILON);
-                        assert!((random[i] as f64 - b[i] as f64).abs() < std::f64::EPSILON);
+                        assert!((random[i] as f64 - a[i] as f64).abs() < f64::EPSILON);
+                        assert!((random[i] as f64 - b[i] as f64).abs() < f64::EPSILON);
                     }
                 }
             }

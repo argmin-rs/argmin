@@ -109,16 +109,8 @@ mod tests {
 
     #[test]
     fn test_sphere_optimum() {
-        assert_relative_eq!(
-            sphere(&[0.0_f32, 0.0_f32]),
-            0.0,
-            epsilon = std::f32::EPSILON
-        );
-        assert_relative_eq!(
-            sphere(&[0.0_f64, 0.0_f64]),
-            0.0,
-            epsilon = std::f64::EPSILON
-        );
+        assert_relative_eq!(sphere(&[0.0_f32, 0.0_f32]), 0.0, epsilon = f32::EPSILON);
+        assert_relative_eq!(sphere(&[0.0_f64, 0.0_f64]), 0.0, epsilon = f64::EPSILON);
     }
 
     proptest! {
@@ -134,7 +126,7 @@ mod tests {
             let param: [f64; 8] = [a, b, c, d, e, f, g, h];
             let v1 = sphere(&param);
             let v2 = a.powi(2) + b.powi(2) + c.powi(2) + d.powi(2) + e.powi(2) + f.powi(2) + g.powi(2) + h.powi(2);
-            assert_relative_eq!(v1, v2, epsilon = std::f64::EPSILON);
+            assert_relative_eq!(v1, v2, epsilon = f64::EPSILON);
         }
     }
 
@@ -251,9 +243,9 @@ mod tests {
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
                     if i == j {
-                        assert_relative_eq!(hessian[i][j], 2.0, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(hessian[i][j], 2.0, epsilon = f64::EPSILON);
                     } else {
-                        assert_relative_eq!(hessian[i][j], 0.0, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(hessian[i][j], 0.0, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -275,9 +267,9 @@ mod tests {
             for i in 0..hessian.len() {
                 for j in 0..hessian.len() {
                     if i == j {
-                        assert_relative_eq!(hessian[i][j], 2.0, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(hessian[i][j], 2.0, epsilon = f64::EPSILON);
                     } else {
-                        assert_relative_eq!(hessian[i][j], 0.0, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(hessian[i][j], 0.0, epsilon = f64::EPSILON);
                     }
                 }
             }

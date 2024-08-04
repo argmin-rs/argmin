@@ -100,7 +100,7 @@ mod tests {
         assert_relative_eq!(
             reduction_ratio(fxk, fxkpk, mk0, mkpk),
             2.0f64,
-            epsilon = std::f64::EPSILON
+            epsilon = f64::EPSILON
         );
     }
 }

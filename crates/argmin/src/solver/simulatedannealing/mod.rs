@@ -236,14 +236,14 @@ where
                 temp_func: SATempFunc::TemperatureFast,
                 temp_iter: 0,
                 stall_iter_accepted: 0,
-                stall_iter_accepted_limit: std::u64::MAX,
+                stall_iter_accepted_limit: u64::MAX,
                 stall_iter_best: 0,
-                stall_iter_best_limit: std::u64::MAX,
-                reanneal_fixed: std::u64::MAX,
+                stall_iter_best_limit: u64::MAX,
+                reanneal_fixed: u64::MAX,
                 reanneal_iter_fixed: 0,
-                reanneal_accepted: std::u64::MAX,
+                reanneal_accepted: u64::MAX,
                 reanneal_iter_accepted: 0,
-                reanneal_best: std::u64::MAX,
+                reanneal_best: u64::MAX,
                 reanneal_iter_best: 0,
                 cur_temp: init_temp,
                 rng,
@@ -275,7 +275,7 @@ where
 
     /// If there are no accepted solutions for `iter` iterations, the algorithm stops.
     ///
-    /// Defaults to `std::u64::MAX`.
+    /// Defaults to `u64::MAX`.
     ///
     /// # Example
     ///
@@ -295,7 +295,7 @@ where
 
     /// If there are no new best solutions for `iter` iterations, the algorithm stops.
     ///
-    /// Defaults to `std::u64::MAX`.
+    /// Defaults to `u64::MAX`.
     ///
     /// # Example
     ///
@@ -318,7 +318,7 @@ where
     /// Every `iter` iterations, reannealing (resetting temperature to its initial value) will be
     /// performed. This may help in overcoming local minima.
     ///
-    /// Defaults to `std::u64::MAX`.
+    /// Defaults to `u64::MAX`.
     ///
     /// # Example
     ///
@@ -342,7 +342,7 @@ where
     /// If no new accepted solution is found for `iter` iterations, reannealing (resetting
     /// temperature to its initial value) is performed. This may help in overcoming local minima.
     ///
-    /// Defaults to `std::u64::MAX`.
+    /// Defaults to `u64::MAX`.
     ///
     /// # Example
     ///
@@ -366,7 +366,7 @@ where
     /// If no new best solution is found for `iter` iterations, reannealing (resetting temperature
     /// to its initial value) is performed. This may help in overcoming local minima.
     ///
-    /// Defaults to `std::u64::MAX`.
+    /// Defaults to `u64::MAX`.
     ///
     /// # Example
     ///
@@ -614,7 +614,7 @@ mod tests {
         assert_eq!(reanneal_iter_best, 0);
         assert_eq!(cur_temp.to_ne_bytes(), 100.0f64.to_ne_bytes());
 
-        for temp in [0.0, -1.0, -std::f64::EPSILON, -100.0] {
+        for temp in [0.0, -1.0, -f64::EPSILON, -100.0] {
             let res = SimulatedAnnealing::new(temp);
             assert_error!(
                 res,
@@ -666,7 +666,7 @@ mod tests {
         // important part
         assert_eq!(rng, MyRng {});
 
-        for temp in [0.0, -1.0, -std::f64::EPSILON, -100.0] {
+        for temp in [0.0, -1.0, -f64::EPSILON, -100.0] {
             let res = SimulatedAnnealing::new_with_rng(temp, MyRng {});
             assert_error!(
                 res,

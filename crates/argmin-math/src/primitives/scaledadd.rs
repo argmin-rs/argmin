@@ -35,7 +35,7 @@ mod tests {
                     let b = 4 as $t;
                     let c = 10 as $t;
                     let res = <$t as ArgminScaledAdd<$t, $t, $t>>::scaled_add(&a, &b, &c);
-                    assert_relative_eq!(42 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(42 as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };

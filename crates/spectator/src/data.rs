@@ -79,7 +79,6 @@ impl FuncCount {
 }
 
 pub struct Run {
-    pub name: String,
     pub solver: String,
     pub settings: HashMap<SettingName, String>,
     pub selected: HashSet<String>,

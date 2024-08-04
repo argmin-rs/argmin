@@ -49,8 +49,8 @@ mod tests {
                     let res_max = <Vector3<$t> as ArgminMinMax>::max(&a, &b);
                     let res_min = <Vector3<$t> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
-                        assert_relative_eq!(target_max[i] as f64, res_max[i] as f64, epsilon = std::f64::EPSILON);
-                        assert_relative_eq!(target_min[i] as f64, res_min[i] as f64, epsilon = std::f64::EPSILON);
+                        assert_relative_eq!(target_max[i] as f64, res_max[i] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target_min[i] as f64, res_min[i] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -78,8 +78,8 @@ mod tests {
                     let res_min = <Matrix2x3<$t> as ArgminMinMax>::min(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target_max[(j, i)] as f64, res_max[(j, i)] as f64, epsilon = std::f64::EPSILON);
-                            assert_relative_eq!(target_min[(j, i)] as f64, res_min[(j, i)] as f64, epsilon = std::f64::EPSILON);
+                            assert_relative_eq!(target_max[(j, i)] as f64, res_max[(j, i)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target_min[(j, i)] as f64, res_min[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }

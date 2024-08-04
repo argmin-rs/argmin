@@ -53,7 +53,7 @@ mod tests {
                 fn [<test_transpose_ $t>]() {
                     let a = 8 as $t;
                     let res = <$t as ArgminTranspose<$t>>::t(a);
-                    assert_relative_eq!(8 as f64, res as f64, epsilon = std::f64::EPSILON);
+                    assert_relative_eq!(8 as f64, res as f64, epsilon = f64::EPSILON);
                 }
             }
         };

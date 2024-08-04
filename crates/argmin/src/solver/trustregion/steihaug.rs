@@ -67,7 +67,7 @@ where
             rtr: F::nan(),
             r_0_norm: F::nan(),
             d: None,
-            max_iters: std::u64::MAX,
+            max_iters: u64::MAX,
         }
     }
 
