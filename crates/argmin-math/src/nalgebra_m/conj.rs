@@ -5,12 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminConj;
+use crate::{Allocator, ArgminConj};
 
-use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim},
-    DefaultAllocator, OMatrix, SimdComplexField,
-};
+use nalgebra::{base::dimension::Dim, DefaultAllocator, OMatrix, SimdComplexField};
 
 impl<N, R, C> ArgminConj for OMatrix<N, R, C>
 where
