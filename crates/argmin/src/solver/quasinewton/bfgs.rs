@@ -134,7 +134,12 @@ impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for BFGS<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
     P: Clone + ArgminSub<P, P> + ArgminDot<G, H> + ArgminDot<P, H>,
-    G: Clone + ArgminL2Norm<F> + ArgminMul<F, P> + ArgminDot<P, F> + ArgminSub<G, G>,
+    G: Clone
+        + ArgminL2Norm<F>
+        + ArgminMul<F, P>
+        + ArgminMul<F, G>
+        + ArgminDot<P, F>
+        + ArgminSub<G, G>,
     H: ArgminSub<H, H>
         + ArgminDot<G, G>
         + ArgminDot<H, H>
@@ -142,7 +147,7 @@ where
         + ArgminMul<F, H>
         + ArgminTranspose<H>
         + ArgminEye,
-    L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
+    L: Clone + LineSearch<G, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
     fn name(&self) -> &str {
@@ -214,9 +219,9 @@ where
             "`BFGS`: Inverse Hessian in state not set."
         ))?;
 
-        let p = inv_hessian.dot(&prev_grad).mul(&float!(-1.0));
+        let g: G = inv_hessian.dot(&prev_grad).mul(&float!(-1.0));
 
-        self.linesearch.search_direction(p);
+        self.linesearch.search_direction(g);
 
         // Run solver
         let OptimizationResult {
