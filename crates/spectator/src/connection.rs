@@ -77,6 +77,7 @@ async fn handle_connection(
                                 storage.runs.insert(
                                     name.clone(),
                                     Run {
+                                        name: name.clone(),
                                         solver,
                                         settings,
                                         selected,

@@ -79,6 +79,8 @@ impl FuncCount {
 }
 
 pub struct Run {
+    #[allow(dead_code)]
+    pub name: String,
     pub solver: String,
     pub settings: HashMap<SettingName, String>,
     pub selected: HashSet<String>,
