@@ -495,6 +495,11 @@
 <a href="#495" id="495">495</a>
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
@@ -631,7 +636,12 @@
 <span class="kw">where
     </span>O: CostFunction&lt;Param = P, Output = F&gt; + Gradient&lt;Param = P, Gradient = G&gt;,
     P: Clone + ArgminSub&lt;P, P&gt; + ArgminDot&lt;G, H&gt; + ArgminDot&lt;P, H&gt;,
-    G: Clone + ArgminL2Norm&lt;F&gt; + ArgminMul&lt;F, P&gt; + ArgminDot&lt;P, F&gt; + ArgminSub&lt;G, G&gt;,
+    G: Clone
+        + ArgminL2Norm&lt;F&gt;
+        + ArgminMul&lt;F, P&gt;
+        + ArgminMul&lt;F, G&gt;
+        + ArgminDot&lt;P, F&gt;
+        + ArgminSub&lt;G, G&gt;,
     H: ArgminSub&lt;H, H&gt;
         + ArgminDot&lt;G, G&gt;
         + ArgminDot&lt;H, H&gt;
@@ -639,7 +649,7 @@
         + ArgminMul&lt;F, H&gt;
         + ArgminTranspose&lt;H&gt;
         + ArgminEye,
-    L: Clone + LineSearch&lt;P, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
+    L: Clone + LineSearch&lt;G, F&gt; + Solver&lt;O, IterState&lt;P, G, (), (), (), F&gt;&gt;,
     F: ArgminFloat,
 {
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
@@ -711,9 +721,9 @@
             <span class="string">"`BFGS`: Inverse Hessian in state not set."
         </span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>p = inv_hessian.dot(<span class="kw-2">&amp;</span>prev_grad).mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>));
+        <span class="kw">let </span>g: G = inv_hessian.dot(<span class="kw-2">&amp;</span>prev_grad).mul(<span class="kw-2">&amp;</span><span class="macro">float!</span>(-<span class="number">1.0</span>));
 
-        <span class="self">self</span>.linesearch.search_direction(p);
+        <span class="self">self</span>.linesearch.search_direction(g);
 
         <span class="comment">// Run solver
         </span><span class="kw">let </span>OptimizationResult {
