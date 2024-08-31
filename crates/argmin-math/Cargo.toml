@@ -26,10 +26,8 @@ ndarray_0_15 = { package = "ndarray", version = "0.15", optional = true }
 ndarray-linalg_0_16 = { package = "ndarray-linalg", version = "0.16", optional = true }
 ## v0.14
 ndarray_0_14 = { package = "ndarray", version = "0.14", optional = true }
-ndarray-linalg_0_13 = { package = "ndarray-linalg", version = "0.13", optional = true }
 ## v0.13
 ndarray_0_13 = { package = "ndarray", version = "0.13", optional = true }
-ndarray-linalg_0_12 = { package = "ndarray-linalg", version = "0.12", optional = true }
 
 # general
 num-complex_0_4 = { package = "num-complex", version = "0.4", optional = true, default-features = false, features = ["std"] }
@@ -71,8 +69,6 @@ ndarray_latest = ["ndarray_v0_15"]
 
 ## With `ndarray-linalg`
 ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
-ndarray_v0_14 = ["ndarray_0_14", "ndarray-linalg_0_13", "num-complex_0_3", "ndarray_all"]
-ndarray_v0_13 = ["ndarray_0_13", "ndarray-linalg_0_12", "num-complex_0_2", "ndarray_all"]
 
 ## Without `ndarray-linalg`
 ndarray_latest-nolinalg = ["ndarray_v0_15-nolinalg"]

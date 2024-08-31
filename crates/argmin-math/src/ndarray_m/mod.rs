@@ -12,11 +12,7 @@ mod conj;
 mod div;
 mod dot;
 mod eye;
-#[cfg(any(
-    feature = "ndarray-linalg_0_12",
-    feature = "ndarray-linalg_0_13",
-    feature = "ndarray-linalg_0_16"
-))]
+#[cfg(feature = "ndarray-linalg_0_16")]
 mod inv;
 mod l1norm;
 mod l2norm;
@@ -35,11 +31,7 @@ pub use conj::*;
 pub use div::*;
 pub use dot::*;
 pub use eye::*;
-#[cfg(any(
-    feature = "ndarray-linalg_0_12",
-    feature = "ndarray-linalg_0_13",
-    feature = "ndarray-linalg_0_16"
-))]
+#[cfg(feature = "ndarray-linalg_0_16")]
 pub use inv::*;
 pub use l1norm::*;
 pub use l2norm::*;
