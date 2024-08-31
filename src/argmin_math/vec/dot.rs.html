@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-math/src/vec/dot.rs`."><title>dot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin_math" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.1 (7cf61ebde 2024-03-27)" data-channel="1.77.1" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
-            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../argmin_math/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-math/src/vec/dot.rs`."><title>dot.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin_math" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -571,7 +569,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::ArgminTranspose;
 <span class="kw">use </span>num_complex::Complex;
 
-<span class="macro">macro_rules! </span>make_dot_vec {
+<span class="macro">macro_rules!</span> make_dot_vec {
     (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
         <span class="kw">impl </span>ArgminDot&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;, <span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Vec&lt;<span class="macro-nonterminal">$t</span>&gt; {
             <span class="attr">#[inline]
@@ -683,19 +681,19 @@
     <span class="kw">use </span>approx::assert_relative_eq;
     <span class="kw">use </span>paste::item;
 
-    <span class="macro">macro_rules! </span>make_test {
+    <span class="macro">macro_rules!</span> make_test {
         (<span class="macro-nonterminal">$t</span>:ty) =&gt; {
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_vec_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>b = <span class="macro">vec!</span>[<span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">5 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>res: <span class="macro-nonterminal">$t </span>= a.dot(<span class="kw-2">&amp;</span>b);
-                    <span class="macro">assert_relative_eq!</span>(<span class="number">32 </span><span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(<span class="number">32 </span><span class="kw">as </span>f64, res <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_vec_vec_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -710,12 +708,12 @@
                     ];
                     <span class="kw">let </span>res: Complex&lt;<span class="macro-nonterminal">$t</span>&gt; = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>target = a[<span class="number">0</span>]<span class="kw-2">*</span>b[<span class="number">0</span>] + a[<span class="number">1</span>]<span class="kw-2">*</span>b[<span class="number">1</span>] + a[<span class="number">2</span>]<span class="kw-2">*</span>b[<span class="number">2</span>];
-                    <span class="macro">assert_relative_eq!</span>(res.re <span class="kw">as </span>f64, target.re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                    <span class="macro">assert_relative_eq!</span>(res.im <span class="kw">as </span>f64, target.im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(res.re <span class="kw">as </span>f64, target.re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                    <span class="macro">assert_relative_eq!</span>(res.im <span class="kw">as </span>f64, target.im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_vec_scalar_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
@@ -723,12 +721,12 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>res = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_vec_scalar_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -740,13 +738,13 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">let </span>res = <span class="macro">vec!</span>[a[<span class="number">0</span>]<span class="kw-2">*</span>b, a[<span class="number">1</span>]<span class="kw-2">*</span>b, a[<span class="number">2</span>]<span class="kw-2">*</span>b];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_scalar_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
@@ -754,12 +752,12 @@
                     <span class="kw">let </span>product = b.dot(<span class="kw-2">&amp;</span>a);
                     <span class="kw">let </span>res = <span class="macro">vec!</span>[<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">4 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">6 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_scalar_vec_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -771,13 +769,13 @@
                     <span class="kw">let </span>product = b.dot(<span class="kw-2">&amp;</span>a);
                     <span class="kw">let </span>res = <span class="macro">vec!</span>[a[<span class="number">0</span>]<span class="kw-2">*</span>b, a[<span class="number">1</span>]<span class="kw-2">*</span>b, a[<span class="number">2</span>]<span class="kw-2">*</span>b];
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_vec_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[<span class="number">1 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">3 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
@@ -790,13 +788,13 @@
                     <span class="kw">let </span>product: Vec&lt;Vec&lt;<span class="macro-nonterminal">$t</span>&gt;&gt; = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_vec_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -814,14 +812,14 @@
                     <span class="kw">let </span>product: Vec&lt;Vec&lt;Complex&lt;<span class="macro-nonterminal">$t</span>&gt;&gt;&gt; = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_vec_2_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -833,12 +831,12 @@
                     <span class="kw">let </span>res = <span class="macro">vec!</span>[<span class="number">14 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">32 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>, <span class="number">50 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>];
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i] <span class="kw">as </span>f64, product[i] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_vec_2_complex <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -855,13 +853,13 @@
                     ];
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].re <span class="kw">as </span>f64, product[i].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                        <span class="macro">assert_relative_eq!</span>(res[i].im <span class="kw">as </span>f64, product[i].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -882,13 +880,13 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert!</span>((((res[i][j] - product[i][j]) <span class="kw">as </span>f64).abs()) &lt; std::f64::EPSILON);
+                            <span class="macro">assert!</span>((((res[i][j] - product[i][j]) <span class="kw">as </span>f64).abs()) &lt; f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_complex <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -912,14 +910,14 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_1_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -933,7 +931,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_2_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -947,7 +945,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_3_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -965,7 +963,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_4_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -983,7 +981,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_5_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -1001,7 +999,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 #[should_panic]
                 </span><span class="kw">fn </span>[&lt;test_mat_mat_panic_6_ <span class="macro-nonterminal">$t</span>&gt;]() {
@@ -1019,7 +1017,7 @@
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_primitive_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -1035,13 +1033,13 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>(<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>));
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_mat_primitive_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -1056,14 +1054,14 @@
                     <span class="kw">let </span>product = a.dot(<span class="kw-2">&amp;</span>b);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_primitive_mat_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -1079,13 +1077,13 @@
                     <span class="kw">let </span>product = (<span class="number">2 </span><span class="kw">as </span><span class="macro-nonterminal">$t</span>).dot(<span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j] <span class="kw">as </span>f64, product[i][j] <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
             }
 
-            <span class="macro">item! </span>{
+            <span class="macro">item!</span> {
                 <span class="attr">#[test]
                 </span><span class="kw">fn </span>[&lt;test_primitive_mat_complex_ <span class="macro-nonterminal">$t</span>&gt;]() {
                     <span class="kw">let </span>a = <span class="macro">vec!</span>[
@@ -1100,8 +1098,8 @@
                     <span class="kw">let </span>product = b.dot(<span class="kw-2">&amp;</span>a);
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
                         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
-                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = std::f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].re <span class="kw">as </span>f64, product[i][j].re <span class="kw">as </span>f64, epsilon = f64::EPSILON);
+                            <span class="macro">assert_relative_eq!</span>(res[i][j].im <span class="kw">as </span>f64, product[i][j].im <span class="kw">as </span>f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
