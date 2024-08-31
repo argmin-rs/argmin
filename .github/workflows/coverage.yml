@@ -27,8 +27,8 @@ jobs:
         run: cargo +nightly-2024-08-29 llvm-cov --doctests --features "argmin/_full_dev,argmin-math/latest_all" --workspace --exclude argmin-testfunctions-py --lcov --output-path lcov.info
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
-          #token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: lcov.info
           fail_ci_if_error: true
