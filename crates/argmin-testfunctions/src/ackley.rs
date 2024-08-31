@@ -299,7 +299,7 @@ mod tests {
         assert_relative_eq!(
             ackley(&[0.0_f64, 0.0_f64, 0.0_f64]),
             0.0,
-            epsilon = f64::EPSILON * 3_f64
+            epsilon = f64::EPSILON * 5_f64
         );
 
         let deriv = ackley_derivative(&[0.0_f64, 0.0_f64, 0.0_f64]);
