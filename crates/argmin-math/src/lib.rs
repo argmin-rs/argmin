@@ -45,9 +45,7 @@
 //! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
 //! | `ndarray_v0_15`                 | no      | version 0.15 with ndarray-linalg 0.16                              |
 //! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
-//! | `ndarray_v0_14`                 | no      | version 0.14 with ndarray-linalg 0.13                              |
 //! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
-//! | `ndarray_v0_13`                 | no      | version 0.13 with ndarray-linalg 0.12                              |
 //! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
 //!
 //! Note that the `*-nolinalg*` features do NOT pull in `ndarray-linalg` as a dependency. This
@@ -104,24 +102,6 @@
 //! features containing `*latest*`. It is therefore recommended to specify the actual version of the
 //! backend you are using.
 //!
-//! # Development
-//!
-//! For development and running the tests a backend for `ndarray-linalg` must be chosen. Normally
-//! one would add those as dev dependencies (the features would then be unified with the regular
-//! dependencies). However, linking somehow fails when the non-dev `ndarra-linalg` dependency is
-//! missing (which is the case for the `*-nolinalg*` features of the ndarray backend). To fix that,
-//! the `_dev_linalg_*` features were introduced. When testing and developing with one of the
-//! ndarray features with linalg support on, the appropriate `_dev_linalg_*` feature must be turned
-//! on as well. Note that the version number in `_dev_linalg_*` is always one below the `ndarray`
-//! version. For instance, for ndarray 0.15, one would use the `_dev_linalg_0_14` feature.
-//!
-//! | Development Feature   | Comment                                      |
-//! |-----------------------|----------------------------------------------|
-//! | `_dev_linalg_latest`  | latest `ndarray-linalg` for latest `ndarray` |
-//! | `_dev_linalg_0_16`    | `ndarray-linalg` v0.16 for `ndarray` v0.15   |
-//! | `_dev_linalg_0_13`    | `ndarray-linalg` v0.13 for `ndarray` v0.14   |
-//! | `_dev_linalg_0_12`    | `ndarray-linalg` v0.12 for `ndarray` v0.13   |
-//!
 //! # Contributing
 //!
 //! You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally
@@ -175,10 +155,6 @@ cfg_if::cfg_if! {
 cfg_if::cfg_if! {
     if #[cfg(feature = "ndarray-linalg_0_16")] {
         extern crate ndarray_linalg_0_16 as ndarray_linalg;
-    } else if #[cfg(feature = "ndarray-linalg_0_13")] {
-        extern crate ndarray_linalg_0_13 as ndarray_linalg;
-    } else if #[cfg(feature = "ndarray-linalg_0_12")] {
-        extern crate ndarray_linalg_0_12 as ndarray_linalg;
     }
 }
 
