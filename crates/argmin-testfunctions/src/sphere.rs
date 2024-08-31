@@ -105,7 +105,6 @@ mod tests {
     use approx::assert_relative_eq;
     use finitediff::FiniteDiff;
     use proptest::prelude::*;
-    use std;
 
     #[test]
     fn test_sphere_optimum() {
