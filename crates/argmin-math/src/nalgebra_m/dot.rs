@@ -5,19 +5,19 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminDot;
+use crate::{Allocator, ArgminDot};
 
 use num_traits::{One, Zero};
 
+use crate::{ClosedAdd, ClosedMul};
 use nalgebra::{
     base::{
-        allocator::Allocator,
         constraint::{AreMultipliable, DimEq, ShapeConstraint},
         dimension::Dim,
         storage::Storage,
         Scalar,
     },
-    ClosedAdd, ClosedMul, DefaultAllocator, Matrix, OMatrix,
+    DefaultAllocator, Matrix, OMatrix,
 };
 
 impl<N, R1, R2, C1, C2, SA, SB> ArgminDot<Matrix<N, R2, C2, SB>, N> for Matrix<N, R1, C1, SA>

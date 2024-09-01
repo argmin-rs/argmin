@@ -5,17 +5,17 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminAdd;
+use crate::{Allocator, ArgminAdd, SameShapeAllocator};
 
+use crate::ClosedAdd;
 use nalgebra::{
     base::{
-        allocator::{Allocator, SameShapeAllocator},
         constraint::{SameNumberOfColumns, SameNumberOfRows, ShapeConstraint},
         dimension::Dim,
         storage::Storage,
         Scalar,
     },
-    ClosedAdd, DefaultAllocator, Matrix, MatrixSum, OMatrix,
+    DefaultAllocator, Matrix, MatrixSum, OMatrix,
 };
 
 impl<N, R, C, S> ArgminAdd<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>

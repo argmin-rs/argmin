@@ -5,14 +5,11 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::{ArgminZero, ArgminZeroLike};
+use crate::{Allocator, ArgminZero, ArgminZeroLike};
 
 use num_traits::Zero;
 
-use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim},
-    DefaultAllocator, OMatrix, Scalar,
-};
+use nalgebra::{base::dimension::Dim, DefaultAllocator, OMatrix, Scalar};
 
 impl<N, R, C> ArgminZeroLike for OMatrix<N, R, C>
 where

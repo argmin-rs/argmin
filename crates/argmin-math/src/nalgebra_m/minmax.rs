@@ -5,11 +5,12 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminMinMax;
+use crate::{Allocator, ArgminMinMax};
 
+use crate::ClosedMul;
 use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim, Scalar},
-    ClosedMul, DefaultAllocator, OMatrix,
+    base::{dimension::Dim, Scalar},
+    DefaultAllocator, OMatrix,
 };
 
 impl<N, R, C> ArgminMinMax for OMatrix<N, R, C>

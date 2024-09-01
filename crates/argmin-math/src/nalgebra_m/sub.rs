@@ -7,11 +7,12 @@
 
 use std::ops::Sub;
 
-use crate::ArgminSub;
+use crate::{Allocator, ArgminSub};
 
+use crate::ClosedSub;
 use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim, storage::Storage, Scalar},
-    ClosedSub, DefaultAllocator, Matrix, OMatrix,
+    base::{dimension::Dim, storage::Storage, Scalar},
+    DefaultAllocator, Matrix, OMatrix,
 };
 
 impl<N, R, C, S> ArgminSub<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>

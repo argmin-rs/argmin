@@ -5,17 +5,17 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::ArgminDiv;
+use crate::{Allocator, ArgminDiv, SameShapeAllocator};
 
+use crate::ClosedDiv;
 use nalgebra::{
     base::{
-        allocator::{Allocator, SameShapeAllocator},
         constraint::{SameNumberOfColumns, SameNumberOfRows, ShapeConstraint},
         dimension::Dim,
         storage::Storage,
         MatrixSum, Scalar,
     },
-    ClosedDiv, DefaultAllocator, Matrix, OMatrix,
+    DefaultAllocator, Matrix, OMatrix,
 };
 
 impl<N, R, C, S> ArgminDiv<N, OMatrix<N, R, C>> for Matrix<N, R, C, S>

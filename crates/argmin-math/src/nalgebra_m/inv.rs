@@ -5,9 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use crate::{ArgminInv, Error};
+use crate::{Allocator, ArgminInv, Error};
 use nalgebra::{
-    base::{allocator::Allocator, dimension::Dim, storage::Storage},
+    base::{dimension::Dim, storage::Storage},
     ComplexField, DefaultAllocator, OMatrix, SquareMatrix,
 };
 use std::fmt;
