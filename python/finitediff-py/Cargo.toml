@@ -1,0 +1,25 @@
+[package]
+name = "finitediff-py"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+description = "Finite differences"
+documentation = "https://docs.rs/finitediff/"
+homepage = "http://argmin-rs.org"
+repository = "https://github.com/argmin-rs/argmin"
+readme = "README.md"
+keywords = ["finite differences", "optimization"]
+categories = ["science"]
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "finitediff"
+crate-type = ["cdylib"]
+
+[dependencies]
+finitediff_rust = { package = "finitediff", version = "0.1.4", path = "../../crates/finitediff", features = ["ndarray"] }
+numpy = "0.20.0"
+pyo3 = { version = "0.20.0", features = ["extension-module", "anyhow"] }
+anyhow = "1.0"
