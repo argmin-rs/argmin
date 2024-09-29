@@ -1,17 +1,20 @@
-// Copyright 2018-2024 argmin developers
-//
-// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
-// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
-// http://opensource.org/licenses/MIT>, at your option. This file may not be
-// copied, modified, or distributed except according to those terms.
-
 use argmin::core::observers::{Observe, ObserverMode};
 use argmin::core::{ArgminFloat, CostFunction, Error, Executor, PopulationState, State, KV};
 use argmin::solver::particleswarm::{Particle, ParticleSwarm};
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};
-use std::error;
 use std::sync::Mutex;
+
+struct MyCloseSentinel;
+
+impl MyCloseSentinel {
+    fn close(&self, result: Result<(), ()>) {
+        match result {
+            Ok(_) => println!("Stream closed successfully"),
+            Err(_) => println!("Error closing stream"),
+        }
+    }
+}
 
 /// Visualize iterations of a solver for cost functions of type
 /// (x,y) -> cost
@@ -36,7 +39,7 @@ pub struct Visualizer3d {
     /// Optional visualized surface of cost function
     surface: Option<Surface>,
     /// Optional delay between iterations
-    delay: Option<instant::Duration>,
+    delay: Option<std::time::Duration>,
 }
 
 impl Visualizer3d {
@@ -57,7 +60,7 @@ impl Visualizer3d {
 
     /// Set delay
     #[must_use]
-    pub fn delay(mut self, duration: instant::Duration) -> Self {
+    pub fn delay(mut self, duration: std::time::Duration) -> Self {
         self.delay = Some(duration);
         self
     }
@@ -71,7 +74,6 @@ impl Visualizer3d {
 
     /// Draw
     fn draw(&mut self) {
-        // TODO: unwrap evil
         let mut figure = match self.fg.lock() {
             Ok(guard) => guard,  
             Err(poisoned) => {
@@ -111,17 +113,17 @@ impl Visualizer3d {
                 &self.particles_z,
                 &options_particles,
             )
-            .set_view(30.0, 30.0); // TODO: do not reset view on new iteration
+            .set_view(30.0, 30.0);
 
-        
-        figure.show().unwrap_or_else(|error|{
-            println!("Error occured while displaying the figure{}\n", error);
-
-        });
+        if let Err(error) = figure.show() {
+            let s = MyCloseSentinel;
+            s.close(Err(()));
+            println!("Error occurred while displaying the figure: {}", error);
+        }
 
         if let Some(delay) = self.delay {
             std::thread::sleep(delay);
-        };
+        }
     }
 
     /// TODO
@@ -168,8 +170,6 @@ impl Observe<PopulationState<Particle<Vec<f64>, f64>, f64>> for Visualizer3d {
         state: &PopulationState<Particle<Vec<f64>, f64>, f64>,
         _kv: &KV,
     ) -> Result<(), Error> {
-        // TODO: get particles from `state` or `kv`
-
         self.iteration(
             &state.get_param().unwrap().position,
             state.best_cost,
@@ -242,18 +242,16 @@ fn run() -> Result<(), Error> {
         .delay(std::time::Duration::from_secs(1))
         .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
 
-    {
-        let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 40);
+    let solver = ParticleSwarm::new((vec![-4.0, -4.0], vec![4.0, 4.0]), 40);
 
-        let executor = Executor::new(cost_function, solver).configure(|state| state.max_iters(15));
+    let executor = Executor::new(cost_function, solver)
+        .configure(|state| state.max_iters(15))
+        .add_observer(visualizer, ObserverMode::Always);
 
-        let executor = executor.add_observer(visualizer, ObserverMode::Always);
+    let res = executor.run()?;
 
-        let res = executor.run()?;
-
-        // Print Result
-        println!("{res}");
-    }
+    // Print Result
+    println!("{res}");
 
     Ok(())
 }

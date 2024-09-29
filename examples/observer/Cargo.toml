@@ -11,3 +11,5 @@ argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-m
 argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
 gnuplot = "0.0.43"
 instant = "0.1.12"
+async-std = "1.11.0"
+
