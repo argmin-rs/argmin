@@ -10,6 +10,7 @@ use argmin::core::{ArgminFloat, CostFunction, Error, Executor, PopulationState, 
 use argmin::solver::particleswarm::{Particle, ParticleSwarm};
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};
+use std::error;
 use std::sync::Mutex;
 
 /// Visualize iterations of a solver for cost functions of type
@@ -71,7 +72,13 @@ impl Visualizer3d {
     /// Draw
     fn draw(&mut self) {
         // TODO: unwrap evil
-        let mut figure = self.fg.lock().unwrap();
+        let mut figure = match self.fg.lock() {
+            Ok(guard) => guard,  
+            Err(poisoned) => {
+                println!("Mutex is poisoned: {}", poisoned);
+                poisoned.into_inner()  
+            }
+        };
 
         figure.clear_axes();
 
@@ -106,8 +113,11 @@ impl Visualizer3d {
             )
             .set_view(30.0, 30.0); // TODO: do not reset view on new iteration
 
-        // TODO: unwrap evil
-        figure.show().unwrap();
+        
+        figure.show().unwrap_or_else(|error|{
+            println!("Error occured while displaying the figure{}\n", error);
+
+        });
 
         if let Some(delay) = self.delay {
             std::thread::sleep(delay);
