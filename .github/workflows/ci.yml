@@ -1,6 +1,7 @@
 name: argmin CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
@@ -207,6 +208,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: EmbarkStudios/cargo-deny-action@v1
+    - uses: EmbarkStudios/cargo-deny-action@v2
       with:
         command: check ${{ matrix.checks }}
