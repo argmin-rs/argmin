@@ -10,4 +10,4 @@ argmin = { version = "*", path = "../../crates/argmin" }
 argmin-math = { version = "*", features = ["nalgebra_latest"], path = "../../crates/argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
 argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
-nalgebra = { version = "0.32.3", features = ["serde-serialize"] }
+nalgebra = { version = "0.33.1", features = ["serde-serialize"] }
