@@ -12,6 +12,9 @@ readme = "README.md"
 keywords = ["test", "function", "optimization"]
 categories = ["science"]
 
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ]
+
 [dependencies]
 num = "0.4"
 
