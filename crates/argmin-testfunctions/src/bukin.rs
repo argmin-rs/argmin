@@ -9,11 +9,13 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = 100*\sqrt{|x_2 - 0.01*x_1^2|} + 0.01 * |x_1 + 10|`
+//! $$
+//! f(x_1, x_2) = 100\sqrt{\left|x_2 - 0.01x_1^2\right|} + 0.01\left|x_1 + 10\right|
+//! $$
 //!
-//! where `x_1 \in [-15, -5]` and `x_2 \in [-3, 3]`.
+//! where $x_1 \in [-15,\\,-5]$ and $x_2 \in [-3,\\,3]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(-10, 1) = 0`.
+//! The global minimum is at $f(x_1, x_2) = f(-10, 1) = 0$.
 
 use num::{Float, FromPrimitive};
 
@@ -21,11 +23,13 @@ use num::{Float, FromPrimitive};
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = 100*\sqrt{|x_2 - 0.01*x_1^2|} + 0.01 * |x_1 + 10|`
+/// $$
+/// f(x_1, x_2) = 100\sqrt{\left|x_2 - 0.01x_1^2\right|} + 0.01\left|x_1 + 10\right|
+/// $$
 ///
-/// where `x_1 \in [-15, -5]` and `x_2 \in [-3, 3]`.
+/// where $x_1 \in [-15,\\,-5]$ and $x_2 \in [-3,\\,3]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(-10, 1) = 0`.
+/// The global minimum is at $f(x_1, x_2) = f(-10, 1) = 0$.
 pub fn bukin_n6<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
