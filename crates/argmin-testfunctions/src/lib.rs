@@ -7,7 +7,7 @@
 
 //! A collection of two- and multidimensional test functions (and their derivatives and Hessians)
 //! for optimization algorithms. For two-dimensional test functions, the derivate and Hessian
-//! calculation does not allocate. For multi-dimensional tes functions, the derivative and Hessian
+//! calculation does not allocate. For multi-dimensional test functions, the derivative and Hessian
 //! calculation comes in two variants. One variant returns `Vec`s and hence does allocate. This is
 //! needed for cases, where the number of parameters is only known at run time. In case the number
 //! of parameters are known at compile-time, the `_const` variants can be used, which return fixed
