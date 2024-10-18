@@ -1,0 +1,2 @@
+[build]
+rustdocflags = [ "--html-in-header", "./crates/argmin-testfunctions/katex-header.html" ]
