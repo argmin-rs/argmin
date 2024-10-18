@@ -9,12 +9,14 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = (1.5 - x_1 + x_1 * x_2)^2 + (2.25 - x_1 + x_1 * x_2^2)^2 +
-//!                (2.625 - x_1 + x1 * x_2^3)^2`
+//! $$
+//! f(x_1, x_2) = (1.5 - x_1 + x_1 x_2)^2 + (2.25 - x_1 + x_1 x_2^2)^2 +
+//!               (2.625 - x_1 + x_1 x_2^3)^2
+//! $$
 //!
-//! where `x_i \in [-4.5, 4.5]`.
+//! where $x_i \in [-4.5,\\,4.5]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(3, 0.5) = 0`.
+//! The global minimum is at $f(x_1, x_2) = f(3, 0.5) = 0$.
 
 use num::{Float, FromPrimitive};
 
@@ -22,12 +24,14 @@ use num::{Float, FromPrimitive};
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = (1.5 - x_1 + x_1 * x_2)^2 + (2.25 - x_1 + x_1 * x_2^2)^2 +
-///                (2.625 - x_1 + x_1 * x_2^3)^2`
+/// $$
+/// f(x_1, x_2) = (1.5 - x_1 + x_1 x_2)^2 + (2.25 - x_1 + x_1 x_2^2)^2 +
+///               (2.625 - x_1 + x_1 x_2^3)^2
+/// $$
 ///
-/// where `x_i \in [-4.5, 4.5]`.
+/// where $x_i \in [-4.5,\\,4.5]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(3, 0.5) = 0`.
+/// The global minimum is at $f(x_1, x_2) = f(3, 0.5) = 0$.
 pub fn beale<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -76,7 +80,7 @@ where
     ]
 }
 
-/// Derivative of Beale test function
+/// Hessian of Beale test function
 pub fn beale_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
