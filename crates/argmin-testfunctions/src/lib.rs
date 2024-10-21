@@ -17,11 +17,11 @@
 //! `<test function name>_hessian`, respectively. The const generics variants are defined as
 //! `<test function name>_derivative_const` and `<test function name>_hessian_const`.
 //!
-//! Some functions, such as `ackley`, `rosenbrock` and `rastrigin` come with additional optional
-//! parameters which change the shape of the functions. These additional parameters are exposed in
-//! `ackley_abc`, `rosenbrock_ab` and `rastrigin_a`.
+//! Some functions, such as [`ackley()`], [`rosenbrock()`] and [`rastrigin()`] come with additional
+//! optional parameters which change the shape of the functions. These additional parameters
+//! are exposed in [`ackley_abc()`], [`rosenbrock_ab()`] and [`rastrigin_a()`].
 //!
-//! All functions are generic over their inputs and work with `[f64]` and `[f32]`.
+//! All functions are generic over their inputs and work with [`f64`] and [`f32`].
 //!
 //! ## Python wrapper
 //!
