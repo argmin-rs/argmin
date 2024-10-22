@@ -33,3 +33,6 @@ jobs:
       - name: Test code samples
         working-directory: ./media/book/tests
         run: cargo test
+        env:
+          # Override value in workspace top-level Cargo config.toml
+          RUSTDOCFLAGS: ''
