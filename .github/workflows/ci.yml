@@ -93,6 +93,9 @@ jobs:
 
   tests-argmin-math:
     runs-on: ubuntu-latest
+    env:
+      # Override value in workspace top-level Cargo config.toml
+      RUSTDOCFLAGS: ''
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
