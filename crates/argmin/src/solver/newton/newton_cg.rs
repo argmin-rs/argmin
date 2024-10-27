@@ -234,7 +234,7 @@ impl<'a, P, H> CGSubProblem<'a, P, H> {
     }
 }
 
-impl<'a, P, H> Operator for CGSubProblem<'a, P, H>
+impl<P, H> Operator for CGSubProblem<'_, P, H>
 where
     H: ArgminDot<P, P>,
 {
