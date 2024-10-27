@@ -377,7 +377,7 @@
 
 <span class="kw">struct </span>SlogKV&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>KV);
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; slog::KV <span class="kw">for </span>SlogKV&lt;<span class="lifetime">'a</span>&gt; {
+<span class="kw">impl </span>slog::KV <span class="kw">for </span>SlogKV&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
         <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.kv.iter() {
             serializer.emit_str(Key::from(idx.<span class="number">0</span>.to_string()), <span class="kw-2">&amp;</span>idx.<span class="number">1</span>.to_string())<span class="question-mark">?</span>;

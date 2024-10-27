@@ -577,7 +577,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, P, H&gt; Operator <span class="kw">for </span>CGSubProblem&lt;<span class="lifetime">'a</span>, P, H&gt;
+<span class="kw">impl</span>&lt;P, H&gt; Operator <span class="kw">for </span>CGSubProblem&lt;<span class="lifetime">'_</span>, P, H&gt;
 <span class="kw">where
     </span>H: ArgminDot&lt;P, P&gt;,
 {
