@@ -164,7 +164,7 @@ impl SlogLogger {
 
 struct SlogKV<'a>(&'a KV);
 
-impl<'a> slog::KV for SlogKV<'a> {
+impl slog::KV for SlogKV<'_> {
     fn serialize(&self, _record: &Record, serializer: &mut dyn Serializer) -> slog::Result {
         for idx in self.0.kv.iter() {
             serializer.emit_str(Key::from(idx.0.to_string()), &idx.1.to_string())?;

@@ -5,6 +5,9 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
+// Some types just are complex
+#![allow(clippy::type_complexity)]
+
 pub mod diff;
 pub mod hessian;
 pub mod jacobian;
