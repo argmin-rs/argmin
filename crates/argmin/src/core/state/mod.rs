@@ -15,6 +15,7 @@ pub use populationstate::PopulationState;
 
 use crate::core::{ArgminFloat, Problem, TerminationReason, TerminationStatus};
 use std::collections::HashMap;
+use web_time::Duration;
 
 /// Minimal interface which struct used for managing state in solvers have to implement.
 ///
@@ -91,10 +92,10 @@ pub trait State {
     fn get_func_counts(&self) -> &HashMap<String, u64>;
 
     /// Set time required since the beginning of the optimization until the current iteration
-    fn time(&mut self, time: Option<instant::Duration>) -> &mut Self;
+    fn time(&mut self, time: Option<Duration>) -> &mut Self;
 
     /// Get time passed since the beginning of the optimization until the current iteration
-    fn get_time(&self) -> Option<instant::Duration>;
+    fn get_time(&self) -> Option<Duration>;
 
     /// Returns iteration number where the last best parameter vector was found
     fn get_last_best_iter(&self) -> u64;
