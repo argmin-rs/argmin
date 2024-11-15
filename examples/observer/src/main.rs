@@ -11,6 +11,7 @@ use argmin::solver::particleswarm::{Particle, ParticleSwarm};
 use argmin_testfunctions::himmelblau;
 use gnuplot::{Color, PointSize};
 use std::sync::Mutex;
+use web_time::Duration;
 
 /// Visualize iterations of a solver for cost functions of type
 /// (x,y) -> cost
@@ -35,7 +36,7 @@ pub struct Visualizer3d {
     /// Optional visualized surface of cost function
     surface: Option<Surface>,
     /// Optional delay between iterations
-    delay: Option<instant::Duration>,
+    delay: Option<Duration>,
 }
 
 impl Visualizer3d {
@@ -56,7 +57,7 @@ impl Visualizer3d {
 
     /// Set delay
     #[must_use]
-    pub fn delay(mut self, duration: instant::Duration) -> Self {
+    pub fn delay(mut self, duration: Duration) -> Self {
         self.delay = Some(duration);
         self
     }
@@ -229,7 +230,7 @@ fn run() -> Result<(), Error> {
     let cost_function = Himmelblau {};
 
     let visualizer = Visualizer3d::new()
-        .delay(std::time::Duration::from_secs(1))
+        .delay(Duration::from_secs(1))
         .surface(Surface::new(Himmelblau {}, (-4.0, -4.0, 4.0, 4.0), 0.1));
 
     {

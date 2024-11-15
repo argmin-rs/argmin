@@ -9,6 +9,7 @@ use crate::core::{ArgminFloat, Problem, State, TerminationReason, TerminationSta
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use web_time::Duration;
 
 /// Maintains the state from iteration to iteration of a solver
 ///
@@ -59,7 +60,7 @@ pub struct LinearProgramState<P, F> {
     /// Update evaluation counts?
     pub counting_enabled: bool,
     /// Time required so far
-    pub time: Option<instant::Duration>,
+    pub time: Option<Duration>,
     /// Status of optimization execution
     pub termination_status: TerminationStatus,
 }
@@ -183,8 +184,8 @@ where
     /// # Example
     ///
     /// ```
-    /// # extern crate instant;
-    /// # use instant;
+    /// # extern crate web_time;
+    /// # use web_time::Duration;
     /// # use std::collections::HashMap;
     /// # use argmin::core::TerminationStatus;
     /// use argmin::core::{LinearProgramState, State};
@@ -203,7 +204,7 @@ where
     /// # assert_eq!(state.last_best_iter, 0);
     /// # assert_eq!(state.max_iters, u64::MAX);
     /// # assert_eq!(state.counts, HashMap::new());
-    /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 0));
+    /// # assert_eq!(state.time.unwrap(), Duration::ZERO);
     /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// ```
     fn new() -> Self {
@@ -222,7 +223,7 @@ where
             max_iters: u64::MAX,
             counts: HashMap::new(),
             counting_enabled: false,
-            time: Some(instant::Duration::new(0, 0)),
+            time: Some(Duration::ZERO),
             termination_status: TerminationStatus::NotTerminated,
         }
     }
@@ -351,14 +352,14 @@ where
     /// # Example
     ///
     /// ```
-    /// # extern crate instant;
-    /// # use instant;
+    /// # extern crate web_time;
+    /// # use web_time::Duration;
     /// # use argmin::core::{LinearProgramState, State, ArgminFloat, TerminationReason};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
-    /// let state = state.time(Some(instant::Duration::new(0, 12)));
-    /// # assert_eq!(state.time.unwrap(), instant::Duration::new(0, 12));
+    /// let state = state.time(Some(Duration::from_nanos(12)));
+    /// # assert_eq!(state.time.unwrap(), Duration::from_nanos(12));
     /// ```
-    fn time(&mut self, time: Option<instant::Duration>) -> &mut Self {
+    fn time(&mut self, time: Option<Duration>) -> &mut Self {
         self.time = time;
         self
     }
@@ -489,14 +490,14 @@ where
     /// # Example
     ///
     /// ```
-    /// # extern crate instant;
-    /// # use instant;
+    /// # extern crate web_time;
+    /// # use web_time::Duration;
     /// # use argmin::core::{LinearProgramState, State, ArgminFloat};
     /// # let mut state: LinearProgramState<Vec<f64>, f64> = LinearProgramState::new();
     /// let time = state.get_time();
-    /// # assert_eq!(time.unwrap(), instant::Duration::new(0, 0));
+    /// # assert_eq!(time.unwrap(), Duration::ZERO);
     /// ```
-    fn get_time(&self) -> Option<instant::Duration> {
+    fn get_time(&self) -> Option<Duration> {
         self.time
     }
 

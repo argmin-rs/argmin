@@ -12,6 +12,7 @@ use crate::core::{
 };
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use web_time::Instant;
 
 /// Solves an optimization problem with a solver
 pub struct Executor<O, S, I> {
@@ -137,7 +138,7 @@ where
             }
         }
         let total_time = if self.timer {
-            Some(instant::Instant::now())
+            Some(Instant::now())
         } else {
             None
         };
@@ -213,7 +214,7 @@ where
 
             // Start time measurement
             let start = if self.timer {
-                Some(instant::Instant::now())
+                Some(Instant::now())
             } else {
                 None
             };
