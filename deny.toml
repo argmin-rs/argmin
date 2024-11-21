@@ -17,6 +17,11 @@
 # this list would mean the nix crate, as well as any of its exclusive
 # dependencies not shared by any other crates, would be ignored, as the target
 # list here is effectively saying which targets you are building for.
+
+# We only care about the licenses of dependencies we have to respect with our own license
+# So crates that are not published or that only appear in dev dependencies can be ignored
+exclude-unpublished = true
+exclude-dev = true
 targets = [
     # The triple can be any string, but only the target triples built in to
     # rustc (as of 1.40) can be checked against actual config expressions
