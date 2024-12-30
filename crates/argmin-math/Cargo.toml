@@ -14,6 +14,10 @@ categories = ["science"]
 exclude = []
 
 [dependencies]
+#faer
+#@todo(geo) make optional
+faer_0_20 = {package = "faer", version = "0.20"}
+
 # nalgebra
 nalgebra_0_33 = { package = "nalgebra", version = "0.33", optional = true }
 nalgebra_0_32 = { package = "nalgebra", version = "0.32", optional = true }

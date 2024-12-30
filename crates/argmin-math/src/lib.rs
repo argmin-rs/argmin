@@ -237,6 +237,12 @@ mod vec;
 #[allow(unused_imports)]
 pub use crate::vec::*;
 
+//@todo(geo) make this conditional
+extern crate faer_0_20 as faer;
+mod faer_m;
+#[allow(unused_imports)]
+pub use crate::faer_m::*;
+
 // Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 pub use anyhow::Error;
 pub use rand::Rng;
