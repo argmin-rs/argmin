@@ -3,34 +3,28 @@ use crate::ArgminDiv;
 use faer::{
     mat::AsMatRef,
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    Conjugate, Mat, MatMut, MatRef, SimpleEntity,
+    unzipped, zipped_rw, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
 };
-use std::ops::DivAssign;
+use std::ops::{Div, DivAssign};
 
-impl<'a, E> ArgminDiv<E, Mat<E::Canonical>> for MatRef<'a, E>
+/// MatRef / Scalar -> MatRef
+impl<'a, E> ArgminDiv<E, Mat<E>> for MatRef<'a, E>
 where
-    E: RealEntity,
-    E::Canonical: DivAssign<E>,
+    E: Entity + Div<E, Output = E>,
 {
-    fn div(&self, other: &E) -> Mat<E::Canonical> {
-        let mut owned = MatRef::to_owned(self);
-        owned
-            .col_iter_mut()
-            .flat_map(|col_iter| col_iter.iter_mut())
-            .for_each(|elem| elem.div_assign(*other));
-
-        owned
+    fn div(&self, other: &E) -> Mat<E> {
+        zipped_rw!(self).map(|unzipped!(this)| this.read() / *other)
     }
 }
 
-impl<E> ArgminDiv<E, Mat<E::Canonical>> for Mat<E>
+/// Mat / Scalar -> Mat
+impl<E> ArgminDiv<E, Mat<E>> for Mat<E>
 where
-    E: RealEntity,
-    E::Canonical: DivAssign<E>,
+    E: Entity + Div<E, Output = E>,
 {
     #[inline]
-    fn div(&self, other: &E) -> Mat<E::Canonical> {
-        <MatRef<E> as ArgminDiv<_, _>>::div(&self.as_mat_ref(), other)
+    fn div(&self, other: &E) -> Mat<E> {
+        faer::zipped_rw!(self).map(|unzipped!(this)| this.read() / *other)
     }
 }
 
