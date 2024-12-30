@@ -23,7 +23,7 @@ mod eye;
 mod inv;
 mod l1norm;
 mod l2norm;
-// mod minmax;
+mod minmax;
 // mod mul;
 // mod random;
 // mod scaledadd;
