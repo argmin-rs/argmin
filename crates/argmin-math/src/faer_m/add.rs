@@ -1,4 +1,3 @@
-use super::RealEntity;
 use crate::ArgminAdd;
 use faer::{
     mat::{AsMatMut, AsMatRef},
