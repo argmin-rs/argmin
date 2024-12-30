@@ -1,8 +1,8 @@
-use faer::{mat, unzipped, zipped, Entity, Mat, SimpleEntity};
+use faer::{mat, unzipped, zipped, Entity, Mat, MatRef, SimpleEntity};
 
 use crate::ArgminMinMax;
 
-impl<'a, E: SimpleEntity + PartialOrd> ArgminMinMax for Mat<E> {
+impl<E: SimpleEntity + PartialOrd> ArgminMinMax for Mat<E> {
     #[inline]
     fn max(a: &Self, b: &Self) -> Self {
         faer::zipped!(a, b).map(|faer::unzipped!(a, b)| {
