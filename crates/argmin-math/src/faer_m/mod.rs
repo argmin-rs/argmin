@@ -7,14 +7,22 @@
 
 #![allow(unused_imports)]
 
+use faer::{Conjugate, SimpleEntity};
+/// minimal helper trait describing real numbers (which are their own
+/// conjugate). Additional bounds like Add, AddAssign, etc are used
+/// where they are required to make a future refactoring easier if
+/// we want to extend the implementations in here for complex numbers.
+trait RealEntity: SimpleEntity + Conjugate<Conj = Self, Canonical = Self> {}
+impl<T: SimpleEntity + Conjugate<Conj = Self, Canonical = T>> RealEntity for T {}
+
 mod add;
-// mod conj;
-// mod div;
-// mod dot;
-// mod eye;
-// mod inv;
-// mod l1norm;
-// mod l2norm;
+mod conj;
+mod div;
+mod dot;
+mod eye;
+mod inv;
+mod l1norm;
+mod l2norm;
 // mod minmax;
 // mod mul;
 // mod random;
@@ -26,13 +34,13 @@ mod add;
 // mod zero;
 
 pub use add::*;
-// pub use conj::*;
-// pub use div::*;
-// pub use dot::*;
-// pub use eye::*;
-// pub use inv::*;
-// pub use l1norm::*;
-// pub use l2norm::*;
+pub use conj::*;
+pub use div::*;
+pub use dot::*;
+pub use eye::*;
+pub use inv::*;
+pub use l1norm::*;
+pub use l2norm::*;
 // pub use minmax::*;
 // pub use mul::*;
 // pub use random::*;
