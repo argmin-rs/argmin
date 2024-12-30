@@ -239,6 +239,7 @@ pub use crate::vec::*;
 
 //@todo(geo) make this conditional
 extern crate faer_0_20 as faer;
+// extern crate faer_core_0_17 as faer_core;
 mod faer_m;
 #[allow(unused_imports)]
 pub use crate::faer_m::*;
