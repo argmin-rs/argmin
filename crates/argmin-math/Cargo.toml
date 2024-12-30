@@ -17,6 +17,7 @@ exclude = []
 #faer
 #@todo(geo) make optional
 faer_0_20 = {package = "faer", version = "0.20"}
+# faer_core_0_17 = {package = "faer-core", version = "0.17"}
 
 # nalgebra
 nalgebra_0_33 = { package = "nalgebra", version = "0.33", optional = true }

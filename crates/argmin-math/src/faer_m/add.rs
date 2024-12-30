@@ -3,38 +3,35 @@ use crate::ArgminAdd;
 use faer::{
     mat::AsMatRef,
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    ComplexField, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
+    unzipped, zipped_rw, ComplexField, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
 };
 use std::ops::{Add, AddAssign};
 
 /// MatRef + Scalar -> Mat
-impl<'a, E> ArgminAdd<E, Mat<E::Canonical>> for MatRef<'a, E>
+impl<'a, E> ArgminAdd<E, Mat<E>> for MatRef<'a, E>
 where
-    E: RealEntity,
-    E::Canonical: AddAssign<E>,
+    E: Entity + Add<E, Output = E>,
 {
     #[inline]
-    fn add(&self, other: &E) -> Mat<E::Canonical> {
-        let mut owned = MatRef::to_owned(self);
-        owned
-            .col_iter_mut()
-            .flat_map(|col_iter| col_iter.iter_mut())
-            .for_each(|elem| elem.add_assign(*other));
-
-        owned
+    fn add(&self, other: &E) -> Mat<E> {
+        let mut sum = Mat::<E>::zeros(self.nrows(), self.ncols());
+        zipped_rw!(sum.as_mut()).for_each(|unzipped!(mut sum)| {
+            let added = sum.read() + *other;
+            sum.write(added)
+        });
+        sum
     }
 }
 
 //@todo(geo) also add scalar + Matrix and matrix + Scalar (and reference variants?)
 
 /// Mat + Scalar -> Mat
-impl<E> ArgminAdd<E, Mat<E::Canonical>> for Mat<E>
+impl<E> ArgminAdd<E, Mat<E>> for Mat<E>
 where
-    E: RealEntity,
-    E::Canonical: AddAssign<E>,
+    E: Entity + Add<E, Output = E>,
 {
     #[inline]
-    fn add(&self, other: &E) -> Mat<E::Canonical> {
+    fn add(&self, other: &E) -> Mat<E> {
         <MatRef<E> as ArgminAdd<_, _>>::add(&self.as_mat_ref(), other)
     }
 }
