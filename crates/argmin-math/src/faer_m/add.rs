@@ -1,9 +1,10 @@
 use super::RealEntity;
 use crate::ArgminAdd;
 use faer::{
-    mat::AsMatRef,
+    mat::{AsMatMut, AsMatRef},
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    unzipped, zipped_rw, ComplexField, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
+    unzipped, zipped, zipped_rw, ComplexField, Conjugate, Entity, Mat, MatMut, MatRef,
+    SimpleEntity,
 };
 use std::ops::{Add, AddAssign};
 
@@ -14,12 +15,19 @@ where
 {
     #[inline]
     fn add(&self, other: &E) -> Mat<E> {
-        let mut sum = Mat::<E>::zeros(self.nrows(), self.ncols());
-        zipped_rw!(sum.as_mut()).for_each(|unzipped!(mut sum)| {
-            let added = sum.read() + *other;
-            sum.write(added)
-        });
-        sum
+        zipped_rw!(self).map(|unzipped!(this)| this.read() + *other)
+    }
+}
+
+/// Scaler + MatRef-> Mat
+impl<'a, E> ArgminAdd<MatRef<'a, E>, Mat<E>> for E
+where
+    E: Entity + Add<E, Output = E>,
+{
+    #[inline]
+    fn add(&self, other: &MatRef<'a, E>) -> Mat<E> {
+        // commutative with MatRef + Scalar so we can fall back on that case
+        <_ as ArgminAdd<_, _>>::add(other, self)
     }
 }
 
@@ -32,7 +40,22 @@ where
 {
     #[inline]
     fn add(&self, other: &E) -> Mat<E> {
-        <MatRef<E> as ArgminAdd<_, _>>::add(&self.as_mat_ref(), other)
+        //@note(geo-ant) because we are taking self by reference we
+        // cannot mutate the matrix in place, so we can just as well
+        // reuse the reference code
+        <_ as ArgminAdd<_, _>>::add(&self.as_mat_ref(), other)
+    }
+}
+
+/// Scalar + Mat -> Mat
+impl<E> ArgminAdd<Mat<E>, Mat<E>> for E
+where
+    E: Entity + Add<E, Output = E>,
+{
+    #[inline]
+    fn add(&self, other: &Mat<E>) -> Mat<E> {
+        // commutative with Mat + Scalar so we can fall back on that case
+        <_ as ArgminAdd<_, _>>::add(other, self)
     }
 }
 
