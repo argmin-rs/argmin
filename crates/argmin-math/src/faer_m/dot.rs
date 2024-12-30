@@ -12,7 +12,8 @@ use std::ops::Mul;
 impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'a, E> {
     #[inline]
     fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        self.transpose() * other
+        //@todo(geo) maybe this is faster using the matmul with
+        self.conjugate() * other
     }
 }
 
@@ -20,7 +21,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for Ma
 impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'a, E> {
     #[inline]
     fn dot(&self, other: &Mat<E>) -> Mat<E> {
-        self.transpose() * other
+        self.conjugate() * other
     }
 }
 
@@ -28,7 +29,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'a
 impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn dot(&self, other: &Mat<E>) -> Mat<E> {
-        self.transpose() * other
+        self.conjugate() * other
     }
 }
 
