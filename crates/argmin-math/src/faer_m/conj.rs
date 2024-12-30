@@ -1,15 +1,13 @@
 use crate::ArgminConj;
 use faer::{mat::AsMatRef, reborrow::ReborrowMut, Conjugate, Entity, Mat, MatMut, MatRef};
 
-use super::RealEntity;
-
 impl<'a, E: Entity + Conjugate<Conj = E>> ArgminConj for MatRef<'a, E> {
     fn conj(&self) -> Self {
         self.conjugate()
     }
 }
 
-impl<E: RealEntity> ArgminConj for Mat<E> {
+impl<E: Entity + Conjugate<Canonical = E, Conj = E>> ArgminConj for Mat<E> {
     #[inline]
     fn conj(&self) -> Self {
         self.as_mat_ref().conj().to_owned()

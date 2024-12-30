@@ -1,4 +1,3 @@
-use super::RealEntity;
 use crate::ArgminDiv;
 use faer::{
     mat::AsMatRef,
@@ -41,7 +40,7 @@ where
     fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
         // does not commute with the expressions above, which is why
         // we need our own implementations
-        zipped_rw!(other).map(|unzipped!(elem)| *self / elem.read())
+        zipped_rw!(other).map(|unzipped!(other_elem)| *self / other_elem.read())
     }
 }
 
@@ -56,6 +55,38 @@ where
         // cannot mutate the matrix in place, so we can just as well
         // reuse the reference code
         <_ as ArgminDiv<_, _>>::div(self, &other.as_mat_ref())
+    }
+}
+
+/// MatRef / MatRef -> Mat
+impl<'a, 'b, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+    #[inline]
+    fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
+        zipped_rw!(self, other).map(|unzipped!(this, other)| this.read() / other.read())
+    }
+}
+
+/// Mat / MatRef -> Mat
+impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for Mat<E> {
+    #[inline]
+    fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
+        <_ as ArgminDiv<_, _>>::div(&self.as_mat_ref(), other)
+    }
+}
+
+/// MatRef / Mat-> Mat
+impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'a, E> {
+    #[inline]
+    fn div(&self, other: &Mat<E>) -> Mat<E> {
+        <_ as ArgminDiv<_, _>>::div(self, &other.as_mat_ref())
+    }
+}
+
+/// Mat / Mat-> Mat
+impl<E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for Mat<E> {
+    #[inline]
+    fn div(&self, other: &Mat<E>) -> Mat<E> {
+        <_ as ArgminDiv<_, _>>::div(&self.as_mat_ref(), &other.as_mat_ref())
     }
 }
 
