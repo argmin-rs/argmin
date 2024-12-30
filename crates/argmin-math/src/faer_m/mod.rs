@@ -17,7 +17,7 @@ mod l1norm;
 mod l2norm;
 mod minmax;
 mod mul;
-// mod random;
+mod random;
 // mod scaledadd;
 // mod scaledsub;
 // mod signum;
