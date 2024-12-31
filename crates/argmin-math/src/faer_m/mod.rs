@@ -18,10 +18,15 @@ mod l2norm;
 mod minmax;
 mod mul;
 mod random;
+//@note(geo-ant):
+// scaled addition and subtraction rely on a blanket implementation
+// for now and don't need to be tested separately for faer.
+// Once specialization becomes stable (or the upstream blanket impl is removed)
+// we should re-add these modules.
 // mod scaledadd;
 // mod scaledsub;
-// mod signum;
-// mod sub;
+mod signum;
+mod sub;
 // mod transpose;
 // mod zero;
 
