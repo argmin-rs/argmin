@@ -27,8 +27,8 @@ mod random;
 // mod scaledsub;
 mod signum;
 mod sub;
-// mod transpose;
-// mod zero;
+mod transpose;
+mod zero;
 
 pub use add::*;
 pub use conj::*;
