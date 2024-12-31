@@ -1,5 +1,5 @@
 use crate::ArgminDot;
-use faer::{ComplexField, Mat, MatRef, SimpleEntity};
+use faer::{mat::AsMatRef, ComplexField, Mat, MatRef, SimpleEntity};
 use std::ops::Mul;
 
 //@note(geo): the order is important here.
@@ -9,27 +9,35 @@ use std::ops::Mul;
 // where it says "dot product of T and Self"
 
 /// MatRef . MatRef -> Mat
-impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'a, E> {
+impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
     #[inline]
     fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        //@todo(geo) maybe this is faster using the matmul with
+        //@note(geo-ant) maybe this would be faster using the matmul with conjugation
         self.conjugate() * other
     }
 }
 
-/// MatRef . MatRef -> Mat
+/// MatRef . Mat -> Mat
 impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'a, E> {
     #[inline]
     fn dot(&self, other: &Mat<E>) -> Mat<E> {
-        self.conjugate() * other
+        <_ as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
     }
 }
 
 /// Mat . MatRef -> Mat
-impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for Mat<E> {
+impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for Mat<E> {
+    #[inline]
+    fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
+        <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), other)
+    }
+}
+
+/// Mat . Mat -> Mat
+impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn dot(&self, other: &Mat<E>) -> Mat<E> {
-        self.conjugate() * other
+        <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), &other.as_mat_ref())
     }
 }
 

@@ -1,18 +1,26 @@
 use crate::ArgminEye;
-use faer::{ComplexField, Entity, Mat};
+use faer::{ComplexField, Entity, Mat, Shape};
 
-impl<E: Entity + ComplexField> ArgminEye for Mat<E> {
+impl<E: Entity + ComplexField, R: Shape, C: Shape> ArgminEye for Mat<E, R, C>
+where
+    R: TryFrom<usize>,
+    C: TryFrom<usize>,
+{
     fn eye(n: usize) -> Self {
-        Mat::<_>::identity(n, n)
+        let (nr, nc) = match (R::try_from(n), C::try_from(n)) {
+            (Ok(nr), Ok(nc)) => (nr, nc),
+            _ => panic!("invalid matrix size for index type"),
+        };
+
+        Mat::identity(nr, nc)
     }
 
     fn eye_like(&self) -> Self {
-        let n = self.nrows();
-        //@note(geo-ant) this constraint is enforced in the nalgebra implementation.
-        // faer does not need it, but I felt it's better to keep the same runtime
-        // invariants.
-        assert_eq!(n, self.ncols(), "internal error: expected square matrix");
-        Mat::<_>::identity(n, n)
+        let nr = self.nrows();
+        let nc = self.ncols();
+        //@note(geo-ant) in the nalgebra implementation we also enforce
+        // that the matrix is square, which we don't enforce here
+        Mat::identity(nr, nc)
     }
 }
 
