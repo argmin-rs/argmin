@@ -65,7 +65,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// MatRef * Mat -> Mat
-impl<'a, E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
+impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
         self * other
@@ -73,7 +73,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_
 }
 
 /// Mat * Mat -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
+impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
         self * other
