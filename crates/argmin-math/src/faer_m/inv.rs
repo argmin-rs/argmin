@@ -18,7 +18,7 @@ impl fmt::Display for InverseError {
     }
 }
 
-/// calculate the inverse by using LU decomposition with partial pivoting
+/// calculate the inverse via LU decomposition with partial pivoting
 impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
@@ -30,7 +30,7 @@ impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for MatRef<'_, E> {
     }
 }
 
-/// calculate the inverse by using LU decomposition with partial pivoting
+/// calculate the inverse via LU decomposition with partial pivoting
 impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for Mat<E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
