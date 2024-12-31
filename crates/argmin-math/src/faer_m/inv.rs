@@ -19,7 +19,7 @@ impl fmt::Display for InverseError {
 }
 
 /// calculate the inverse by using LU decomposition with partial pivoting
-impl<'a, E: Entity + ComplexField> ArgminInv<Mat<E>> for MatRef<'a, E> {
+impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
         if self.nrows() != self.ncols() || self.nrows() == 0 {
