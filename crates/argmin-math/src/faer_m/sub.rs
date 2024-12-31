@@ -7,7 +7,7 @@ use faer::{
 use std::ops::{Sub, SubAssign};
 
 /// MatRef / Scalar -> MatRef
-impl<'a, E> ArgminSub<E, Mat<E>> for MatRef<'a, E>
+impl<E> ArgminSub<E, Mat<E>> for MatRef<'_, E>
 where
     E: Entity + Sub<E, Output = E>,
 {
@@ -59,7 +59,7 @@ where
 }
 
 /// MatRef / MatRef -> Mat
-impl<'a, 'b, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn sub(&self, other: &MatRef<'a, E>) -> Mat<E> {
         zipped_rw!(self, other).map(|unzipped!(this, other)| this.read() - other.read())
@@ -75,7 +75,7 @@ impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// MatRef / Mat-> Mat
-impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for MatRef<'a, E> {
+impl<E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn sub(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminSub<_, _>>::sub(self, &other.as_mat_ref())

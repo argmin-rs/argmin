@@ -1,7 +1,7 @@
 use crate::ArgminConj;
 use faer::{mat::AsMatRef, reborrow::ReborrowMut, Conjugate, Entity, Mat, MatMut, MatRef};
 
-impl<'a, E: Entity + Conjugate<Conj = E>> ArgminConj for MatRef<'a, E> {
+impl<E: Entity + Conjugate<Conj = E>> ArgminConj for MatRef<'_, E> {
     fn conj(&self) -> Self {
         self.conjugate()
     }

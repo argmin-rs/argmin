@@ -8,7 +8,7 @@ use faer::{
 use std::ops::Mul;
 
 /// MatRef * Scalar -> Mat
-impl<'a, E> ArgminMul<E, Mat<E>> for MatRef<'a, E>
+impl<E> ArgminMul<E, Mat<E>> for MatRef<'_, E>
 where
     E: Entity + Mul<E, Output = E>,
 {
@@ -57,7 +57,7 @@ where
 }
 
 /// MatRef * MatRef -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
         <_ as Mul>::mul(self, other)
@@ -65,7 +65,7 @@ impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> fo
 }
 
 /// MatRef * Mat -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
         self * other

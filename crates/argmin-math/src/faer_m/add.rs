@@ -8,7 +8,7 @@ use faer::{
 use std::ops::{Add, AddAssign};
 
 /// MatRef + Scalar -> Mat
-impl<'a, E, R, C> ArgminAdd<E, Mat<E, R, C>> for MatRef<'a, E, R, C>
+impl<E, R, C> ArgminAdd<E, Mat<E, R, C>> for MatRef<'_, E, R, C>
 where
     E: Entity + Add<E, Output = E>,
     R: faer::Shape,
@@ -67,7 +67,7 @@ where
 }
 
 /// MatRef + MatRef -> Mat
-impl<'a, 'b, E> ArgminAdd<MatRef<'a, E>, Mat<E>> for MatRef<'b, E>
+impl<'a, E> ArgminAdd<MatRef<'a, E>, Mat<E>> for MatRef<'_, E>
 where
     E: Entity + ComplexField,
 {
@@ -78,7 +78,7 @@ where
 }
 
 /// MatRef + Mat -> Mat
-impl<'a, 'b, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
         self + other

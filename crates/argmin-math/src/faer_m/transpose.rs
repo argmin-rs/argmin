@@ -13,7 +13,7 @@ where
     }
 }
 
-impl<'a, E> ArgminTranspose<Mat<E>> for MatRef<'a, E>
+impl<E> ArgminTranspose<Mat<E>> for MatRef<'_, E>
 where
     E: Entity + Conjugate<Canonical = E>,
 {
