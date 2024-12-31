@@ -7,7 +7,7 @@ impl<E: Entity + ComplexField> ArgminL2Norm<E::Real> for MatRef<'_, E> {
     }
 }
 
-impl<'a, E: Entity + ComplexField> ArgminL2Norm<E::Real> for Mat<E> {
+impl<E: Entity + ComplexField> ArgminL2Norm<E::Real> for Mat<E> {
     fn l2_norm(&self) -> E::Real {
         self.norm_l2()
     }
