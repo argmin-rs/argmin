@@ -38,12 +38,16 @@ pub use eye::*;
 pub use inv::*;
 pub use l1norm::*;
 pub use l2norm::*;
-// pub use minmax::*;
-// pub use mul::*;
-// pub use random::*;
+pub use minmax::*;
+pub use mul::*;
+pub use random::*;
+//@note(geo-ant) see above
 // pub use scaledadd::*;
 // pub use scaledsub::*;
-// pub use signum::*;
-// pub use sub::*;
-// pub use transpose::*;
-// pub use zero::*;
+pub use signum::*;
+pub use sub::*;
+pub use transpose::*;
+pub use zero::*;
+
+#[cfg(test)]
+mod test_helper;
