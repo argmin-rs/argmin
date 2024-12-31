@@ -78,7 +78,7 @@ where
 }
 
 /// MatRef + Mat -> Mat
-impl<'a, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'_, E> {
+impl<E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
         self + other
@@ -86,7 +86,7 @@ impl<'a, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'_, E> {
 }
 
 /// Mat + Mat -> Mat
-impl<'a, 'b, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for Mat<E> {
+impl<E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
         self + other

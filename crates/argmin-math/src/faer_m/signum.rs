@@ -46,7 +46,7 @@ make_signum_complex!(Complex<i64>);
 make_signum_complex!(Complex<f32>);
 make_signum_complex!(Complex<f64>);
 
-impl<'a, E, R, C> ArgminSignum for Mat<E, R, C>
+impl<E, R, C> ArgminSignum for Mat<E, R, C>
 where
     E: Entity + SignumInternal,
     R: Shape,
