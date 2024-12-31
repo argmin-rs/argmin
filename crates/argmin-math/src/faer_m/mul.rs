@@ -60,7 +60,7 @@ where
 impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        <_ as Mul>::mul(self, other)
+        zipped!(self, other).map(|unzipped!(this, other)| *this * *other)
     }
 }
 
@@ -68,7 +68,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
 impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
-        self * other
+        <_ as ArgminMul<_, _>>::mul(self, &other.as_mat_ref())
     }
 }
 
@@ -76,7 +76,7 @@ impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E>
 impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        self * other
+        <_ as ArgminMul<_, _>>::mul(&self.as_mat_ref(), other)
     }
 }
 
@@ -84,7 +84,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
 impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
-        self * other
+        <_ as ArgminMul<_, _>>::mul(&self.as_mat_ref(), &other.as_mat_ref())
     }
 }
 
@@ -158,19 +158,28 @@ mod tests {
             item! {
                 #[test]
                 fn [<test_mul_mat_mat_ $t>]() {
-                    let a = Matrix2x3::new(
+                    let a = matrix2x3_new(
                         1 as $t, 4 as $t, 8 as $t,
                         2 as $t, 5 as $t, 9 as $t
                     );
-                    let b = Matrix2x3::new(
+                    let b = matrix2x3_new(
                         2 as $t, 3 as $t, 4 as $t,
                         3 as $t, 4 as $t, 5 as $t
                     );
-                    let target = Matrix2x3::new(
+                    let target = matrix2x3_new(
                         2 as $t, 12 as $t, 32 as $t,
                         6 as $t, 20 as $t, 45 as $t
                     );
-                    let res = <Matrix2x3<$t> as ArgminMul<Matrix2x3<$t>, Matrix2x3<$t>>>::mul(&a, &b);
+                    let res = <_ as ArgminMul<_,_>>::mul(&a, &b);
+                    let res2 = <_ as ArgminMul<_,_>>::mul(&a.as_mat_ref(), &b);
+                    let res3 = <_ as ArgminMul<_,_>>::mul(&a, &b.as_mat_ref());
+                    let res4 = <_ as ArgminMul<_,_>>::mul(&a.as_mat_ref(), &b.as_mat_ref());
+                    assert_eq!(res.nrows(),2);
+                    assert_eq!(res.ncols(),3);
+                    assert_eq!(res,res2);
+                    assert_eq!(res,res3);
+                    assert_eq!(res,res4);
+                    let res = <_ as ArgminMul<_,_>>::mul(&a, &b);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
@@ -182,16 +191,20 @@ mod tests {
             item! {
                 #[test]
                 fn [<test_mul_scalar_mat_1_ $t>]() {
-                    let a = Matrix2x3::new(
+                    let a = matrix2x3_new(
                         1 as $t, 4 as $t, 8 as $t,
                         2 as $t, 5 as $t, 9 as $t
                     );
                     let b = 2 as $t;
-                    let target = Matrix2x3::new(
+                    let target = matrix2x3_new(
                         2 as $t, 8 as $t, 16 as $t,
                         4 as $t, 10 as $t, 18 as $t
                     );
-                    let res = <Matrix2x3<$t> as ArgminMul<$t, Matrix2x3<$t>>>::mul(&a, &b);
+                    let res = <_ as ArgminMul<_,_>>::mul(&a, &b);
+                    let res2 = <_ as ArgminMul<_,_>>::mul(&a.as_mat_ref(), &b);
+                    assert_eq!(res.nrows(),2);
+                    assert_eq!(res.ncols(),3);
+                    assert_eq!(res,res2);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
@@ -203,16 +216,20 @@ mod tests {
             item! {
                 #[test]
                 fn [<test_mul_scalar_mat_2_ $t>]() {
-                    let b = Matrix2x3::new(
+                    let b = matrix2x3_new(
                         1 as $t, 4 as $t, 8 as $t,
                         2 as $t, 5 as $t, 9 as $t
                     );
                     let a = 2 as $t;
-                    let target = Matrix2x3::new(
+                    let target = matrix2x3_new(
                         2 as $t, 8 as $t, 16 as $t,
                         4 as $t, 10 as $t, 18 as $t
                     );
-                    let res = <$t as ArgminMul<Matrix2x3<$t>, Matrix2x3<$t>>>::mul(&a, &b);
+                    let res = <$t as ArgminMul<_,_>>::mul(&a, &b);
+                    let res2 = <$t as ArgminMul<_,_>>::mul(&a, &b.as_mat_ref());
+                    assert_eq!(res.nrows(),2);
+                    assert_eq!(res.ncols(),3);
+                    assert_eq!(res,res2);
                     for i in 0..3 {
                         for j in 0..2 {
                             assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
