@@ -18,7 +18,7 @@ mod tests {
     use super::*;
     use approx::assert_relative_eq;
     use faer::mat;
-    use faer::mat::AsMatRef;
+    use faer::mat::{AsMatRef, MatRef};
     use paste::item;
 
     macro_rules! make_test {
