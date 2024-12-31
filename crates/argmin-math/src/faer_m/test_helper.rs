@@ -15,3 +15,9 @@ pub fn column_vector_from_slice<E: SimpleEntity>(slice: &[E]) -> Mat<E> {
 pub fn vector3_new<E: SimpleEntity>(a: E, b: E, c: E) -> Mat<E> {
     column_vector_from_slice(&[a, b, c])
 }
+
+/// helper method to translate an nalgebra call Matrix2x3::new(a,b,c, d,e,f) to the
+/// equivalent faer matrix constructor
+pub fn matrix2x3_new<E: SimpleEntity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat<E> {
+    faer::mat![[a, b, c], [d, e, f]]
+}
