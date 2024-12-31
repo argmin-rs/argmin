@@ -8,23 +8,27 @@ use faer::{
 use std::ops::{Add, AddAssign};
 
 /// MatRef + Scalar -> Mat
-impl<'a, E> ArgminAdd<E, Mat<E>> for MatRef<'a, E>
+impl<'a, E, R, C> ArgminAdd<E, Mat<E, R, C>> for MatRef<'a, E, R, C>
 where
     E: Entity + Add<E, Output = E>,
+    R: faer::Shape,
+    C: faer::Shape,
 {
     #[inline]
-    fn add(&self, other: &E) -> Mat<E> {
+    fn add(&self, other: &E) -> Mat<E, R, C> {
         zipped_rw!(self).map(|unzipped!(this)| this.read() + *other)
     }
 }
 
 /// Scaler + MatRef-> Mat
-impl<'a, E> ArgminAdd<MatRef<'a, E>, Mat<E>> for E
+impl<'a, E, R, C> ArgminAdd<MatRef<'a, E, R, C>, Mat<E, R, C>> for E
 where
     E: Entity + Add<E, Output = E>,
+    R: faer::Shape,
+    C: faer::Shape,
 {
     #[inline]
-    fn add(&self, other: &MatRef<'a, E>) -> Mat<E> {
+    fn add(&self, other: &MatRef<'a, E, R, C>) -> Mat<E, R, C> {
         // commutative with MatRef + Scalar so we can fall back on that case
         <_ as ArgminAdd<_, _>>::add(other, self)
     }
@@ -33,12 +37,14 @@ where
 //@todo(geo) also add scalar + Matrix and matrix + Scalar (and reference variants?)
 
 /// Mat + Scalar -> Mat
-impl<E> ArgminAdd<E, Mat<E>> for Mat<E>
+impl<E, R, C> ArgminAdd<E, Mat<E, R, C>> for Mat<E, R, C>
 where
     E: Entity + Add<E, Output = E>,
+    R: faer::Shape,
+    C: faer::Shape,
 {
     #[inline]
-    fn add(&self, other: &E) -> Mat<E> {
+    fn add(&self, other: &E) -> Mat<E, R, C> {
         //@note(geo-ant) because we are taking self by reference we
         // cannot mutate the matrix in place, so we can just as well
         // reuse the reference code
@@ -47,19 +53,24 @@ where
 }
 
 /// Scalar + Mat -> Mat
-impl<E> ArgminAdd<Mat<E>, Mat<E>> for E
+impl<E, R, C> ArgminAdd<Mat<E, R, C>, Mat<E, R, C>> for E
 where
     E: Entity + Add<E, Output = E>,
+    R: faer::Shape,
+    C: faer::Shape,
 {
     #[inline]
-    fn add(&self, other: &Mat<E>) -> Mat<E> {
+    fn add(&self, other: &Mat<E, R, C>) -> Mat<E, R, C> {
         // commutative with Mat + Scalar so we can fall back on that case
         <_ as ArgminAdd<_, _>>::add(other, self)
     }
 }
 
 /// MatRef + MatRef -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminAdd<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, 'b, E> ArgminAdd<MatRef<'a, E>, Mat<E>> for MatRef<'b, E>
+where
+    E: Entity + ComplexField,
+{
     #[inline]
     fn add(&self, other: &MatRef<'a, E>) -> Mat<E> {
         <_ as Add>::add(self, other)
@@ -67,7 +78,7 @@ impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminAdd<MatRef<'a, E>, Mat<E>> fo
 }
 
 /// MatRef + Mat -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, 'b, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'b, E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
         self + other
@@ -75,7 +86,7 @@ impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRe
 }
 
 /// Mat + Mat -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for Mat<E> {
+impl<'a, 'b, E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
         self + other
