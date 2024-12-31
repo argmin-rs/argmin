@@ -24,11 +24,11 @@ impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
             // We do want to know if a and b are *exactly* the same.
             #[allow(clippy::float_cmp)]
             if a == b {
-                a.clone()
+                a
             } else if a < b {
-                rng.gen_range(a.clone()..b.clone())
+                rng.gen_range(a..b)
             } else {
-                rng.gen_range(b.clone()..a.clone())
+                rng.gen_range(b..a)
             }
         })
     }

@@ -7,7 +7,7 @@ use faer::{
 use std::ops::{Div, DivAssign};
 
 /// MatRef / Scalar -> MatRef
-impl<'a, E> ArgminDiv<E, Mat<E>> for MatRef<'a, E>
+impl<E> ArgminDiv<E, Mat<E>> for MatRef<'_, E>
 where
     E: Entity + Div<E, Output = E>,
 {
@@ -59,7 +59,7 @@ where
 }
 
 /// MatRef / MatRef -> Mat
-impl<'a, 'b, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
         zipped_rw!(self, other).map(|unzipped!(this, other)| this.read() / other.read())
@@ -75,7 +75,7 @@ impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// MatRef / Mat-> Mat
-impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'a, E> {
+impl<E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn div(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminDiv<_, _>>::div(self, &other.as_mat_ref())

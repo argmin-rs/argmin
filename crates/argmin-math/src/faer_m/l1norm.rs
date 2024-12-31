@@ -1,7 +1,7 @@
 use crate::ArgminL1Norm;
 use faer::{ComplexField, Entity, Mat, MatRef, SimpleEntity};
 
-impl<'a, E: Entity + ComplexField> ArgminL1Norm<E::Real> for MatRef<'a, E> {
+impl<E: Entity + ComplexField> ArgminL1Norm<E::Real> for MatRef<'_, E> {
     fn l1_norm(&self) -> E::Real {
         self.norm_l1()
     }

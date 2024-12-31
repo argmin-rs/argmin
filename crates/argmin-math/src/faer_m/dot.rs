@@ -9,7 +9,7 @@ use std::ops::Mul;
 // where it says "dot product of T and Self"
 
 /// MatRef . MatRef -> Mat
-impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'b, E> {
+impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
         //@note(geo-ant) maybe this would be faster using the matmul with conjugation
@@ -18,7 +18,7 @@ impl<'a, 'b, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> fo
 }
 
 /// MatRef . Mat -> Mat
-impl<'a, E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'a, E> {
+impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn dot(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
