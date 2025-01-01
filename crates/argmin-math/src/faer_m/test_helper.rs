@@ -27,3 +27,9 @@ pub fn vector2_new<E: SimpleEntity>(a: E, b: E) -> Mat<E> {
 pub fn matrix2x3_new<E: SimpleEntity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat<E> {
     faer::mat![[a, b, c], [d, e, f]]
 }
+
+/// helper method to translate an nalgebra call Matrix2::new(a,b, c,d) to the
+/// equivalent faer matrix constructor
+pub fn matrix2_new<E: SimpleEntity>(a: E, b: E, c: E, d: E) -> Mat<E> {
+    faer::mat![[a, b], [c, d]]
+}

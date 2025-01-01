@@ -43,9 +43,53 @@ impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for Mat<E> {
 }
 
 #[cfg(test)]
-mod test {
-    #[test]
-    fn more_tests() {
-        todo!()
+mod tests {
+    use super::super::test_helper::*;
+    use super::*;
+    use approx::assert_relative_eq;
+    use faer::mat::AsMatRef;
+    use paste::item;
+
+    macro_rules! make_test {
+        ($t:ty) => {
+            item! {
+                #[test]
+                fn [<test_inv_ $t>]() {
+                    let a = matrix2_new(
+                        2 as $t, 5 as $t,
+                        1 as $t, 3 as $t,
+                    );
+                    let target = matrix2_new(
+                        3 as $t, -5 as $t,
+                        -1 as $t, 2 as $t,
+                    );
+                    let res = <_ as ArgminInv<_>>::inv(&a).unwrap();
+                    let res1 = <_ as ArgminInv<_>>::inv(&a.as_mat_ref()).unwrap();
+                    assert_eq!(res,res1);
+                    assert_eq!(res.nrows(),2);
+                    assert_eq!(res.ncols(),2);
+                    for i in 0..2 {
+                        for j in 0..2 {
+                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = $t::EPSILON);
+                        }
+                    }
+                }
+            }
+
+            item! {
+                #[test]
+                fn [<test_inv_error $t>]() {
+                    let a = matrix2_new(
+                        2 as $t, 5 as $t,
+                        4 as $t, 10 as $t,
+                    );
+                    let err = <_ as ArgminInv<_>>::inv(&a).unwrap_err().downcast::<InverseError>().unwrap();
+                    assert_eq!(err, InverseError {});
+                }
+            }
+        };
     }
+
+    make_test!(f32);
+    make_test!(f64);
 }
