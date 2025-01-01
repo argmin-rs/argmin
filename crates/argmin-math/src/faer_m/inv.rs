@@ -19,9 +19,7 @@ impl fmt::Display for InverseError {
 }
 
 /// calculate the inverse via LU decomposition with full pivoting
-impl<E: SimpleEntity + RealField + PartialOrd + std::fmt::Debug> ArgminInv<Mat<E>>
-    for MatRef<'_, E>
-{
+impl<E: SimpleEntity + RealField + PartialOrd> ArgminInv<Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
         //@note(geo-ant) this panic is consistent with the
@@ -31,10 +29,12 @@ impl<E: SimpleEntity + RealField + PartialOrd + std::fmt::Debug> ArgminInv<Mat<E
             self.ncols(),
             "cannot invert non-square matrix"
         );
-        let lu_decomp = self.full_piv_lu();
-        let lmat = lu_decomp.compute_u();
-        let is_singular = lmat.diagonal().column_vector().iter().any(|elem: &E| {
-            println!("diag: {:?}", elem);
+        //@note(geo-ant) to check whether the matrix is
+        // invertible, we perform a rank-revealing decomposition
+        // and check the diagonal elements of the appropriate matrix
+        let lu_decomp = self.full_piv_lu(); //@note(geo-ant) rank revealing
+        let umat = lu_decomp.compute_u();
+        let is_singular = umat.diagonal().column_vector().iter().any(|elem: &E| {
             !elem.faer_is_finite() || (elem.faer_abs() <= E::faer_zero_threshold())
         });
         if !is_singular {

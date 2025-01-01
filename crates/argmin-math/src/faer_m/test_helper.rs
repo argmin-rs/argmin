@@ -33,3 +33,19 @@ pub fn matrix2x3_new<E: SimpleEntity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat
 pub fn matrix2_new<E: SimpleEntity>(a: E, b: E, c: E, d: E) -> Mat<E> {
     faer::mat![[a, b], [c, d]]
 }
+
+/// helper method to translate an nalgebra call Matrix3::new(a,b,c, d,e,f, g,h,i) to the
+/// equivalent faer matrix constructor
+pub fn matrix3_new<E: SimpleEntity>(
+    a: E,
+    b: E,
+    c: E,
+    d: E,
+    e: E,
+    f: E,
+    g: E,
+    h: E,
+    i: E,
+) -> Mat<E> {
+    faer::mat![[a, b, c], [d, e, f], [g, h, i]]
+}
