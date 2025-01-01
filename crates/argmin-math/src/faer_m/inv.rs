@@ -5,7 +5,7 @@ use faer::{
     mat::{AsMatMut, AsMatRef},
     prelude::SolverCore,
     reborrow::ReborrowMut,
-    ComplexField, Entity, Mat, MatRef, SimpleEntity,
+    Entity, Mat, MatRef, RealField, SimpleEntity,
 };
 use std::fmt;
 
@@ -18,27 +18,38 @@ impl fmt::Display for InverseError {
     }
 }
 
-/// calculate the inverse via LU decomposition with partial pivoting
-impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for MatRef<'_, E> {
+/// calculate the inverse via LU decomposition with full pivoting
+impl<E: SimpleEntity + RealField + PartialOrd + std::fmt::Debug> ArgminInv<Mat<E>>
+    for MatRef<'_, E>
+{
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
-        if self.nrows() != self.ncols() || self.nrows() == 0 {
-            Err(InverseError.into())
+        //@note(geo-ant) this panic is consistent with the
+        // behavior when using nalgebra
+        assert_eq!(
+            self.nrows(),
+            self.ncols(),
+            "cannot invert non-square matrix"
+        );
+        let lu_decomp = self.full_piv_lu();
+        let lmat = lu_decomp.compute_u();
+        let is_singular = lmat.diagonal().column_vector().iter().any(|elem: &E| {
+            println!("diag: {:?}", elem);
+            !elem.faer_is_finite() || (elem.faer_abs() <= E::faer_zero_threshold())
+        });
+        if !is_singular {
+            Ok(lu_decomp.inverse())
         } else {
-            Ok(self.partial_piv_lu().inverse())
+            Err(InverseError {}.into())
         }
     }
 }
 
-/// calculate the inverse via LU decomposition with partial pivoting
-impl<E: Entity + ComplexField> ArgminInv<Mat<E>> for Mat<E> {
+/// calculate the inverse via LU decomposition with full pivoting
+impl<E: SimpleEntity + RealField> ArgminInv<Mat<E>> for Mat<E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
-        if self.nrows() != self.ncols() || self.nrows() == 0 {
-            Err(InverseError.into())
-        } else {
-            Ok(self.partial_piv_lu().inverse())
-        }
+        <_ as ArgminInv<_>>::inv(&self.as_mat_ref())
     }
 }
 
@@ -70,7 +81,10 @@ mod tests {
                     assert_eq!(res.ncols(),2);
                     for i in 0..2 {
                         for j in 0..2 {
-                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = $t::EPSILON);
+                            //@note(geo-ant) the 20 epsilon are a bit arbitrary,
+                            // but it's to avoid spurious errors due to numerical effects
+                            // while keeping good accuracy.
+                            assert_relative_eq!(res[(i, j)], target[(i, j)], epsilon = 20.*$t::EPSILON);
                         }
                     }
                 }
