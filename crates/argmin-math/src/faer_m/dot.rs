@@ -71,8 +71,8 @@ mod scalar_product {
                 "vectors for dot product must have same number of elements"
             );
 
-            let value: Mat<E> =
-                <_ as ArgminDot<_, _>>::dot(&self.as_shape(count, 1), &other.as_shape(count, 1));
+            todo!("this logic is still incorrect");
+            let value: Mat<E> = self.as_shape(count, 1) * &other.as_shape(1, count);
             debug_assert_eq!(value.nrows(), 1);
             debug_assert_eq!(value.ncols(), 1);
             value[(0, 0)]
@@ -104,11 +104,17 @@ mod scalar_product {
     }
 }
 
+//@note(geo) implemented for compatibility with the nalgebra implementations,
+// but this should probably not have to exist, since the functionality is
+// already covered with ArgminMul
+mod matrix_and_scalar_product {}
+
 #[cfg(test)]
 mod tests {
     use super::super::test_helper::*;
     use super::*;
     use approx::assert_relative_eq;
+    use faer::mat::AsMatRef;
     use paste::item;
 
     macro_rules! make_test {
@@ -118,8 +124,15 @@ mod tests {
                 fn [<test_vec_vec_ $t>]() {
                     let a = vector3_new(1 as $t, 2 as $t, 3 as $t);
                     let b = vector3_new(4 as $t, 5 as $t, 6 as $t);
-                    let res: $t = <_ as ArgminDot<_, _>>::dot(&a, &b);
-                    assert_relative_eq!(res as f64, 32 as f64, epsilon = f64::EPSILON);
+                    // all owned and reference type combinations
+                    let res1: $t = <_ as ArgminDot<_, _>>::dot(&a, &b);
+                    let res2: $t = <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b);
+                    let res3: $t = <_ as ArgminDot<_, _>>::dot(&a, &b.as_mat_ref());
+                    let res4: $t = <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b.as_mat_ref());
+                    assert_relative_eq!(res1 as f64, 32 as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(res2 as f64, 32 as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(res3 as f64, 32 as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(res4 as f64, 32 as f64, epsilon = f64::EPSILON);
                 }
             }
 
@@ -161,11 +174,20 @@ mod tests {
                         8 as $t, 10 as $t, 12 as $t,
                         12 as $t, 15 as $t, 18 as $t
                     );
-                    let product: Mat<$t> =
+                    let product1: Mat<$t> =
                         <_ as ArgminDot<_, _>>::dot(&a, &b);
+                    let product2: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b);
+                    let product3: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a, &b.as_mat_ref());
+                    let product4: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b.as_mat_ref());
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product1[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product2[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product3[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product4[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -181,10 +203,19 @@ mod tests {
                     );
                     let b = vector3_new(1 as $t, 2 as $t, 3 as $t);
                     let res = vector3_new(14 as $t, 32 as $t, 50 as $t);
-                    let product: Mat<$t> =
+                    let product1: Mat<$t> =
                         <_ as ArgminDot<_, _>>::dot(&a, &b);
+                    let product2: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b);
+                    let product3: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a, &b.as_mat_ref());
+                    let product4: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b.as_mat_ref());
                     for i in 0..3 {
-                        assert_relative_eq!(res[(i,0)] as f64, product[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(res[(i,0)] as f64, product1[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(res[(i,0)] as f64, product2[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(res[(i,0)] as f64, product3[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(res[(i,0)] as f64, product4[(i,0)] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -207,11 +238,20 @@ mod tests {
                         54 as $t, 57 as $t, 42 as $t,
                         23 as $t, 20 as $t, 14 as $t
                     );
-                    let product: Mat<$t> =
+                    let product1: Mat<$t> =
                         <_ as ArgminDot<_, _>>::dot(&a, &b);
+                    let product2: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b);
+                    let product3: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a, &b.as_mat_ref());
+                    let product4: Mat<$t> =
+                        <_ as ArgminDot<_, _>>::dot(&a.as_mat_ref(), &b.as_mat_ref());
                     for i in 0..3 {
                         for j in 0..3 {
-                            assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product1[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product2[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product3[(i, j)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(res[(i, j)] as f64, product4[(i, j)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
