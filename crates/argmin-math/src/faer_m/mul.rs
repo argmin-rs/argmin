@@ -44,7 +44,7 @@ where
     }
 }
 
-/// Scalar + Mat -> Mat
+/// Scalar * Mat -> Mat
 impl<E> ArgminMul<Mat<E>, Mat<E>> for E
 where
     E: Entity + Mul<E, Output = E>,
@@ -56,7 +56,7 @@ where
     }
 }
 
-/// MatRef * MatRef -> Mat
+/// MatRef * MatRef -> Mat (pointwise multiplication)
 impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
@@ -64,7 +64,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
     }
 }
 
-/// MatRef * Mat -> Mat
+/// MatRef * Mat -> Mat (pointwise multiplication)
 impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
@@ -72,7 +72,7 @@ impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E>
     }
 }
 
-/// Mat * MatRef-> Mat
+/// Mat * MatRef-> Mat (pointwise multiplication)
 impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
@@ -80,7 +80,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
     }
 }
 
-/// Mat * Mat -> Mat
+/// Mat * Mat -> Mat (pointwise multiplication)
 impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
