@@ -124,7 +124,7 @@ mod multiply_matrix_with_scalar {
     use std::ops::Mul;
 
     // MatRef . Scalar -> Mat
-    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for MatRef<'a, E> {
+    impl<E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &E) -> Mat<E> {
             <Self as ArgminMul<E, _>>::mul(self, other)
@@ -148,7 +148,7 @@ mod multiply_matrix_with_scalar {
     }
 
     // Mat . Scalar -> Mat
-    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<Mat<E>, Mat<E>> for E {
+    impl<E: Entity + Mul<E, Output = E>> ArgminDot<Mat<E>, Mat<E>> for E {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> Mat<E> {
             <E as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
