@@ -61,7 +61,7 @@ pub struct BrentRoot<F> {
 
 impl<F: ArgminFloat> BrentRoot<F> {
     /// Constructor
-    /// The values `min` and `max` must bracketing the root of the function.
+    /// The values `min` and `max` must be bracketing the root of the function.
     /// The parameter `tol` specifies the relative error to be targeted.
     pub fn new(min: F, max: F, tol: F) -> Self {
         BrentRoot {
