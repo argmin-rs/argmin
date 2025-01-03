@@ -9,6 +9,7 @@ use std::ops::Mul;
 // where it says "dot product of T and Self"
 
 /// ArgminDot implementation for matrix multiplication: Matrix . Matrix -> Matrix
+/// In these cases, ArgminDot means the matrix-matrix product
 mod matrix_matrix_multiplication {
     use super::*;
 
@@ -16,8 +17,7 @@ mod matrix_matrix_multiplication {
     impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
-            //@note(geo-ant) maybe this would be faster using the matmul with conjugation
-            self.conjugate() * other
+            self * other
         }
     }
 
@@ -47,14 +47,18 @@ mod matrix_matrix_multiplication {
 }
 
 /// contains implementations for the scalar product of two column vectors of
-/// the same length.
+/// the same length. This is v^H . u for two column vectors v,u.
 //@note(geo-ant) the corresponding nalgebra implementations allow taking a scalar
 // product of any two matrices of same shape ("as vectors"). I've opted to not
 // reproduce this behavior here, since it's likely invoked in error.
 mod scalar_product {
+    use faer::Conjugate;
+
     use super::*;
     /// MatRef . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, E> for MatRef<'_, E> {
+    impl<'a, E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E>
+        for MatRef<'_, E>
+    {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> E {
             //@note(geo): we allow the scalar dot product between two vectors
@@ -71,8 +75,10 @@ mod scalar_product {
                 "vectors for dot product must have same number of elements"
             );
 
-            todo!("this logic is still incorrect");
-            let value: Mat<E> = self.as_shape(count, 1) * &other.as_shape(1, count);
+            let value: Mat<E> = <_ as ArgminDot<_, _>>::dot(
+                &self.as_shape(count, 1).conjugate().transpose(),
+                &other.as_shape(count, 1),
+            );
             debug_assert_eq!(value.nrows(), 1);
             debug_assert_eq!(value.ncols(), 1);
             value[(0, 0)]
@@ -80,7 +86,7 @@ mod scalar_product {
     }
 
     /// MatRef . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, E> for MatRef<'_, E> {
+    impl<E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> E {
             <_ as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
@@ -88,7 +94,9 @@ mod scalar_product {
     }
 
     /// Mat . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, E> for Mat<E> {
+    impl<'a, E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E>
+        for Mat<E>
+    {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> E {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), other)
@@ -96,7 +104,7 @@ mod scalar_product {
     }
 
     /// Mat . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, E> for Mat<E> {
+    impl<E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for Mat<E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> E {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), &other.as_mat_ref())
@@ -107,7 +115,46 @@ mod scalar_product {
 //@note(geo) implemented for compatibility with the nalgebra implementations,
 // but this should probably not have to exist, since the functionality is
 // already covered with ArgminMul
-mod matrix_and_scalar_product {}
+// Scalar . Matrix -> Matrix
+// and Matrix . Scalar -> Matrix
+mod multiply_matrix_with_scalar {
+    use super::*;
+    use crate::ArgminMul;
+    use faer::Entity;
+    use std::ops::Mul;
+
+    // MatRef . Scalar -> Mat
+    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for MatRef<'a, E> {
+        #[inline]
+        fn dot(&self, other: &E) -> Mat<E> {
+            <Self as ArgminMul<E, _>>::mul(self, other)
+        }
+    }
+
+    // Mat . Scalar -> Mat
+    impl<E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for Mat<E> {
+        #[inline]
+        fn dot(&self, other: &E) -> Mat<E> {
+            <_ as ArgminDot<E, _>>::dot(&self.as_mat_ref(), other)
+        }
+    }
+
+    // MatRef . Scalar -> Mat
+    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<MatRef<'a, E>, Mat<E>> for E {
+        #[inline]
+        fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
+            <E as ArgminMul<MatRef<'a, E>, _>>::mul(self, other)
+        }
+    }
+
+    // Mat . Scalar -> Mat
+    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<Mat<E>, Mat<E>> for E {
+        #[inline]
+        fn dot(&self, other: &Mat<E>) -> Mat<E> {
+            <E as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -136,33 +183,43 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_vec_scalar_ $t>]() {
-            //         let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
-            //         let b = 2 as $t;
-            //         let product: Vector3<$t> =
-            //             <Vector3<$t> as ArgminDot<$t, Vector3<$t>>>::dot(&a, &b);
-            //         let res = Vector3::new(2 as $t, 4 as $t, 6 as $t);
-            //         for i in 0..3 {
-            //             assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = f64::EPSILON);
-            //         }
-            //     }
-            // }
+            item! {
+                #[test]
+                fn [<test_vec_scalar_ $t>]() {
+                    let a = vector3_new(1 as $t, 2 as $t, 3 as $t);
+                    let b = 2 as $t;
+                    let product1: Mat<$t> =
+                        <_ as ArgminDot<$t, _>>::dot(&a, &b);
+                    let product2: Mat<$t> =
+                        <_ as ArgminDot<$t, _>>::dot(&a.as_mat_ref(), &b);
+                    let res = vector3_new(2 as $t, 4 as $t, 6 as $t);
+                    assert_eq!(product1,product2);
+                    assert_eq!(product1.nrows(),3);
+                    assert_eq!(product1.ncols(),1);
+                    for i in 0..3 {
+                        assert_relative_eq!(res[(i,0)] as f64, product1[(i,0)] as f64, epsilon = f64::EPSILON);
+                    }
+                }
+            }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_scalar_vec_ $t>]() {
-            //         let a = Vector3::new(1 as $t, 2 as $t, 3 as $t);
-            //         let b = 2 as $t;
-            //         let product: Vector3<$t> =
-            //             <$t as ArgminDot<Vector3<$t>, Vector3<$t>>>::dot(&b, &a);
-            //         let res = Vector3::new(2 as $t, 4 as $t, 6 as $t);
-            //         for i in 0..3 {
-            //             assert_relative_eq!(res[i] as f64, product[i] as f64, epsilon = f64::EPSILON);
-            //         }
-            //     }
-            // }
+            item! {
+                #[test]
+                fn [<test_scalar_vec_ $t>]() {
+                    let a = vector3_new(1 as $t, 2 as $t, 3 as $t);
+                    let b = 2 as $t;
+                    let product1: Mat<$t> =
+                        <$t as ArgminDot<_, _>>::dot(&b, &a);
+                    let product2: Mat<$t> =
+                        <$t as ArgminDot<_, _>>::dot(&b, &a.as_mat_ref());
+                    assert_eq!(product1,product2);
+                    assert_eq!(product1.nrows(),3);
+                    assert_eq!(product1.ncols(),1);
+                    let res = vector3_new(2 as $t, 4 as $t, 6 as $t);
+                    for i in 0..3 {
+                        assert_relative_eq!(res[(i,0)] as f64, product1[(i,0)] as f64, epsilon = f64::EPSILON);
+                    }
+                }
+            }
 
             item! {
                 #[test]
@@ -257,51 +314,61 @@ mod tests {
                 }
             }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_mat_primitive_ $t>]() {
-            //         let a = Matrix3::new(
-            //             1 as $t, 2 as $t, 3 as $t,
-            //             4 as $t, 5 as $t, 6 as $t,
-            //             3 as $t, 2 as $t, 1 as $t
-            //         );
-            //         let res = Matrix3::new(
-            //             2 as $t, 4 as $t, 6 as $t,
-            //             8 as $t, 10 as $t, 12 as $t,
-            //             6 as $t, 4 as $t, 2 as $t
-            //         );
-            //         let product: Matrix3<$t> =
-            //             <Matrix3<$t> as ArgminDot<$t, Matrix3<$t>>>::dot(&a, &(2 as $t));
-            //         for i in 0..3 {
-            //             for j in 0..3 {
-            //                 assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = f64::EPSILON);
-            //             }
-            //         }
-            //     }
-            // }
+            item! {
+                #[test]
+                fn [<test_mat_primitive_ $t>]() {
+                    let a = matrix3_new(
+                        1 as $t, 2 as $t, 3 as $t,
+                        4 as $t, 5 as $t, 6 as $t,
+                        3 as $t, 2 as $t, 1 as $t
+                    );
+                    let res = matrix3_new(
+                        2 as $t, 4 as $t, 6 as $t,
+                        8 as $t, 10 as $t, 12 as $t,
+                        6 as $t, 4 as $t, 2 as $t
+                    );
+                    let product1: Mat<$t> =
+                        <_ as ArgminDot<$t, _>>::dot(&a, &(2 as $t));
+                    let product2: Mat<$t> =
+                        <_ as ArgminDot<$t, _>>::dot(&a.as_mat_ref(), &(2 as $t));
+                    assert_eq!(product1, product2);
+                    assert_eq!(product1.nrows(), 3);
+                    assert_eq!(product1.ncols(), 3);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert_relative_eq!(res[(i, j)] as f64, product1[(i, j)] as f64, epsilon = f64::EPSILON);
+                        }
+                    }
+                }
+            }
 
-            // item! {
-            //     #[test]
-            //     fn [<test_primitive_mat_ $t>]() {
-            //         let a = Matrix3::new(
-            //             1 as $t, 2 as $t, 3 as $t,
-            //             4 as $t, 5 as $t, 6 as $t,
-            //             3 as $t, 2 as $t, 1 as $t
-            //         );
-            //         let res = Matrix3::new(
-            //             2 as $t, 4 as $t, 6 as $t,
-            //             8 as $t, 10 as $t, 12 as $t,
-            //             6 as $t, 4 as $t, 2 as $t
-            //         );
-            //         let product: Matrix3<$t> =
-            //             <$t as ArgminDot<Matrix3<$t>, Matrix3<$t>>>::dot(&(2 as $t), &a);
-            //         for i in 0..3 {
-            //             for j in 0..3 {
-            //                 assert_relative_eq!(res[(i, j)] as f64, product[(i, j)] as f64, epsilon = f64::EPSILON);
-            //             }
-            //         }
-            //     }
-            // }
+            item! {
+                #[test]
+                fn [<test_primitive_mat_ $t>]() {
+                    let a = matrix3_new(
+                        1 as $t, 2 as $t, 3 as $t,
+                        4 as $t, 5 as $t, 6 as $t,
+                        3 as $t, 2 as $t, 1 as $t
+                    );
+                    let res = matrix3_new(
+                        2 as $t, 4 as $t, 6 as $t,
+                        8 as $t, 10 as $t, 12 as $t,
+                        6 as $t, 4 as $t, 2 as $t
+                    );
+                    let product1: Mat<$t> =
+                        <$t as ArgminDot<_, _>>::dot(&(2 as $t), &a);
+                    let product2: Mat<$t> =
+                        <$t as ArgminDot<_, _>>::dot(&(2 as $t), &a.as_mat_ref());
+                    assert_eq!(product1, product2);
+                    assert_eq!(product1.nrows(), 3);
+                    assert_eq!(product1.ncols(), 3);
+                    for i in 0..3 {
+                        for j in 0..3 {
+                            assert_relative_eq!(res[(i, j)] as f64, product1[(i, j)] as f64, epsilon = f64::EPSILON);
+                        }
+                    }
+                }
+            }
         };
     }
 
