@@ -74,6 +74,12 @@
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
 //! | `nalgebra_v0_29`       | no      | version 0.29                             |
 //!
+//! ### `faer`
+//!
+//! | Feature                | Default | Comment                                  |
+//! |------------------------|---------|------------------------------------------|
+//! | `faer_latest`          | no      | latest supported version                 |
+//! | `faer_v0_20`           | no      | version 0.20                             |
 //!
 //! ## Choosing a backend
 //!

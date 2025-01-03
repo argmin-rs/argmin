@@ -1,6 +1,7 @@
 use faer::{mat::from_column_major_slice_generic, zipped, Conjugate, Entity, Mat};
 
 /// create a column vector (in Nx1 matrix form) from a Vec instance
+/// equivalent to the nalgebra call DVector::from_vec
 pub fn column_vector_from_vec<E: Entity>(vec: Vec<E>) -> Mat<E> {
     column_vector_from_slice(vec.as_slice())
 }
