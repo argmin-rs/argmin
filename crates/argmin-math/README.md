@@ -47,7 +47,7 @@
 
 
 This create provides a abstractions for mathematical operations needed in [argmin](https://argmin-rs.org).
-The supported math backends so far are basic `Vec`s, `ndarray` and `nalgebra`.
+The supported math backends so far are basic `Vec`s, `ndarray`, `nalgebra`, and `faer`.
 Please consult the documentation for details.
 
 

@@ -14,11 +14,6 @@ categories = ["science"]
 exclude = []
 
 [dependencies]
-#faer
-#@todo(geo) make optional
-faer_0_20 = {package = "faer", version = "0.20"}
-# faer_core_0_17 = {package = "faer-core", version = "0.17"}
-
 # nalgebra
 nalgebra_0_33 = { package = "nalgebra", version = "0.33", optional = true }
 nalgebra_0_32 = { package = "nalgebra", version = "0.32", optional = true }
@@ -34,6 +29,10 @@ ndarray-linalg_0_16 = { package = "ndarray-linalg", version = "0.16", optional =
 ndarray_0_14 = { package = "ndarray", version = "0.14", optional = true }
 ## v0.13
 ndarray_0_13 = { package = "ndarray", version = "0.13", optional = true }
+
+#faer
+#@todo(geo) TODO make optional true
+faer_0_20 = { package = "faer", version = "0.20", optional = false }
 
 # general
 num-complex_0_4 = { package = "num-complex", version = "0.4", optional = true, default-features = false, features = ["std"] }
@@ -73,6 +72,11 @@ nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]
 # ndarray
 ndarray_all = ["primitives"]
 ndarray_latest = ["ndarray_v0_15"]
+
+#faer
+# faer_all = ["primitives"]
+# faer_latest = ["faer_v0_20"]
+# faer_v0_20  = ["faer_0_20", "num-complex_0_4", "faer_all"]
 
 ## With `ndarray-linalg`
 ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
