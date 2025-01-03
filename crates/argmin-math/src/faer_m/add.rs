@@ -34,8 +34,6 @@ where
     }
 }
 
-//@todo(geo) also add scalar + Matrix and matrix + Scalar (and reference variants?)
-
 /// Mat + Scalar -> Mat
 impl<E, R, C> ArgminAdd<E, Mat<E, R, C>> for Mat<E, R, C>
 where
@@ -73,7 +71,7 @@ where
 {
     #[inline]
     fn add(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        <_ as Add>::add(self, other)
+        self + other
     }
 }
 
@@ -81,6 +79,14 @@ where
 impl<E: Entity + ComplexField> ArgminAdd<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn add(&self, other: &Mat<E>) -> Mat<E> {
+        self + other
+    }
+}
+
+/// Mat + MatRef -> Mat
+impl<E: Entity + ComplexField> ArgminAdd<MatRef<'_, E>, Mat<E>> for Mat<E> {
+    #[inline]
+    fn add(&self, other: &MatRef<'_, E>) -> Mat<E> {
         self + other
     }
 }
@@ -109,9 +115,13 @@ mod tests {
                     let a = vector3_new(1 as $t, 4 as $t, 8 as $t);
                     let b = 34 as $t;
                     let target = vector3_new(35 as $t, 38 as $t, 42 as $t);
-                    let res = <_ as ArgminAdd<$t, _>>::add(&a, &b);
+                    let res1 = <_ as ArgminAdd<$t, _>>::add(&a, &b);
+                    let res2 = <_ as ArgminAdd<$t, _>>::add(&a.as_mat_ref(), &b);
+                    assert_eq!(res1, res2);
+                    assert_eq!(res1.nrows(), 3);
+                    assert_eq!(res1.ncols(), 1);
                     for i in 0..3 {
-                        assert_relative_eq!(target[(i,0)] as f64, res[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target[(i,0)] as f64, res1[(i,0)] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -122,9 +132,13 @@ mod tests {
                     let a = vector3_new(1 as $t, 4 as $t, 8 as $t);
                     let b = 34 as $t;
                     let target = vector3_new(35 as $t, 38 as $t, 42 as $t);
-                    let res = <$t as ArgminAdd<_,_>>::add(&b, &a);
+                    let res1 = <_ as ArgminAdd<_, _>>::add(&b, &a);
+                    let res2 = <_ as ArgminAdd<_, _>>::add(&b, &a.as_mat_ref());
+                    assert_eq!(res1, res2);
+                    assert_eq!(res1.nrows(), 3);
+                    assert_eq!(res1.ncols(), 1);
                     for i in 0..3 {
-                        assert_relative_eq!(target[(i,0)] as f64, res[(i,0)] as f64, epsilon = f64::EPSILON);
+                        assert_relative_eq!(target[(i,0)] as f64, res1[(i,0)] as f64, epsilon = f64::EPSILON);
                     }
                 }
             }
@@ -187,10 +201,18 @@ mod tests {
                         42 as $t, 42 as $t, 42 as $t,
                         42 as $t, 42 as $t, 42 as $t
                     );
-                    let res = <_ as ArgminAdd<_, _>>::add(&a, &b);
+                    let res1 = <_ as ArgminAdd<_, _>>::add(&a, &b);
+                    let res2 = <_ as ArgminAdd<_, _>>::add(&a.as_mat_ref(), &b);
+                    let res3 = <_ as ArgminAdd<_, _>>::add(&a, &b.as_mat_ref());
+                    let res4 = <_ as ArgminAdd<_, _>>::add(&a.as_mat_ref(), &b.as_mat_ref());
+                    assert_eq!(res1, res2);
+                    assert_eq!(res1, res3);
+                    assert_eq!(res1, res4);
+                    assert_eq!(res1.nrows(), 2);
+                    assert_eq!(res1.ncols(), 3);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res1[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
@@ -208,10 +230,14 @@ mod tests {
                         3 as $t, 6 as $t, 10 as $t,
                         4 as $t, 7 as $t, 11 as $t
                     );
-                    let res = <_ as ArgminAdd<$t, _>>::add(&a, &b);
+                    let res1 = <_ as ArgminAdd<$t, _>>::add(&a, &b);
+                    let res2 = <_ as ArgminAdd<$t, _>>::add(&a.as_mat_ref(), &b);
+                    assert_eq!(res1, res2);
+                    assert_eq!(res1.nrows(), 2);
+                    assert_eq!(res1.ncols(), 3);
                     for i in 0..3 {
                         for j in 0..2 {
-                            assert_relative_eq!(target[(j, i)] as f64, res[(j, i)] as f64, epsilon = f64::EPSILON);
+                            assert_relative_eq!(target[(j, i)] as f64, res1[(j, i)] as f64, epsilon = f64::EPSILON);
                         }
                     }
                 }
