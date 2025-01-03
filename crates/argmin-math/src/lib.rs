@@ -6,9 +6,9 @@
 // copied, modified, or distributed except according to those terms.
 
 //! argmin-math provides mathematics related abstractions needed in argmin. It supports
-//! implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`.
-//! The traits can of course also be implemented for your own types to make them compatible with
-//! argmin.
+//! implementations of these abstractions for basic `Vec`s and for the `ndarray`, `nalgebra`,
+//! and `faer` linear algebra libraries. The traits can of course also be implemented
+//! for your own types to make them compatible with argmin.
 //!
 //! For an introduction on how to use argmin, please also have a look at the
 //! [book](https://www.argmin-rs.org/book/).
