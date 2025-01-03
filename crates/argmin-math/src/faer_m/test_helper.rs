@@ -1,18 +1,18 @@
-use faer::{mat::from_column_major_slice_generic, zipped, Conjugate, Mat, SimpleEntity};
+use faer::{mat::from_column_major_slice_generic, zipped, Conjugate, Entity, Mat};
 
 /// create a column vector (in Nx1 matrix form) from a Vec instance
-pub fn column_vector_from_vec<E: SimpleEntity>(vec: Vec<E>) -> Mat<E> {
+pub fn column_vector_from_vec<E: Entity>(vec: Vec<E>) -> Mat<E> {
     column_vector_from_slice(vec.as_slice())
 }
 
 /// create an owning column vector from a slice
-pub fn column_vector_from_slice<E: SimpleEntity>(slice: &[E]) -> Mat<E> {
+pub fn column_vector_from_slice<E: Entity>(slice: &[E]) -> Mat<E> {
     Mat::<E>::from_fn(slice.len(), 1, |ir, _ic| slice[ir])
 }
 
 /// helper method to translate an nalgebra call Vector3::new(a,b,c) to the
 /// equivalent faer matrix constructor
-pub fn vector3_new<E: SimpleEntity>(a: E, b: E, c: E) -> Mat<E> {
+pub fn vector3_new<E: Entity>(a: E, b: E, c: E) -> Mat<E> {
     let v = column_vector_from_slice(&[a, b, c]);
     assert_eq!(v.nrows(), 3);
     assert_eq!(v.ncols(), 1);
@@ -21,7 +21,7 @@ pub fn vector3_new<E: SimpleEntity>(a: E, b: E, c: E) -> Mat<E> {
 
 /// helper method to translate an nalgebra call RowVector3::new(a,b,c) to the
 /// equivalent faer matrix constructor
-pub fn row_vector3_new<E: SimpleEntity>(a: E, b: E, c: E) -> Mat<E> {
+pub fn row_vector3_new<E: Entity>(a: E, b: E, c: E) -> Mat<E> {
     let v = faer::mat![[a, b, c]];
     assert_eq!(v.nrows(), 1);
     assert_eq!(v.ncols(), 3);
@@ -30,7 +30,7 @@ pub fn row_vector3_new<E: SimpleEntity>(a: E, b: E, c: E) -> Mat<E> {
 
 /// helper method to translate an nalgebra call Vector2::new(a,b) to the
 /// equivalent faer matrix constructor
-pub fn vector2_new<E: SimpleEntity>(a: E, b: E) -> Mat<E> {
+pub fn vector2_new<E: Entity>(a: E, b: E) -> Mat<E> {
     let v = column_vector_from_slice(&[a, b]);
     assert_eq!(v.nrows(), 2);
     assert_eq!(v.ncols(), 1);
@@ -39,7 +39,7 @@ pub fn vector2_new<E: SimpleEntity>(a: E, b: E) -> Mat<E> {
 
 /// helper method to translate an nalgebra call Matrix2x3::new(a,b,c, d,e,f) to the
 /// equivalent faer matrix constructor
-pub fn matrix2x3_new<E: SimpleEntity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat<E> {
+pub fn matrix2x3_new<E: Entity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat<E> {
     let m = faer::mat![[a, b, c], [d, e, f]];
     assert_eq!(m.nrows(), 2);
     assert_eq!(m.ncols(), 3);
@@ -48,7 +48,7 @@ pub fn matrix2x3_new<E: SimpleEntity>(a: E, b: E, c: E, d: E, e: E, f: E) -> Mat
 
 /// helper method to translate an nalgebra call Matrix2::new(a,b, c,d) to the
 /// equivalent faer matrix constructor
-pub fn matrix2_new<E: SimpleEntity>(a: E, b: E, c: E, d: E) -> Mat<E> {
+pub fn matrix2_new<E: Entity>(a: E, b: E, c: E, d: E) -> Mat<E> {
     let m = faer::mat![[a, b], [c, d]];
     assert_eq!(m.nrows(), 2);
     assert_eq!(m.ncols(), 2);
@@ -57,17 +57,7 @@ pub fn matrix2_new<E: SimpleEntity>(a: E, b: E, c: E, d: E) -> Mat<E> {
 
 /// helper method to translate an nalgebra call Matrix3::new(a,b,c, d,e,f, g,h,i) to the
 /// equivalent faer matrix constructor
-pub fn matrix3_new<E: SimpleEntity>(
-    a: E,
-    b: E,
-    c: E,
-    d: E,
-    e: E,
-    f: E,
-    g: E,
-    h: E,
-    i: E,
-) -> Mat<E> {
+pub fn matrix3_new<E: Entity>(a: E, b: E, c: E, d: E, e: E, f: E, g: E, h: E, i: E) -> Mat<E> {
     let m = faer::mat![[a, b, c], [d, e, f], [g, h, i]];
     assert_eq!(m.nrows(), 3);
     assert_eq!(m.ncols(), 3);
