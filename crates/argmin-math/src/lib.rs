@@ -219,6 +219,12 @@ cfg_if::cfg_if! {
     }
 }
 
+cfg_if::cfg_if! {
+    if #[cfg(feature = "faer_v0_20")] {
+        extern crate faer_0_20 as faer;
+    }
+}
+
 #[cfg(feature = "primitives")]
 mod primitives;
 #[cfg(feature = "primitives")]
@@ -243,10 +249,9 @@ mod vec;
 #[allow(unused_imports)]
 pub use crate::vec::*;
 
-//@todo(geo) make this conditional
-extern crate faer_0_20 as faer;
-// extern crate faer_core_0_17 as faer_core;
+#[cfg(feature = "faer_all")]
 mod faer_m;
+#[cfg(feature = "faer_all")]
 #[allow(unused_imports)]
 pub use crate::faer_m::*;
 
