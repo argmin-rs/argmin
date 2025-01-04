@@ -68,7 +68,7 @@ nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]
 
 # ndarray
 ndarray_all = ["primitives"]
-ndarray_latest = ["ndarray_v0_15"]
+ndarray_latest = ["ndarray_v0_16"]
 
 ## With `ndarray-linalg`
 ndarray_v0_16 = ["ndarray_0_16", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
