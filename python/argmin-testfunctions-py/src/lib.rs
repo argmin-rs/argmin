@@ -100,7 +100,7 @@ func!(styblinski_tang);
 func!(threehumpcamel, num = 2);
 
 #[pymodule]
-fn argmin_testfunctions_py(_py: Python, m: &PyModule) -> PyResult<()> {
+fn argmin_testfunctions_py(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     add_function!(m, ackley);
     add_function!(m, beale);
     add_function!(m, booth);
