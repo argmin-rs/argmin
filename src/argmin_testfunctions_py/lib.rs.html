@@ -227,7 +227,7 @@
 <span class="macro">func!</span>(threehumpcamel, num = <span class="number">2</span>);
 
 <span class="attr">#[pymodule]
-</span><span class="kw">fn </span>argmin_testfunctions_py(_py: Python, m: <span class="kw-2">&amp;</span>PyModule) -&gt; PyResult&lt;()&gt; {
+</span><span class="kw">fn </span>argmin_testfunctions_py(_py: Python, m: <span class="kw-2">&amp;</span>Bound&lt;<span class="lifetime">'_</span>, PyModule&gt;) -&gt; PyResult&lt;()&gt; {
     <span class="macro">add_function!</span>(m, ackley);
     <span class="macro">add_function!</span>(m, beale);
     <span class="macro">add_function!</span>(m, booth);
