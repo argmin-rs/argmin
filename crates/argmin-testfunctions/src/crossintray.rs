@@ -9,16 +9,19 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = -0.0001 * ( | sin(x_1)*sin(x_2)*exp(| 100 -
-//!                                                      \sqrt{x_1^2+x_2^2} / pi |) | + 1)^0.1`
+//! $$
+//! f(x_1, x_2) = -0.0001\left(\left|\sin(x_1)\sin(x_2)
+//!               \exp\left(\left| 100 - \frac{\sqrt{x_1^2+x_2^2}}{\pi} \right|\right)\right| +
+//!               1\right)^{0.1}
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10,\\,10]$.
 //!
 //! The global minima are at
-//!  * `f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261`.
+//!  * $f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261$.
 
 use std::f64::consts::PI;
 
@@ -28,18 +31,21 @@ use num::{Float, FromPrimitive};
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = -0.0001 * ( | sin(x_1)*sin(x_2)*exp(| 100 -
-///                                                      \sqrt{x_1^2+x_2^2} / pi |) | + 1)^0.1`
+/// $$
+/// f(x_1, x_2) = -0.0001\left(\left|\sin(x_1)\sin(x_2)
+///               \exp\left(\left| 100 - \frac{\sqrt{x_1^2+x_2^2}}{\pi} \right|\right)\right| +
+///               1\right)^{0.1}
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10,\\,10]$.
 ///
 /// The global minima are at
-///  * `f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261`.
+///  * $f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261$.
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 pub fn cross_in_tray<T>(param: &[T; 2]) -> T
 where
     T: Float + Into<f64> + FromPrimitive,
@@ -58,7 +64,7 @@ where
 
 /// Derivative of Cross-in-tray test function
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 pub fn cross_in_tray_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + Into<f64> + FromPrimitive,
@@ -111,9 +117,9 @@ where
 
 /// Hessian of Cross-in-tray test function
 ///
-/// This function may return NaN or INF.
+/// This function may return [NAN][f64::NAN] or [INFINITY][f64::INFINITY].
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 pub fn cross_in_tray_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + Into<f64> + FromPrimitive,
