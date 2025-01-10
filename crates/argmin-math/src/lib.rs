@@ -188,7 +188,9 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray_0_15")] {
+    if #[cfg(feature = "ndarray_0_16")] {
+        extern crate ndarray_0_16 as ndarray;
+    } else if #[cfg(feature = "ndarray_0_15")] {
         extern crate ndarray_0_15 as ndarray;
     } else if #[cfg(feature = "ndarray_0_14")]  {
         extern crate ndarray_0_14 as ndarray;
