@@ -27,6 +27,9 @@ pub enum ItpRootError {
     /// max must be larger than min
     #[error("ItpRoot error: max must be larger than min.")]
     MinLargerThanMax,
+    /// max and min are equivalent
+    #[error("ItpRoot error: max is equivalent to min.")]
+    MaxEqualToMin,
 }
 
 /// # ITP method
@@ -114,6 +117,10 @@ impl<F: ArgminFloat> ItpRoot<F> {
     /// kappa2 is defaulted to 2.0.
     /// n0 is defaulted to 1.0.
     pub fn from_defaults(min: F, max: F, tol: F) -> Result<Self, Error> {
+        if (max - min).is_zero() {
+            return Err(ItpRootError::MaxEqualToMin.into())
+        }
+
         Self::new(
             min,
             max,
