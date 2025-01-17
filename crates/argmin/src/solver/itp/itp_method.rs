@@ -77,8 +77,20 @@ impl<F: ArgminFloat> ItpRoot<F> {
     /// The values `kappa1` and `kappa2` are hyper-parameters tuning the truncation size.
     /// The parameter `n0` is a hyper-parameter slack variable controlling the projection interval
     /// size.
-    pub fn new(min: F, max: F, tol: F, kappa1: F, kappa2: F, n0: F) -> Self {
-        ItpRoot {
+    pub fn new(min: F, max: F, tol: F, kappa1: F, kappa2: F, n0: F) -> Result<Self, Error> {
+        if tol < F::zero() {
+            return Err(ItpRootError::NegativeTol.into());
+        }
+        // This helps ensure the log evaluation (in the init) is stable
+        if min > max {
+            return Err(ItpRootError::MinLargerThanMax.into());
+        }
+        // It's important to check this to verify n1o2 doesn't panic
+        if tol.is_zero() {
+            return Err(ItpRootError::ZeroTol.into());
+        }
+
+        Ok(ItpRoot {
             tol,
             kappa1,
             kappa2,
@@ -87,10 +99,12 @@ impl<F: ArgminFloat> ItpRoot<F> {
             b: max,
             fa: F::nan(),
             fb: F::nan(),
+            // Starts at zero, increments in the solver
             j: F::zero(),
+            // These get computed in the solver
             n1o2: F::nan(),
             nmax: F::nan(),
-        }
+        })
     }
 
     /// Constructor with default hyperparameters
@@ -99,7 +113,7 @@ impl<F: ArgminFloat> ItpRoot<F> {
     /// kappa1 is defaulted to 0.2 / (max - min).
     /// kappa2 is defaulted to 2.0.
     /// n0 is defaulted to 1.0.
-    pub fn from_defaults(min: F, max: F, tol: F) -> Self {
+    pub fn from_defaults(min: F, max: F, tol: F) -> Result<Self, Error> {
         Self::new(
             min,
             max,
@@ -133,17 +147,6 @@ where
         self.fb = problem.cost(&self.b)?;
         if self.fa * self.fb > float!(0.0) {
             return Err(ItpRootError::WrongSign.into());
-        }
-        if self.tol < F::zero() {
-            return Err(ItpRootError::NegativeTol.into());
-        }
-        // This helps ensure the log evaluation is stable
-        if self.a > self.b {
-            return Err(ItpRootError::MinLargerThanMax.into());
-        }
-        // It's important to check this to verify n1o2 doesn't panic
-        if self.tol.is_zero() {
-            return Err(ItpRootError::ZeroTol.into());
         }
 
         // Preprocessing
@@ -257,11 +260,7 @@ mod tests {
         let max: f64 = 2.0;
         let tol: f64 = -1e-6;
 
-        let mut solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol);
-        let mut problem: Problem<Quadratic> = Problem::new(Quadratic {});
-
-        let result: Result<(IterState<f64, (), (), (), (), f64>, Option<KV>), Error> =
-            solver.init(&mut problem, IterState::new());
+        let result = ItpRoot::from_defaults(min, max, tol);
 
         // Check if the initialization fails and we get the correct error message
         assert!(result.is_err());
@@ -277,7 +276,7 @@ mod tests {
         let max: f64 = 3.0;
         let tol: f64 = 1e-6;
 
-        let mut solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol);
+        let mut solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol).unwrap();
         let mut problem: Problem<Quadratic> = Problem::new(Quadratic {});
 
         let result: Result<(IterState<f64, (), (), (), (), f64>, Option<KV>), Error> =
@@ -297,7 +296,7 @@ mod tests {
         let max: f64 = 2.0;
         let tol: f64 = 1e-6;
 
-        let mut solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol);
+        let mut solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol).unwrap();
         let mut problem: Problem<Quadratic> = Problem::new(Quadratic {});
 
         let result: Result<(IterState<f64, (), (), (), (), f64>, Option<KV>), Error> =
@@ -314,7 +313,7 @@ mod tests {
         let tol: f64 = 1e-6;
         let init_param: f64 = 1.5;
 
-        let solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol);
+        let solver: ItpRoot<f64> = ItpRoot::from_defaults(min, max, tol).unwrap();
         let problem: Quadratic = Quadratic {};
 
         let res = Executor::new(problem, solver)
@@ -336,7 +335,7 @@ mod tests {
         let n0: f64 = 1.0;
         let init_param: f64 = 1.5;
 
-        let solver: ItpRoot<f64> = ItpRoot::new(min, max, tol, kappa1, kappa2, n0);
+        let solver: ItpRoot<f64> = ItpRoot::new(min, max, tol, kappa1, kappa2, n0).unwrap();
         let problem: Polynomial = Polynomial {};
 
         let res = Executor::new(problem, solver)
