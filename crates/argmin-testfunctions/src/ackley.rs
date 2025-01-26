@@ -9,12 +9,14 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2, ..., x_n) = - a * exp( -b \sqrt{\frac{1}{d}\sum_{i=1}^n x_i^2 ) -
-//! exp( \frac{1}{d} cos(c * x_i) ) + a + exp(1)`
+//! $$
+//! f(x_1, x_2, ..., x_n) = -a\exp\left(-b\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}\right) -
+//! \exp\left(\frac{1}{n}\sum_{i=1}^{n}\cos(cx_i)\right) + a + \exp(1)
+//! $$
 //!
-//! where `x_i \in [-32.768, 32.768]` and usually `a = 10`, `b = 0.2` and `c = 2*pi`
+//! where $x_i \in [-32.768,\\,32.768]$ and usually $a = 20$, $b = 0.2$ and $c = 2\pi$.
 //!
-//! The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+//! The global minimum is at $f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0$.
 
 use num::{Float, FromPrimitive};
 use std::f64::consts::PI;
@@ -24,12 +26,14 @@ use std::iter::Sum;
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = - a * exp( -b \sqrt{\frac{1}{d}\sum_{i=1}^n x_i^2 ) -
-/// exp( \frac{1}{d} cos(c * x_i) ) + a + exp(1)`
+/// $$
+/// f(x_1, x_2, ..., x_n) = -a\exp\left(-b\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}\right) -
+/// \exp\left(\frac{1}{n}\sum_{i=1}^{n}\cos(cx_i)\right) + a + \exp(1)
+/// $$
 ///
-/// where `x_i \in [-32.768, 32.768]` and usually `a = 10`, `b = 0.2` and `c = 2*pi`
+/// where $x_i \in [-32.768,\\,32.768]$ and usually $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+/// The global minimum is at $f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0$.
 pub fn ackley<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -44,7 +48,7 @@ where
 
 /// Ackley test function
 ///
-/// The same as `ackley`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley`]; however, it allows to set the parameters $a$, $b$ and $c$.
 pub fn ackley_abc<T>(param: &[T], a: T, b: T, c: T) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -59,7 +63,7 @@ where
 
 /// Derivative of Ackley test function
 ///
-/// Calls `ackley_abc_derivative` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_derivative`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 pub fn ackley_derivative<T>(param: &[T]) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum,
@@ -74,7 +78,7 @@ where
 
 /// Derivative of Ackley test function
 ///
-/// The same as `ackley_derivative`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_derivative`]; however, it allows to set the parameters $a$, $b$ and $c$.
 pub fn ackley_abc_derivative<T>(param: &[T], a: T, b: T, c: T) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum,
@@ -100,7 +104,7 @@ where
 
 /// Derivative of Ackley test function
 ///
-/// Calls `ackley_abc_derivative_const` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_derivative_const`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -118,7 +122,7 @@ where
 
 /// Derivative of Ackley test function
 ///
-/// The same as `ackley_derivative`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_derivative`]; however, it allows to set the parameters $a$, $b$ and $c$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -151,7 +155,7 @@ where
 
 /// Hessian of Ackley test function
 ///
-/// Calls `ackley_abc_hessian` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_hessian`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 pub fn ackley_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum + std::fmt::Debug,
@@ -166,7 +170,7 @@ where
 
 /// Hessian of Ackley test function
 ///
-/// The same as `ackley_hessian`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_hessian`]; however, it allows to set the parameters $a$, $b$ and $c$.
 pub fn ackley_abc_hessian<T>(param: &[T], a: T, b: T, c: T) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum,
@@ -216,7 +220,7 @@ where
 
 /// Hessian of Ackley test function
 ///
-/// Calls `ackley_abc_hessian` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_hessian`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -234,7 +238,7 @@ where
 
 /// Hessian of Ackley test function
 ///
-/// The same as `ackley_hessian`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_hessian`]; however, it allows to set the parameters $a$, $b$ and $c$.
 pub fn ackley_abc_hessian_const<const N: usize, T>(param: &[T; N], a: T, b: T, c: T) -> [[T; N]; N]
 where
     T: Float + FromPrimitive + Sum,
