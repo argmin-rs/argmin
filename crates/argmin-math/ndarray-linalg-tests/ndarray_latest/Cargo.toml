@@ -10,8 +10,8 @@ publish = false
 argmin-math = { path = "../../", version = "*", features = [
     "ndarray_latest",
 ] }
-ndarray = { version = "0.15", default-features = false }
-ndarray-linalg = { version = "0.16", default-features = false, features = ["intel-mkl-static"] }
+ndarray = { version = "0.16", default-features = false }
+ndarray-linalg = { version = "0.17", default-features = false, features = ["intel-mkl-static"] }
 num-complex = { version = "0.4", default-features = false }
 num-traits = { version = "0.2", default-features = false }
 num-integer = { version = "0.1", default-features = false }

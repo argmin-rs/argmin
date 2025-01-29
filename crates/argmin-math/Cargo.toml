@@ -23,6 +23,7 @@ nalgebra_0_29 = { package = "nalgebra", version = "0.29", optional = true }
 
 # ndarray
 ndarray_0_16 = { package = "ndarray", version = "0.16", optional = true }
+ndarray-linalg_0_17 = { package = "ndarray-linalg", version = "0.17", optional = true }
 ## v0.15
 ndarray_0_15 = { package = "ndarray", version = "0.15", optional = true }
 ndarray-linalg_0_16 = { package = "ndarray-linalg", version = "0.16", optional = true }
@@ -71,7 +72,7 @@ ndarray_all = ["primitives"]
 ndarray_latest = ["ndarray_v0_16"]
 
 ## With `ndarray-linalg`
-ndarray_v0_16 = ["ndarray_0_16", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
+ndarray_v0_16 = ["ndarray_0_16", "ndarray-linalg_0_17", "num-complex_0_4", "ndarray_all"]
 ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
 
 ## Without `ndarray-linalg`

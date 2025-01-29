@@ -200,7 +200,9 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray-linalg_0_16")] {
+    if #[cfg(feature = "ndarray-linalg_0_17")] {
+        extern crate ndarray_linalg_0_17 as ndarray_linalg;
+    } else if #[cfg(feature = "ndarray-linalg_0_16")] {
         extern crate ndarray_linalg_0_16 as ndarray_linalg;
     }
 }
