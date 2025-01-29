@@ -17,7 +17,7 @@ num-traits = { version = "0.2", default-features = false }
 num-integer = { version = "0.1", default-features = false }
 paste = "1"
 approx = "0.5.0"
-rand = "*" # Should unify with whatever is currently used in argmin itself
+rand = "0.8"
 
 [features]
 
