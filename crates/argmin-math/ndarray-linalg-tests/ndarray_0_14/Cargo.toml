@@ -19,7 +19,7 @@ num-integer = { version = "0.1" }
 anyhow = { version = "<=1.0.48" }
 paste = "1"
 approx = "0.5.0"
-rand = "*" # Should unify with whatever is currently used in argmin itself
+rand = "0.8"
 
 [features]
 
