@@ -57,8 +57,8 @@ Feel free to join the [argmin Discord](https://discord.gg/fYB8AwxxMW)!
 
 Both the source code as well as the documentation are licensed under either of
 
- - Apache License, Version 2.0, ([LICENSE-APACHE][__link35] or <http://www.apache.org/licenses/LICENSE-2.0>)
- - MIT License ([LICENSE-MIT][__link37] or <http://opensource.org/licenses/MIT>)
+ - Apache License, Version 2.0, ([LICENSE-APACHE](https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+ - MIT License ([LICENSE-MIT](https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
