@@ -185,13 +185,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown,wasm32-unknown-emscripten,wasm32-wasi
+          targets: wasm32-unknown-unknown,wasm32-unknown-emscripten,wasm32-wasip1
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
         run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-unknown-unknown --features wasm-bindgen
-      - name: Build target wasm32-wasi with feature wasm-bindgen
-        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-wasi --features wasm-bindgen
+      - name: Build target wasm32-wasip1 with feature wasm-bindgen
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-wasip1 --features wasm-bindgen
       - name: Build target wasm32-unknown-emscripten
         run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-unknown-emscripten --no-default-features --features wasm-bindgen
 
