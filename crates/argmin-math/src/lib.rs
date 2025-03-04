@@ -6,9 +6,9 @@
 // copied, modified, or distributed except according to those terms.
 
 //! argmin-math provides mathematics related abstractions needed in argmin. It supports
-//! implementations of these abstractions for basic `Vec`s and for `ndarray` and `nalgebra`.
-//! The traits can of course also be implemented for your own types to make them compatible with
-//! argmin.
+//! implementations of these abstractions for basic `Vec`s and for the `ndarray`, `nalgebra`,
+//! and `faer` linear algebra libraries. The traits can of course also be implemented
+//! for your own types to make them compatible with argmin.
 //!
 //! For an introduction on how to use argmin, please also have a look at the
 //! [book](https://www.argmin-rs.org/book/).
@@ -74,6 +74,12 @@
 //! | `nalgebra_v0_30`       | no      | version 0.30                             |
 //! | `nalgebra_v0_29`       | no      | version 0.29                             |
 //!
+//! ### `faer`
+//!
+//! | Feature                | Default | Comment                                  |
+//! |------------------------|---------|------------------------------------------|
+//! | `faer_latest`          | no      | latest supported version                 |
+//! | `faer_v0_20`           | no      | version 0.20                             |
 //!
 //! ## Choosing a backend
 //!
@@ -213,6 +219,12 @@ cfg_if::cfg_if! {
     }
 }
 
+cfg_if::cfg_if! {
+    if #[cfg(feature = "faer_v0_20")] {
+        extern crate faer_0_20 as faer;
+    }
+}
+
 #[cfg(feature = "primitives")]
 mod primitives;
 #[cfg(feature = "primitives")]
@@ -236,6 +248,12 @@ mod vec;
 #[cfg(feature = "vec")]
 #[allow(unused_imports)]
 pub use crate::vec::*;
+
+#[cfg(feature = "faer_all")]
+mod faer_m;
+#[cfg(feature = "faer_all")]
+#[allow(unused_imports)]
+pub use crate::faer_m::*;
 
 // Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 pub use anyhow::Error;

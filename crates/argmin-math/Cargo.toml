@@ -30,6 +30,9 @@ ndarray_0_14 = { package = "ndarray", version = "0.14", optional = true }
 ## v0.13
 ndarray_0_13 = { package = "ndarray", version = "0.13", optional = true }
 
+#faer
+faer_0_20 = { package = "faer", version = "0.20", optional = true}
+
 # general
 num-complex_0_4 = { package = "num-complex", version = "0.4", optional = true, default-features = false, features = ["std"] }
 num-complex_0_3 = { package = "num-complex", version = "0.3", optional = true, default-features = false, features = ["std"] }
@@ -68,6 +71,11 @@ nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]
 # ndarray
 ndarray_all = ["primitives"]
 ndarray_latest = ["ndarray_v0_15"]
+
+#faer
+faer_all = ["primitives"]
+faer_latest = ["faer_v0_20"]
+faer_v0_20  = ["faer_0_20", "num-complex_0_4", "faer_all"]
 
 ## With `ndarray-linalg`
 ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
