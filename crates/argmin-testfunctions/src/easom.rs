@@ -9,11 +9,13 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = - cos(x_1) * cos(x_2) * exp(-(x_1 - pi)^2 - (x_2 - pi)^2)`
+//! $$
+//! f(x_1, x_2) = - \cos(x_1)\cos(x_2)\exp\left(-(x_1 - \pi)^2 - (x_2 - \pi)^2\right)
+//! $$
 //!
-//! where `x_i \in [-100, 100]`.
+//! where $x_i \in [-100,\\,100]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(pi, pi) = -1`.
+//! The global minimum is at $f(x_1, x_2) = f(\pi, \pi) = -1$.
 
 use num::{Float, FromPrimitive};
 use std::f64::consts::PI;
@@ -22,11 +24,13 @@ use std::f64::consts::PI;
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = - cos(x_1) * cos(x_2) * exp(-(x_1 - pi)^2 - (x_2 - pi)^2)`
+/// $$
+/// f(x_1, x_2) = - \cos(x_1)\cos(x_2)\exp\left(-(x_1 - \pi)^2 - (x_2 - \pi)^2\right)
+/// $$
 ///
-/// where `x_i \in [-100, 100]`.
+/// where $x_i \in [-100,\\,100]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(pi, pi) = -1`.
+/// The global minimum is at $f(x_1, x_2) = f(\pi, \pi) = -1$.
 pub fn easom<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,

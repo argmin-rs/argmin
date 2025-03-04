@@ -9,11 +9,13 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = (x_1 + 2*x_2 - 7)^2 + (2*x_1 + x_2 - 5)^2`
+//! $$
+//! f(x_1, x_2) = (x_1 + 2x_2 - 7)^2 + (2x_1 + x_2 - 5)^2
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10,\\,10]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(1, 3) = 0`.
+//! The global minimum is at $f(x_1, x_2) = f(1, 3) = 0$.
 
 use num::{Float, FromPrimitive};
 
@@ -21,11 +23,13 @@ use num::{Float, FromPrimitive};
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = (x_1 + 2*x_2 - 7)^2 + (2*x_1 + x_2 - 5)^2
+/// $$
+/// f(x_1, x_2) = (x_1 + 2x_2 - 7)^2 + (2x_1 + x_2 - 5)^2
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10,\\,10]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(1, 3) = 0`.
+/// The global minimum is at $f(x_1, x_2) = f(1, 3) = 0$.
 pub fn booth<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -55,7 +59,7 @@ where
 
 /// Hessian of Booth test function
 ///
-/// Returns [[10, 8], [8, 10]] for every input.
+/// Returns $\left(\begin{matrix}10 & 8\\\\8 & 10\end{matrix}\right)$ for every input.
 pub fn booth_hessian<T>(_param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
