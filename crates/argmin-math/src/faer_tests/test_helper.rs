@@ -1,4 +1,4 @@
-use faer::{mat::from_column_major_slice_generic, zipped, Conjugate, Entity, Mat};
+use faer::{Entity, Mat};
 
 /// create a column vector (in Nx1 matrix form) from a Vec instance
 /// equivalent to the nalgebra call DVector::from_vec

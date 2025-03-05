@@ -36,8 +36,8 @@ impl<E: SimpleEntity + PartialOrd> ArgminMinMax for Mat<E> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_helper::*;
     use super::*;
+    use crate::faer_tests::test_helper::*;
     use approx::assert_relative_eq;
     use paste::item;
 

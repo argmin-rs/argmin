@@ -75,7 +75,7 @@ ndarray_latest = ["ndarray_v0_15"]
 
 #faer
 faer_all = ["primitives"]
-faer_latest = ["faer_v0_21"]
+faer_latest = ["faer_v0_20"]
 faer_v0_20  = ["faer_0_20", "num-complex_0_4", "faer_all"]
 faer_v0_21  = ["faer_0_21", "num-complex_0_4", "faer_all"]
 

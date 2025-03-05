@@ -252,14 +252,28 @@ mod vec;
 #[allow(unused_imports)]
 pub use crate::vec::*;
 
-#[cfg(feature = "faer_all")]
-mod faer_m;
+cfg_if! {
+    // faer has significant breaking changes between 0.20 and 0.21, which
+    // makes this trickery necessary
+    if #[cfg(feature = "faer_v0_20")] {
+        mod faer_m_0_20;
+        use faer_m_0_20 as faer_m;
+    } else if #[cfg(feature = "faer_v0_21")] {
+        mod faer_m_0_21;
+        use faer_m_0_21 as faer_m;
+    }
+}
 #[cfg(feature = "faer_all")]
 #[allow(unused_imports)]
 pub use crate::faer_m::*;
 
+#[cfg(test)]
+#[cfg(feature = "faer_all")]
+mod faer_tests;
+
 // Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 pub use anyhow::Error;
+use cfg_if::cfg_if;
 pub use rand::Rng;
 
 /// Dot/scalar product of `T` and `self`

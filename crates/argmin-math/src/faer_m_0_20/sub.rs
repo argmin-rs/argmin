@@ -92,8 +92,8 @@ impl<E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for Mat<E> {
 
 #[cfg(test)]
 mod test {
-    use super::super::test_helper::*;
     use super::*;
+    use crate::faer_tests::test_helper::*;
     use approx::assert_relative_eq;
     use faer::mat;
     use faer::mat::{AsMatRef, MatRef};

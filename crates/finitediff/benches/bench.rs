@@ -8,7 +8,6 @@
 //! Benches
 
 #![feature(test)]
-
 extern crate finitediff;
 extern crate test;
 

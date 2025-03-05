@@ -17,8 +17,8 @@ impl<E: Entity + num_complex::ComplexFloat> ArgminConj for Mat<E> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_helper::*;
     use super::*;
+    use crate::faer_tests::test_helper::*;
     use approx::assert_relative_eq;
     use faer::linalg::entity::complex_split::ComplexConj;
     use num_complex::Complex;

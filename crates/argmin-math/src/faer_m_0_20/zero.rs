@@ -14,8 +14,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_helper::*;
     use super::*;
+    use crate::faer_tests::test_helper::*;
     use approx::assert_relative_eq;
     use faer::mat;
     use faer::mat::{AsMatRef, MatRef};

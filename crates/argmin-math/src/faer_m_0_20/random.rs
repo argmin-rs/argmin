@@ -36,8 +36,8 @@ impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::test_helper::*;
     use super::*;
+    use crate::faer_tests::test_helper::*;
     use faer::mat;
     use faer::Mat;
     use paste::item;
