@@ -79,6 +79,7 @@
 //! | Feature                | Default | Comment                                  |
 //! |------------------------|---------|------------------------------------------|
 //! | `faer_latest`          | no      | latest supported version                 |
+//! | `faer_v0_21`           | no      | version 0.21                             |
 //! | `faer_v0_20`           | no      | version 0.20                             |
 //!
 //! ## Choosing a backend
@@ -222,6 +223,8 @@ cfg_if::cfg_if! {
 cfg_if::cfg_if! {
     if #[cfg(feature = "faer_v0_20")] {
         extern crate faer_0_20 as faer;
+    } else if #[cfg(feature = "faer_v0_21")] {
+        extern crate faer_0_21 as faer;
     }
 }
 
