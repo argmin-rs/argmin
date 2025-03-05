@@ -1,4 +1,18 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/ackley.rs`."><title>ackley.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>ackley.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/ackley.rs`."><title>ackley.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+            ]
+        });
+    });
+</script>
+
+</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>ackley.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -461,7 +475,11 @@
 <a href="#460" id="460">460</a>
 <a href="#461" id="461">461</a>
 <a href="#462" id="462">462</a>
-<a href="#463" id="463">463</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -472,12 +490,14 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2, ..., x_n) = - a * exp( -b \sqrt{\frac{1}{d}\sum_{i=1}^n x_i^2 ) -
-//! exp( \frac{1}{d} cos(c * x_i) ) + a + exp(1)`
+//! $$
+//! f(x_1, x_2, ..., x_n) = -a\exp\left(-b\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}\right) -
+//! \exp\left(\frac{1}{n}\sum_{i=1}^{n}\cos(cx_i)\right) + a + \exp(1)
+//! $$
 //!
-//! where `x_i \in [-32.768, 32.768]` and usually `a = 10`, `b = 0.2` and `c = 2*pi`
+//! where $x_i \in [-32.768,\\,32.768]$ and usually $a = 20$, $b = 0.2$ and $c = 2\pi$.
 //!
-//! The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+//! The global minimum is at $f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0$.
 
 </span><span class="kw">use </span>num::{Float, FromPrimitive};
 <span class="kw">use </span>std::f64::consts::PI;
@@ -487,12 +507,14 @@
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = - a * exp( -b \sqrt{\frac{1}{d}\sum_{i=1}^n x_i^2 ) -
-/// exp( \frac{1}{d} cos(c * x_i) ) + a + exp(1)`
+/// $$
+/// f(x_1, x_2, ..., x_n) = -a\exp\left(-b\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2}\right) -
+/// \exp\left(\frac{1}{n}\sum_{i=1}^{n}\cos(cx_i)\right) + a + \exp(1)
+/// $$
 ///
-/// where `x_i \in [-32.768, 32.768]` and usually `a = 10`, `b = 0.2` and `c = 2*pi`
+/// where $x_i \in [-32.768,\\,32.768]$ and usually $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+/// The global minimum is at $f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0$.
 </span><span class="kw">pub fn </span>ackley&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; T
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
@@ -507,7 +529,7 @@
 
 <span class="doccomment">/// Ackley test function
 ///
-/// The same as `ackley`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley`]; however, it allows to set the parameters $a$, $b$ and $c$.
 </span><span class="kw">pub fn </span>ackley_abc&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T, c: T) -&gt; T
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
@@ -522,7 +544,7 @@
 
 <span class="doccomment">/// Derivative of Ackley test function
 ///
-/// Calls `ackley_abc_derivative` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_derivative`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 </span><span class="kw">pub fn </span>ackley_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;T&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
@@ -537,7 +559,7 @@
 
 <span class="doccomment">/// Derivative of Ackley test function
 ///
-/// The same as `ackley_derivative`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_derivative`]; however, it allows to set the parameters $a$, $b$ and $c$.
 </span><span class="kw">pub fn </span>ackley_abc_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T, c: T) -&gt; Vec&lt;T&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
@@ -563,7 +585,7 @@
 
 <span class="doccomment">/// Derivative of Ackley test function
 ///
-/// Calls `ackley_abc_derivative_const` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_derivative_const`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -581,7 +603,7 @@
 
 <span class="doccomment">/// Derivative of Ackley test function
 ///
-/// The same as `ackley_derivative`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_derivative`]; however, it allows to set the parameters $a$, $b$ and $c$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -614,7 +636,7 @@
 
 <span class="doccomment">/// Hessian of Ackley test function
 ///
-/// Calls `ackley_abc_hessian` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_hessian`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 </span><span class="kw">pub fn </span>ackley_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T]) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum + std::fmt::Debug,
@@ -629,7 +651,7 @@
 
 <span class="doccomment">/// Hessian of Ackley test function
 ///
-/// The same as `ackley_hessian`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_hessian`]; however, it allows to set the parameters $a$, $b$ and $c$.
 </span><span class="kw">pub fn </span>ackley_abc_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T], a: T, b: T, c: T) -&gt; Vec&lt;Vec&lt;T&gt;&gt;
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,
@@ -679,7 +701,7 @@
 
 <span class="doccomment">/// Hessian of Ackley test function
 ///
-/// Calls `ackley_abc_hessian` with `a = 10`, `b = 0.2` and `c = 2*pi`
+/// Calls [`ackley_abc_hessian`] with $a = 20$, $b = 0.2$ and $c = 2\pi$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -697,7 +719,7 @@
 
 <span class="doccomment">/// Hessian of Ackley test function
 ///
-/// The same as `ackley_hessian`; however, it allows to set the parameters a, b and c.
+/// The same as [`ackley_hessian`]; however, it allows to set the parameters $a$, $b$ and $c$.
 </span><span class="kw">pub fn </span>ackley_abc_hessian_const&lt;<span class="kw">const </span>N: usize, T&gt;(param: <span class="kw-2">&amp;</span>[T; N], a: T, b: T, c: T) -&gt; [[T; N]; N]
 <span class="kw">where
     </span>T: Float + FromPrimitive + Sum,

@@ -1,4 +1,18 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/crossintray.rs`."><title>crossintray.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>crossintray.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/crossintray.rs`."><title>crossintray.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0 (4d91de4e4 2025-02-17)" data-channel="1.85.0" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false},
+            ]
+        });
+    });
+</script>
+
+</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>crossintray.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -289,7 +303,13 @@
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -300,16 +320,19 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = -0.0001 * ( | sin(x_1)*sin(x_2)*exp(| 100 -
-//!                                                      \sqrt{x_1^2+x_2^2} / pi |) | + 1)^0.1`
+//! $$
+//! f(x_1, x_2) = -0.0001\left(\left|\sin(x_1)\sin(x_2)
+//!               \exp\left(\left| 100 - \frac{\sqrt{x_1^2+x_2^2}}{\pi} \right|\right)\right| +
+//!               1\right)^{0.1}
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10,\\,10]$.
 //!
 //! The global minima are at
-//!  * `f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261`.
-//!  * `f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261`.
+//!  * $f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261$.
+//!  * $f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261$.
 
 </span><span class="kw">use </span>std::f64::consts::PI;
 
@@ -319,18 +342,21 @@
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = -0.0001 * ( | sin(x_1)*sin(x_2)*exp(| 100 -
-///                                                      \sqrt{x_1^2+x_2^2} / pi |) | + 1)^0.1`
+/// $$
+/// f(x_1, x_2) = -0.0001\left(\left|\sin(x_1)\sin(x_2)
+///               \exp\left(\left| 100 - \frac{\sqrt{x_1^2+x_2^2}}{\pi} \right|\right)\right| +
+///               1\right)^{0.1}
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10,\\,10]$.
 ///
 /// The global minima are at
-///  * `f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261`.
-///  * `f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261`.
+///  * $f(x_1, x_2) = f(1.34941, 1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(1.34941, -1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(-1.34941, 1.34941) = -2.06261$.
+///  * $f(x_1, x_2) = f(-1.34941, -1.34941) = -2.06261$.
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 </span><span class="kw">pub fn </span>cross_in_tray&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
 <span class="kw">where
     </span>T: Float + Into&lt;f64&gt; + FromPrimitive,
@@ -349,7 +375,7 @@
 
 <span class="doccomment">/// Derivative of Cross-in-tray test function
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 </span><span class="kw">pub fn </span>cross_in_tray_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [T; <span class="number">2</span>]
 <span class="kw">where
     </span>T: Float + Into&lt;f64&gt; + FromPrimitive,
@@ -402,9 +428,9 @@
 
 <span class="doccomment">/// Hessian of Cross-in-tray test function
 ///
-/// This function may return NaN or INF.
+/// This function may return [NAN][f64::NAN] or [INFINITY][f64::INFINITY].
 ///
-/// Note: Even if the input parameters are f32, internal computations will be performed in f64.
+/// Note: Even if the input parameters are [`f32`], internal computations will be performed in [`f64`].
 </span><span class="kw">pub fn </span>cross_in_tray_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
 <span class="kw">where
     </span>T: Float + Into&lt;f64&gt; + FromPrimitive,
