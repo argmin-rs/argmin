@@ -7,7 +7,7 @@
 
 //! A collection of two- and multidimensional test functions (and their derivatives and Hessians)
 //! for optimization algorithms. For two-dimensional test functions, the derivate and Hessian
-//! calculation does not allocate. For multi-dimensional tes functions, the derivative and Hessian
+//! calculation does not allocate. For multi-dimensional test functions, the derivative and Hessian
 //! calculation comes in two variants. One variant returns `Vec`s and hence does allocate. This is
 //! needed for cases, where the number of parameters is only known at run time. In case the number
 //! of parameters are known at compile-time, the `_const` variants can be used, which return fixed
@@ -17,11 +17,11 @@
 //! `<test function name>_hessian`, respectively. The const generics variants are defined as
 //! `<test function name>_derivative_const` and `<test function name>_hessian_const`.
 //!
-//! Some functions, such as `ackley`, `rosenbrock` and `rastrigin` come with additional optional
-//! parameters which change the shape of the functions. These additional parameters are exposed in
-//! `ackley_abc`, `rosenbrock_ab` and `rastrigin_a`.
+//! Some functions, such as [`ackley()`], [`rosenbrock()`] and [`rastrigin()`] come with additional
+//! optional parameters which change the shape of the functions. These additional parameters
+//! are exposed in [`ackley_abc()`], [`rosenbrock_ab()`] and [`rastrigin_a()`].
 //!
-//! All functions are generic over their inputs and work with `[f64]` and `[f32]`.
+//! All functions are generic over their inputs and work with [`f64`] and [`f32`].
 //!
 //! ## Python wrapper
 //!
