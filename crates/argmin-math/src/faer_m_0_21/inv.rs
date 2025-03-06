@@ -1,12 +1,11 @@
 use crate::ArgminInv;
 use faer::{
-    dyn_stack::{GlobalPodBuffer, PodStack},
-    linalg::lu::partial_pivoting::compute::{lu_in_place, lu_in_place_req},
+    linalg::solvers::DenseSolveCore,
     mat::{AsMatMut, AsMatRef},
-    prelude::SolverCore,
     reborrow::ReborrowMut,
-    Entity, Mat, MatRef, RealField, SimpleEntity,
+    Mat, MatRef,
 };
+use faer_traits::{math_utils, ComplexField, RealField};
 use std::fmt;
 
 #[derive(Debug, thiserror::Error, PartialEq)]
@@ -20,7 +19,7 @@ impl fmt::Display for InverseError {
 }
 
 /// calculate the inverse via LU decomposition with full pivoting
-impl<E: SimpleEntity + RealField + PartialOrd> ArgminInv<Mat<E>> for MatRef<'_, E> {
+impl<E: RealField + PartialOrd> ArgminInv<Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
         //@note(geo-ant) this panic is consistent with the
@@ -34,9 +33,10 @@ impl<E: SimpleEntity + RealField + PartialOrd> ArgminInv<Mat<E>> for MatRef<'_, 
         // invertible, we perform a rank-revealing decomposition
         // and check the diagonal elements of the appropriate matrix
         let lu_decomp = self.full_piv_lu(); //@note(geo-ant) rank revealing
-        let umat = lu_decomp.compute_u();
+        let umat = lu_decomp.U();
         let is_singular = umat.diagonal().column_vector().iter().any(|elem: &E| {
-            !elem.faer_is_finite() || (elem.faer_abs() <= E::faer_zero_threshold())
+            !math_utils::is_finite(elem)
+                || (math_utils::abs(elem) <= math_utils::min_positive::<E>())
         });
         if !is_singular {
             Ok(lu_decomp.inverse())
@@ -47,7 +47,7 @@ impl<E: SimpleEntity + RealField + PartialOrd> ArgminInv<Mat<E>> for MatRef<'_, 
 }
 
 /// calculate the inverse via LU decomposition with full pivoting
-impl<E: SimpleEntity + RealField> ArgminInv<Mat<E>> for Mat<E> {
+impl<E: RealField> ArgminInv<Mat<E>> for Mat<E> {
     #[inline]
     fn inv(&self) -> Result<Mat<E>, anyhow::Error> {
         <_ as ArgminInv<_>>::inv(&self.as_mat_ref())

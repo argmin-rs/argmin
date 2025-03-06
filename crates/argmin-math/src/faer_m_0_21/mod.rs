@@ -9,10 +9,10 @@
 
 mod add;
 mod conj;
-// mod div;
+mod div;
 // mod dot;
-// mod eye;
-// mod inv;
+mod eye;
+mod inv;
 // mod l1norm;
 // mod l2norm;
 // mod minmax;
@@ -30,8 +30,8 @@ mod conj;
 // mod transpose;
 // mod zero;
 
-// pub use add::*;
-// pub use conj::*;
+pub use add::*;
+pub use conj::*;
 // pub use div::*;
 // pub use dot::*;
 // pub use eye::*;

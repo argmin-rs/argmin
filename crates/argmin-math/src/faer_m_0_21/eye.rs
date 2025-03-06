@@ -1,7 +1,8 @@
 use crate::ArgminEye;
-use faer::{ComplexField, Entity, Mat, Shape};
+use faer::{Mat, Shape};
+use faer_traits::ComplexField;
 
-impl<E: Entity + ComplexField, R: Shape, C: Shape> ArgminEye for Mat<E, R, C>
+impl<E: ComplexField, R: Shape, C: Shape> ArgminEye for Mat<E, R, C>
 where
     R: TryFrom<usize>,
     C: TryFrom<usize>,

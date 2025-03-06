@@ -2,25 +2,26 @@ use crate::ArgminDiv;
 use faer::{
     mat::AsMatRef,
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    unzipped, zipped_rw, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
+    unzip, zip, Mat, MatMut, MatRef,
 };
+use faer_traits::{ComplexField, DivByRef};
 use std::ops::{Div, DivAssign};
 
 /// MatRef / Scalar -> MatRef
 impl<E> ArgminDiv<E, Mat<E>> for MatRef<'_, E>
 where
-    E: Entity + Div<E, Output = E>,
+    E: ComplexField + DivByRef<Output = E>,
 {
     #[inline]
     fn div(&self, other: &E) -> Mat<E> {
-        zipped_rw!(self).map(|unzipped!(this)| this.read() / *other)
+        zip!(self).map(|unzip!(this)| this.div_by_ref(other))
     }
 }
 
 /// Mat / Scalar -> Mat
 impl<E> ArgminDiv<E, Mat<E>> for Mat<E>
 where
-    E: Entity + Div<E, Output = E>,
+    E: ComplexField + DivByRef<Output = E>,
 {
     #[inline]
     fn div(&self, other: &E) -> Mat<E> {
@@ -34,20 +35,20 @@ where
 /// Scalar / MatRef -> Mat
 impl<'a, E> ArgminDiv<MatRef<'a, E>, Mat<E>> for E
 where
-    E: Entity + Div<E, Output = E>,
+    E: ComplexField + DivByRef<Output = E>,
 {
     #[inline]
     fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
         // does not commute with the expressions above, which is why
         // we need our own implementations
-        zipped_rw!(other).map(|unzipped!(other_elem)| *self / other_elem.read())
+        zip!(other).map(|unzip!(other_elem)| self.div_by_ref(other_elem))
     }
 }
 
 /// Scalar / Mat -> Mat
 impl<E> ArgminDiv<Mat<E>, Mat<E>> for E
 where
-    E: Entity + Div<E, Output = E>,
+    E: ComplexField + DivByRef<Output = E>,
 {
     #[inline]
     fn div(&self, other: &Mat<E>) -> Mat<E> {
@@ -59,15 +60,17 @@ where
 }
 
 /// MatRef / MatRef -> Mat (pointwise division)
-impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
+impl<'a, E: ComplexField + DivByRef<Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>>
+    for MatRef<'_, E>
+{
     #[inline]
     fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        zipped_rw!(self, other).map(|unzipped!(this, other)| this.read() / other.read())
+        zip!(self, other).map(|unzip!(this, other)| this.div_by_ref(other))
     }
 }
 
 /// Mat / MatRef -> Mat (pointwise division)
-impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for Mat<E> {
+impl<'a, E: ComplexField + DivByRef<Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for Mat<E> {
     #[inline]
     fn div(&self, other: &MatRef<'a, E>) -> Mat<E> {
         <_ as ArgminDiv<_, _>>::div(&self.as_mat_ref(), other)
@@ -75,7 +78,7 @@ impl<'a, E: Entity + Div<E, Output = E>> ArgminDiv<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// MatRef / Mat-> Mat (pointwise division)
-impl<E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'_, E> {
+impl<E: ComplexField + DivByRef<Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn div(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminDiv<_, _>>::div(self, &other.as_mat_ref())
@@ -83,7 +86,7 @@ impl<E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for MatRef<'_, E>
 }
 
 /// Mat / Mat-> Mat (pointwise division)
-impl<E: Entity + Div<E, Output = E>> ArgminDiv<Mat<E>, Mat<E>> for Mat<E> {
+impl<E: ComplexField + DivByRef<Output = E>> ArgminDiv<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn div(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminDiv<_, _>>::div(&self.as_mat_ref(), &other.as_mat_ref())

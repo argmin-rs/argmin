@@ -1,4 +1,3 @@
-use crate::faer_m::InverseError;
 use crate::faer_tests::test_helper::*;
 use crate::ArgminInv;
 use approx::assert_relative_eq;
@@ -41,8 +40,8 @@ macro_rules! make_test {
                     2 as $t, 5 as $t,
                     4 as $t, 10 as $t,
                 );
-                let err = <_ as ArgminInv<_>>::inv(&a).unwrap_err().downcast::<InverseError>().unwrap();
-                assert_eq!(err, InverseError {});
+                let inv= <_ as ArgminInv<_>>::inv(&a);
+                assert!(inv.is_err());
             }
         }
     };

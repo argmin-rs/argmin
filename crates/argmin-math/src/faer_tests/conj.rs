@@ -25,8 +25,8 @@ macro_rules! make_test {
                 assert_eq!(res.nrows(),3);
                 assert_eq!(res.ncols(),1);
                 for i in 0..3 {
-                    assert_relative_eq!(b.read(i,0).re(), res.read(i,0).re(), epsilon = $t::EPSILON);
-                    assert_relative_eq!(b.read(i,0).im(), res.read(i,0).im(), epsilon = $t::EPSILON);
+                    assert_relative_eq!(matrix_element_at(&b,(i,0)).re(), matrix_element_at(&res,(i,0)).re(), epsilon = $t::EPSILON);
+                    assert_relative_eq!(matrix_element_at(&b,(i,0)).im(), matrix_element_at(&res,(i,0)).im(), epsilon = $t::EPSILON);
                 }
             }
         }

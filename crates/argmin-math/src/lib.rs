@@ -264,6 +264,7 @@ cfg_if! {
         use faer_m_0_21 as faer_m;
     }
 }
+
 #[cfg(feature = "faer_all")]
 #[allow(unused_imports)]
 pub use crate::faer_m::*;
