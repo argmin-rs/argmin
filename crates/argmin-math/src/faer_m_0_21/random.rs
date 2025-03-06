@@ -1,8 +1,8 @@
 use crate::ArgminRandom;
-use faer::{unzipped, Entity, Mat};
+use faer::Mat;
 use rand::distributions::uniform::SampleUniform;
 
-impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
+impl<E: PartialOrd + SampleUniform + Copy> ArgminRandom for Mat<E> {
     fn rand_from_range<R: rand::Rng>(min: &Self, max: &Self, rng: &mut R) -> Self {
         assert!(
             min.nrows() != 0 || min.ncols() != 0,
@@ -14,9 +14,9 @@ impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
             "internal error: matrices of same shape expected"
         );
 
-        faer::zipped_rw!(min, max).map(|unzipped!(min, max)| {
-            let a = min.read();
-            let b = max.read();
+        faer::zip!(min, max).map(|faer::unzip!(min, max)| {
+            let a = *min;
+            let b = *max;
             //@note(geo-ant) code was copied from the nalgebra implementation
             // to get the exact same behaviour
             // Do not require a < b:

@@ -1,9 +1,9 @@
 use crate::ArgminZeroLike;
-use faer::{Entity, Mat, Shape};
+use faer::{Mat, Shape};
 
 impl<E, R, C> ArgminZeroLike for Mat<E, R, C>
 where
-    E: Entity,
+    E: faer_traits::ComplexField,
     R: Shape,
     C: Shape,
 {

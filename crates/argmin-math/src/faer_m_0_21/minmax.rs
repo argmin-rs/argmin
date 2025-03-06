@@ -1,10 +1,10 @@
 use crate::ArgminMinMax;
-use faer::{mat, unzipped, zipped, Entity, Mat, MatRef, SimpleEntity};
+use faer::{mat, unzip, zip, Mat, MatRef};
 
-impl<E: SimpleEntity + PartialOrd> ArgminMinMax for Mat<E> {
+impl<E: PartialOrd + Copy> ArgminMinMax for Mat<E> {
     #[inline]
     fn max(a: &Self, b: &Self) -> Self {
-        faer::zipped!(a, b).map(|faer::unzipped!(a, b)| {
+        faer::zip!(a, b).map(|faer::unzip!(a, b)| {
             let aa = *a;
             let bb = *b;
             //@note(geo-ant) directly cribbed from the nalgebra implementation
@@ -19,7 +19,7 @@ impl<E: SimpleEntity + PartialOrd> ArgminMinMax for Mat<E> {
 
     #[inline]
     fn min(a: &Mat<E>, b: &Mat<E>) -> Mat<E> {
-        faer::zipped!(a, b).map(|faer::unzipped!(a, b)| {
+        faer::zip!(a, b).map(|faer::unzip!(a, b)| {
             let aa = *a;
             let bb = *b;
             //@note(geo-ant) directly cribbed from the nalgebra implementation

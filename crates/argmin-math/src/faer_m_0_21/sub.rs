@@ -2,25 +2,26 @@ use crate::ArgminSub;
 use faer::{
     mat::AsMatRef,
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    unzipped, zipped_rw, Conjugate, Entity, Mat, MatMut, MatRef, SimpleEntity,
+    unzip, zip, Mat, MatMut, MatRef,
 };
+use faer_traits::{ComplexField, Conjugate};
 use std::ops::{Sub, SubAssign};
 
 /// MatRef / Scalar -> MatRef
 impl<E> ArgminSub<E, Mat<E>> for MatRef<'_, E>
 where
-    E: Entity + Sub<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn sub(&self, other: &E) -> Mat<E> {
-        zipped_rw!(self).map(|unzipped!(this)| this.read() - *other)
+        zip!(self).map(|unzip!(this)| this.sub_by_ref(other))
     }
 }
 
 /// Mat / Scalar -> Mat
 impl<E> ArgminSub<E, Mat<E>> for Mat<E>
 where
-    E: Entity + Sub<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn sub(&self, other: &E) -> Mat<E> {
@@ -34,20 +35,20 @@ where
 /// Scalar / MatRef -> Mat
 impl<'a, E> ArgminSub<MatRef<'a, E>, Mat<E>> for E
 where
-    E: Entity + Sub<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn sub(&self, other: &MatRef<'a, E>) -> Mat<E> {
         // does not commute with the expressions above, which is why
         // we need our own implementations
-        zipped_rw!(other).map(|unzipped!(other_elem)| *self - other_elem.read())
+        zip!(other).map(|unzip!(other_elem)| self.sub_by_ref(other_elem))
     }
 }
 
 /// Scalar / Mat -> Mat
 impl<E> ArgminSub<Mat<E>, Mat<E>> for E
 where
-    E: Entity + Sub<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn sub(&self, other: &Mat<E>) -> Mat<E> {
@@ -59,15 +60,15 @@ where
 }
 
 /// MatRef / MatRef -> Mat
-impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
+impl<'a, E: ComplexField> ArgminSub<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn sub(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        zipped_rw!(self, other).map(|unzipped!(this, other)| this.read() - other.read())
+        zip!(self, other).map(|unzip!(this, other)| this.sub_by_ref(other))
     }
 }
 
 /// Mat / MatRef -> Mat
-impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for Mat<E> {
+impl<'a, E: ComplexField> ArgminSub<MatRef<'a, E>, Mat<E>> for Mat<E> {
     #[inline]
     fn sub(&self, other: &MatRef<'a, E>) -> Mat<E> {
         <_ as ArgminSub<_, _>>::sub(&self.as_mat_ref(), other)
@@ -75,7 +76,7 @@ impl<'a, E: Entity + Sub<E, Output = E>> ArgminSub<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// MatRef / Mat-> Mat
-impl<E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for MatRef<'_, E> {
+impl<E: ComplexField> ArgminSub<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn sub(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminSub<_, _>>::sub(self, &other.as_mat_ref())
@@ -83,7 +84,7 @@ impl<E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for MatRef<'_, E>
 }
 
 /// Mat / Mat-> Mat
-impl<E: Entity + Sub<E, Output = E>> ArgminSub<Mat<E>, Mat<E>> for Mat<E> {
+impl<E: ComplexField> ArgminSub<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn sub(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminSub<_, _>>::sub(&self.as_mat_ref(), &other.as_mat_ref())

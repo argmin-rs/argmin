@@ -1,14 +1,16 @@
 use crate::ArgminL1Norm;
-use faer::{ComplexField, Entity, Mat, MatRef, SimpleEntity};
+use faer::mat::AsMatRef;
+use faer::{Mat, MatRef};
+use faer_traits::ComplexField;
 
-impl<E: Entity + ComplexField> ArgminL1Norm<E::Real> for MatRef<'_, E> {
+impl<E: ComplexField> ArgminL1Norm<E::Real> for MatRef<'_, E> {
     fn l1_norm(&self) -> E::Real {
         self.norm_l1()
     }
 }
 
-impl<E: Entity + ComplexField> ArgminL1Norm<E::Real> for Mat<E> {
+impl<E: ComplexField> ArgminL1Norm<E::Real> for Mat<E> {
     fn l1_norm(&self) -> E::Real {
-        self.norm_l1()
+        self.as_mat_ref().norm_l1()
     }
 }

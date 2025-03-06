@@ -1,5 +1,6 @@
 use crate::ArgminSignum;
-use faer::{unzipped, zipped_rw, Entity, Mat, MatRef, Shape};
+use faer::{Mat, MatRef, Shape};
+use faer_traits::ComplexField;
 use num_complex::Complex;
 
 /// helper trait that indicates the signum of a numeric value can
@@ -7,13 +8,13 @@ use num_complex::Complex;
 //@note(geo-ant): one could also decide to implement ArgminSignum
 // on the primitive types themselves.
 trait SignumInternal {
-    fn signum_internal(self) -> Self;
+    fn signum_internal(&self) -> Self;
 }
 
 macro_rules! make_signum {
     ($t:ty) => {
         impl SignumInternal for $t {
-            fn signum_internal(self) -> Self {
+            fn signum_internal(&self) -> Self {
                 self.signum()
             }
         }
@@ -23,7 +24,7 @@ macro_rules! make_signum {
 macro_rules! make_signum_complex {
     ($t:ty) => {
         impl SignumInternal for $t {
-            fn signum_internal(self) -> Self {
+            fn signum_internal(&self) -> Self {
                 Complex {
                     re: self.re.signum(),
                     im: self.im.signum(),
@@ -48,12 +49,12 @@ make_signum_complex!(Complex<f64>);
 
 impl<E, R, C> ArgminSignum for Mat<E, R, C>
 where
-    E: Entity + SignumInternal,
+    E: ComplexField + SignumInternal,
     R: Shape,
     C: Shape,
 {
     #[inline]
     fn signum(self) -> Self {
-        zipped_rw!(self).map(|unzipped!(elem)| elem.read().signum_internal())
+        faer::zip!(&self).map(|faer::unzip!(elem)| elem.signum_internal())
     }
 }

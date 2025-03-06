@@ -2,26 +2,26 @@ use crate::ArgminMul;
 use faer::{
     mat::{AsMatMut, AsMatRef},
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    unzipped, zipped, zipped_rw, ComplexField, Conjugate, Entity, Mat, MatMut, MatRef,
-    SimpleEntity,
+    Mat, MatMut, MatRef,
 };
+use faer_traits::ComplexField;
 use std::ops::Mul;
 
 /// MatRef * Scalar -> Mat
 impl<E> ArgminMul<E, Mat<E>> for MatRef<'_, E>
 where
-    E: Entity + Mul<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn mul(&self, other: &E) -> Mat<E> {
-        zipped_rw!(self).map(|unzipped!(this)| this.read() * *other)
+        faer::zip!(self).map(|faer::unzip!(this)| this.mul_by_ref(other))
     }
 }
 
 /// Scalar * MatRef-> Mat
 impl<'a, E> ArgminMul<MatRef<'a, E>, Mat<E>> for E
 where
-    E: Entity + Mul<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
@@ -33,7 +33,7 @@ where
 /// Mat * Scalar -> Mat
 impl<E> ArgminMul<E, Mat<E>> for Mat<E>
 where
-    E: Entity + Mul<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn mul(&self, other: &E) -> Mat<E> {
@@ -47,7 +47,7 @@ where
 /// Scalar * Mat -> Mat
 impl<E> ArgminMul<Mat<E>, Mat<E>> for E
 where
-    E: Entity + Mul<E, Output = E>,
+    E: ComplexField,
 {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
@@ -57,15 +57,15 @@ where
 }
 
 /// MatRef * MatRef -> Mat (pointwise multiplication)
-impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
+impl<'a, E: ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        zipped!(self, other).map(|unzipped!(this, other)| *this * *other)
+        faer::zip!(self, other).map(|faer::unzip!(this, other)| this.mul_by_ref(other))
     }
 }
 
 /// MatRef * Mat -> Mat (pointwise multiplication)
-impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
+impl<E: ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminMul<_, _>>::mul(self, &other.as_mat_ref())
@@ -73,7 +73,7 @@ impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for MatRef<'_, E>
 }
 
 /// Mat * MatRef-> Mat (pointwise multiplication)
-impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Mat<E> {
+impl<'a, E: ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
         <_ as ArgminMul<_, _>>::mul(&self.as_mat_ref(), other)
@@ -81,7 +81,7 @@ impl<'a, E: SimpleEntity + ComplexField> ArgminMul<MatRef<'a, E>, Mat<E>> for Ma
 }
 
 /// Mat * Mat -> Mat (pointwise multiplication)
-impl<E: SimpleEntity + ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
+impl<E: ComplexField> ArgminMul<Mat<E>, Mat<E>> for Mat<E> {
     #[inline]
     fn mul(&self, other: &Mat<E>) -> Mat<E> {
         <_ as ArgminMul<_, _>>::mul(&self.as_mat_ref(), &other.as_mat_ref())
