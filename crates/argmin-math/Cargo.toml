@@ -52,7 +52,7 @@ paste = "1"
 approx = "0.5.0"
 
 [features]
-default = ["primitives", "vec", "faer_latest"] #todo!! remove faer from default features
+default = ["primitives", "vec"]
 latest_all = ["primitives", "vec", "nalgebra_latest", "ndarray_latest"]
 
 # primitives
