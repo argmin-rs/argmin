@@ -10,7 +10,7 @@
 mod add;
 mod conj;
 mod div;
-// mod dot;
+mod dot;
 mod eye;
 mod inv;
 mod l1norm;

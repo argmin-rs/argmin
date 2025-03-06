@@ -1,5 +1,6 @@
 use crate::ArgminDot;
-use faer::{mat::AsMatRef, ComplexField, Mat, MatRef, SimpleEntity};
+use faer::{mat::AsMatRef, Mat, MatRef};
+use faer_traits::ComplexField;
 use std::ops::Mul;
 
 //@note(geo): the order is important here.
@@ -14,7 +15,7 @@ mod matrix_matrix_multiplication {
     use super::*;
 
     /// MatRef . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
+    impl<'a, E: ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
             self * other
@@ -22,7 +23,7 @@ mod matrix_matrix_multiplication {
     }
 
     /// MatRef . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'_, E> {
+    impl<E: ComplexField> ArgminDot<Mat<E>, Mat<E>> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> Mat<E> {
             <_ as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
@@ -30,7 +31,7 @@ mod matrix_matrix_multiplication {
     }
 
     /// Mat . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for Mat<E> {
+    impl<'a, E: ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for Mat<E> {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), other)
@@ -38,7 +39,7 @@ mod matrix_matrix_multiplication {
     }
 
     /// Mat . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField> ArgminDot<Mat<E>, Mat<E>> for Mat<E> {
+    impl<E: ComplexField> ArgminDot<Mat<E>, Mat<E>> for Mat<E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> Mat<E> {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), &other.as_mat_ref())
@@ -52,13 +53,11 @@ mod matrix_matrix_multiplication {
 // product of any two matrices of same shape ("as vectors"). I've opted to not
 // reproduce this behavior here, since it's likely invoked in error.
 mod scalar_product {
-    use faer::Conjugate;
+    use faer_traits::Conjugate;
 
     use super::*;
     /// MatRef . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E>
-        for MatRef<'_, E>
-    {
+    impl<'a, E: ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> E {
             //@note(geo): we allow the scalar dot product between two vectors
@@ -81,12 +80,12 @@ mod scalar_product {
             );
             debug_assert_eq!(value.nrows(), 1);
             debug_assert_eq!(value.ncols(), 1);
-            value[(0, 0)]
+            value[(0, 0)].clone()
         }
     }
 
     /// MatRef . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for MatRef<'_, E> {
+    impl<E: ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> E {
             <_ as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
@@ -94,9 +93,7 @@ mod scalar_product {
     }
 
     /// Mat . MatRef -> Mat
-    impl<'a, E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E>
-        for Mat<E>
-    {
+    impl<'a, E: ComplexField + Conjugate<Conj = E>> ArgminDot<MatRef<'a, E>, E> for Mat<E> {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> E {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), other)
@@ -104,7 +101,7 @@ mod scalar_product {
     }
 
     /// Mat . Mat -> Mat
-    impl<E: SimpleEntity + ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for Mat<E> {
+    impl<E: ComplexField + Conjugate<Conj = E>> ArgminDot<Mat<E>, E> for Mat<E> {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> E {
             <_ as ArgminDot<_, _>>::dot(&self.as_mat_ref(), &other.as_mat_ref())
@@ -120,11 +117,11 @@ mod scalar_product {
 mod multiply_matrix_with_scalar {
     use super::*;
     use crate::ArgminMul;
-    use faer::Entity;
+    use faer_traits::ComplexField;
     use std::ops::Mul;
 
     // MatRef . Scalar -> Mat
-    impl<E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for MatRef<'_, E> {
+    impl<E: ComplexField> ArgminDot<E, Mat<E>> for MatRef<'_, E> {
         #[inline]
         fn dot(&self, other: &E) -> Mat<E> {
             <Self as ArgminMul<E, _>>::mul(self, other)
@@ -132,7 +129,7 @@ mod multiply_matrix_with_scalar {
     }
 
     // Mat . Scalar -> Mat
-    impl<E: Entity + Mul<E, Output = E>> ArgminDot<E, Mat<E>> for Mat<E> {
+    impl<E: ComplexField> ArgminDot<E, Mat<E>> for Mat<E> {
         #[inline]
         fn dot(&self, other: &E) -> Mat<E> {
             <_ as ArgminDot<E, _>>::dot(&self.as_mat_ref(), other)
@@ -140,7 +137,7 @@ mod multiply_matrix_with_scalar {
     }
 
     // MatRef . Scalar -> Mat
-    impl<'a, E: Entity + Mul<E, Output = E>> ArgminDot<MatRef<'a, E>, Mat<E>> for E {
+    impl<'a, E: ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for E {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
             <E as ArgminMul<MatRef<'a, E>, _>>::mul(self, other)
@@ -148,7 +145,7 @@ mod multiply_matrix_with_scalar {
     }
 
     // Mat . Scalar -> Mat
-    impl<E: Entity + Mul<E, Output = E>> ArgminDot<Mat<E>, Mat<E>> for E {
+    impl<E: ComplexField> ArgminDot<Mat<E>, Mat<E>> for E {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> Mat<E> {
             <E as ArgminDot<_, _>>::dot(self, &other.as_mat_ref())
