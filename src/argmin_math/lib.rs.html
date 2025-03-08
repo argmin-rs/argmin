@@ -394,7 +394,26 @@
 <a href="#379" id="379">379</a>
 <a href="#380" id="380">380</a>
 <a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -475,6 +494,7 @@
 //! | Feature                | Default | Comment                                  |
 //! |------------------------|---------|------------------------------------------|
 //! | `faer_latest`          | no      | latest supported version                 |
+//! | `faer_v0_21`           | no      | version 0.21                             |
 //! | `faer_v0_20`           | no      | version 0.20                             |
 //!
 //! ## Choosing a backend
@@ -618,6 +638,8 @@
 <span class="macro">cfg_if::cfg_if!</span> {
     <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"faer_v0_20"</span>)] </span>{
         <span class="kw">extern crate </span>faer_0_20 <span class="kw">as </span>faer;
+    } <span class="kw">else if </span><span class="attr">#[cfg(feature = <span class="string">"faer_v0_21"</span>)] </span>{
+        <span class="kw">extern crate </span>faer_0_21 <span class="kw">as </span>faer;
     }
 }
 
@@ -645,14 +667,30 @@
 #[allow(unused_imports)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::vec::<span class="kw-2">*</span>;
 
-<span class="attr">#[cfg(feature = <span class="string">"faer_all"</span>)]
-</span><span class="kw">mod </span>faer_m;
+<span class="macro">cfg_if!</span> {
+    <span class="comment">// faer has significant breaking changes between 0.20 and 0.21, which
+    // makes this trickery necessary
+    </span><span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"faer_v0_20"</span>)] </span>{
+        <span class="kw">mod </span>faer_m_0_20;
+        <span class="kw">use </span>faer_m_0_20 <span class="kw">as </span>faer_m;
+    } <span class="kw">else if </span><span class="attr">#[cfg(feature = <span class="string">"faer_v0_21"</span>)] </span>{
+        <span class="kw">extern crate </span>faer_traits_0_21 <span class="kw">as </span>faer_traits;
+        <span class="kw">mod </span>faer_m_0_21;
+        <span class="kw">use </span>faer_m_0_21 <span class="kw">as </span>faer_m;
+    }
+}
+
 <span class="attr">#[cfg(feature = <span class="string">"faer_all"</span>)]
 #[allow(unused_imports)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::faer_m::<span class="kw-2">*</span>;
 
+<span class="attr">#[cfg(test)]
+#[cfg(feature = <span class="string">"faer_all"</span>)]
+</span><span class="kw">mod </span>faer_tests;
+
 <span class="comment">// Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 </span><span class="kw">pub use </span>anyhow::Error;
+<span class="kw">use </span>cfg_if::cfg_if;
 <span class="kw">pub use </span>rand::Rng;
 
 <span class="doccomment">/// Dot/scalar product of `T` and `self`
