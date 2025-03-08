@@ -79,6 +79,7 @@
 //! | Feature                | Default | Comment                                  |
 //! |------------------------|---------|------------------------------------------|
 //! | `faer_latest`          | no      | latest supported version                 |
+//! | `faer_v0_21`           | no      | version 0.21                             |
 //! | `faer_v0_20`           | no      | version 0.20                             |
 //!
 //! ## Choosing a backend
@@ -222,6 +223,8 @@ cfg_if::cfg_if! {
 cfg_if::cfg_if! {
     if #[cfg(feature = "faer_v0_20")] {
         extern crate faer_0_20 as faer;
+    } else if #[cfg(feature = "faer_v0_21")] {
+        extern crate faer_0_21 as faer;
     }
 }
 
@@ -249,14 +252,30 @@ mod vec;
 #[allow(unused_imports)]
 pub use crate::vec::*;
 
-#[cfg(feature = "faer_all")]
-mod faer_m;
+cfg_if! {
+    // faer has significant breaking changes between 0.20 and 0.21, which
+    // makes this trickery necessary
+    if #[cfg(feature = "faer_v0_20")] {
+        mod faer_m_0_20;
+        use faer_m_0_20 as faer_m;
+    } else if #[cfg(feature = "faer_v0_21")] {
+        extern crate faer_traits_0_21 as faer_traits;
+        mod faer_m_0_21;
+        use faer_m_0_21 as faer_m;
+    }
+}
+
 #[cfg(feature = "faer_all")]
 #[allow(unused_imports)]
 pub use crate::faer_m::*;
 
+#[cfg(test)]
+#[cfg(feature = "faer_all")]
+mod faer_tests;
+
 // Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 pub use anyhow::Error;
+use cfg_if::cfg_if;
 pub use rand::Rng;
 
 /// Dot/scalar product of `T` and `self`
