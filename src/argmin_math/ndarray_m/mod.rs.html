@@ -71,7 +71,7 @@
 <span class="kw">mod </span>div;
 <span class="kw">mod </span>dot;
 <span class="kw">mod </span>eye;
-<span class="attr">#[cfg(feature = <span class="string">"ndarray-linalg_0_16"</span>)]
+<span class="attr">#[cfg(any(feature = <span class="string">"ndarray-linalg_0_16"</span>, feature = <span class="string">"ndarray-linalg_0_17"</span>,))]
 </span><span class="kw">mod </span>inv;
 <span class="kw">mod </span>l1norm;
 <span class="kw">mod </span>l2norm;
@@ -90,7 +90,7 @@
 <span class="kw">pub use </span>div::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>dot::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>eye::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"ndarray-linalg_0_16"</span>)]
+<span class="attr">#[cfg(any(feature = <span class="string">"ndarray-linalg_0_16"</span>, feature = <span class="string">"ndarray-linalg_0_17"</span>,))]
 </span><span class="kw">pub use </span>inv::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>l1norm::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>l2norm::<span class="kw-2">*</span>;

@@ -413,7 +413,11 @@
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
 //
 // Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -610,7 +614,9 @@
 }
 
 <span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray_0_15"</span>)] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray_0_16"</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_0_16 <span class="kw">as </span>ndarray;
+    } <span class="kw">else if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray_0_15"</span>)] </span>{
         <span class="kw">extern crate </span>ndarray_0_15 <span class="kw">as </span>ndarray;
     } <span class="kw">else if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray_0_14"</span>)]  </span>{
         <span class="kw">extern crate </span>ndarray_0_14 <span class="kw">as </span>ndarray;
@@ -620,7 +626,9 @@
 }
 
 <span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray-linalg_0_16"</span>)] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray-linalg_0_17"</span>)] </span>{
+        <span class="kw">extern crate </span>ndarray_linalg_0_17 <span class="kw">as </span>ndarray_linalg;
+    } <span class="kw">else if </span><span class="attr">#[cfg(feature = <span class="string">"ndarray-linalg_0_16"</span>)] </span>{
         <span class="kw">extern crate </span>ndarray_linalg_0_16 <span class="kw">as </span>ndarray_linalg;
     }
 }
