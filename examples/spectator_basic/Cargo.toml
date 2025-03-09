@@ -11,4 +11,4 @@ argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-m
 argmin-observer-spectator = { version = "*", path = "../../crates/argmin-observer-spectator" }
 argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
 rand = "0.8.5"
-rand_xoshiro = "0.6.0"
+rand_xoshiro = "0.7.0"
