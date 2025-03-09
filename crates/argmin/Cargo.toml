@@ -33,8 +33,8 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 approx = "0.5.0"
 finitediff = { version = "0.1.4", path = "../finitediff", features = ["ndarray"] }
 argmin_testfunctions = { version = "0.2.0", path = "../argmin-testfunctions" }
-ndarray = { version = "0.15", features = ["serde-1"] }
-ndarray-linalg = { version = "0.16", features = ["intel-mkl-static"] }
+ndarray = { version = "0.16", features = ["serde-1"] }
+ndarray-linalg = { version = "0.17", features = ["intel-mkl-static"] }
 argmin-math = { path = "../argmin-math", version = "0.4", features = ["vec"] }
 argmin-observer-slog = { path = "../argmin-observer-slog" }
 argmin-observer-paramwriter = { path = "../argmin-observer-paramwriter" }

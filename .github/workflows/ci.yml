@@ -110,6 +110,8 @@ jobs:
       # ndarray without linalg
       - name: argmin-math (ndarray_latest-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_latest-nolinalg"
+      - name: argmin-math (ndarray_v0_16-nolinalg)
+        run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_16-nolinalg"
       - name: argmin-math (ndarray_v0_15-nolinalg)
         run: cargo test -p argmin-math --no-default-features --features "ndarray_v0_15-nolinalg"
       - name: argmin-math (ndarray_v0_14-nolinalg)
@@ -119,6 +121,8 @@ jobs:
       # ndarray with linalg
       - name: argmin-math (ndarray_latest)
         run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_latest/Cargo.toml
+      - name: argmin-math (ndarray_v0_16)
+        run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_0_16/Cargo.toml
       - name: argmin-math (ndarray_v0_15)
         run: cargo test --manifest-path ./crates/argmin-math/ndarray-linalg-tests/ndarray_0_15/Cargo.toml
       # nalgebra

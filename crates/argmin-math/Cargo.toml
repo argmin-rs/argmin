@@ -22,6 +22,8 @@ nalgebra_0_30 = { package = "nalgebra", version = "0.30", optional = true }
 nalgebra_0_29 = { package = "nalgebra", version = "0.29", optional = true }
 
 # ndarray
+ndarray_0_16 = { package = "ndarray", version = "0.16", optional = true }
+ndarray-linalg_0_17 = { package = "ndarray-linalg", version = "0.17", optional = true }
 ## v0.15
 ndarray_0_15 = { package = "ndarray", version = "0.15", optional = true }
 ndarray-linalg_0_16 = { package = "ndarray-linalg", version = "0.16", optional = true }
@@ -72,7 +74,7 @@ nalgebra_v0_29 = ["nalgebra_0_29", "num-complex_0_4", "nalgebra_all"]
 
 # ndarray
 ndarray_all = ["primitives"]
-ndarray_latest = ["ndarray_v0_15"]
+ndarray_latest = ["ndarray_v0_16"]
 
 #faer
 faer_all = ["primitives"]
@@ -81,10 +83,12 @@ faer_v0_20  = ["faer_0_20", "num-complex_0_4", "faer_all"]
 faer_v0_21  = ["faer_0_21", "num-complex_0_4", "faer_traits_0_21", "faer_all"]
 
 ## With `ndarray-linalg`
+ndarray_v0_16 = ["ndarray_0_16", "ndarray-linalg_0_17", "num-complex_0_4", "ndarray_all"]
 ndarray_v0_15 = ["ndarray_0_15", "ndarray-linalg_0_16", "num-complex_0_4", "ndarray_all"]
 
 ## Without `ndarray-linalg`
-ndarray_latest-nolinalg = ["ndarray_v0_15-nolinalg"]
+ndarray_latest-nolinalg = ["ndarray_v0_16-nolinalg"]
+ndarray_v0_16-nolinalg = ["ndarray_0_16", "num-complex_0_4", "ndarray_all"]
 ndarray_v0_15-nolinalg = ["ndarray_0_15", "num-complex_0_4", "ndarray_all"]
 ndarray_v0_14-nolinalg = ["ndarray_0_14", "num-complex_0_3", "ndarray_all"]
 ndarray_v0_13-nolinalg = ["ndarray_0_13", "num-complex_0_2", "ndarray_all"]

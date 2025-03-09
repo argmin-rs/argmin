@@ -1,5 +1,5 @@
 [package]
-name = "ndarray_latest"
+name = "ndarray_0_16"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -8,7 +8,7 @@ publish = false
 
 [dev-dependencies]
 argmin-math = { path = "../../", version = "*", features = [
-    "ndarray_latest",
+    "ndarray_v0_16",
 ] }
 ndarray = { version = "0.16", default-features = false }
 ndarray-linalg = { version = "0.17", default-features = false, features = ["intel-mkl-static"] }
