@@ -19,7 +19,7 @@ anyhow = "1.0"
 paste = "1"
 num-traits = "0.2"
 rand = "0.8.5"
-rand_xoshiro = "0.6.0"
+rand_xoshiro = "0.7.0"
 thiserror = "1.0"
 web-time = "1.1.0"
 argmin-math = { path = "../argmin-math", version = "0.4", default-features = false, features = ["primitives"] }
