@@ -23,6 +23,7 @@ pub trait ArgminFloat:
     + Display
     + SendAlias
     + Into<KvValue>
+    + Into<f64>
 {
 }
 
@@ -37,5 +38,6 @@ impl<I> ArgminFloat for I where
         + Display
         + SendAlias
         + Into<KvValue>
+        + Into<f64>
 {
 }
