@@ -9,32 +9,36 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = -abs(sin(x_1)*cos(x_2)*exp(abs(1- sqrt(x_1^2+x_2^2)/pi)))`
+//! $$
+//! f(x_1,\\,x_2) = -\left|\sin(x_1)\cos(x_2)\exp\left(\left|1- \frac{\sqrt{x_1^2+x_2^2}}{\pi}\right|\right)\right|
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10,\\,10]$.
 //!
 //! The global minima are at
-//!  * `f(x_1, x_2) = f(8.05502, 9.66459) = -19.2085`.
-//!  * `f(x_1, x_2) = f(8.05502, -9.66459) = -19.2085`.
-//!  * `f(x_1, x_2) = f(-8.05502, 9.66459) = -19.2085`.
-//!  * `f(x_1, x_2) = f(-8.05502, -9.66459) = -19.2085`.
+//!  * $f(x_1,\\,x_2) = f(8.05502,\\,9.66459) = -19.2085$.
+//!  * $f(x_1,\\,x_2) = f(8.05502,\\,-9.66459) = -19.2085$.
+//!  * $f(x_1,\\,x_2) = f(-8.05502,\\,9.66459) = -19.2085$.
+//!  * $f(x_1,\\,x_2) = f(-8.05502,\\,-9.66459) = -19.2085$.
 
 use num::{Float, FromPrimitive};
 use std::f64::consts::PI;
 
-/// Holder table test function
+/// Holder table test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = -abs(sin(x_1)*cos(x_2)*exp(abs(1- sqrt(x_1^2+x_2^2)/pi)))`
+/// $$
+/// f(x_1,\\,x_2) = -\left|\sin(x_1)\cos(x_2)\exp\left(\left|1- \frac{\sqrt{x_1^2+x_2^2}}{\pi}\right|\right)\right|
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10,\\,10]$.
 ///
 /// The global minima are at
-///  * `f(x_1, x_2) = f(8.05502, 9.66459) = -19.2085`.
-///  * `f(x_1, x_2) = f(8.05502, -9.66459) = -19.2085`.
-///  * `f(x_1, x_2) = f(-8.05502, 9.66459) = -19.2085`.
-///  * `f(x_1, x_2) = f(-8.05502, -9.66459) = -19.2085`.
+///  * $f(x_1,\\,x_2) = f(8.05502,\\,9.66459) = -19.2085$.
+///  * $f(x_1,\\,x_2) = f(8.05502,\\,-9.66459) = -19.2085$.
+///  * $f(x_1,\\,x_2) = f(-8.05502,\\,9.66459) = -19.2085$.
+///  * $f(x_1,\\,x_2) = f(-8.05502,\\,-9.66459) = -19.2085$.
 pub fn holder_table<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -45,9 +49,10 @@ where
     -(x1.sin() * x2.cos() * (n1 - (x1.powi(2) + x2.powi(2)).sqrt() / pi).abs().exp()).abs()
 }
 
-/// Derivative of the Holder table test function
+/// Derivative of the Holder table test function.
 ///
-/// This function has a discontinuity at `sqrt(x_1^2+x_2^2) = PI`, and hence can return `NaN`.
+/// The test function has a discontinuity at $\sqrt{x_1^2+x_2^2} = \pi$,
+/// hence the derivative can be [NaN](num::Float::nan)-valued.
 pub fn holder_table_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -90,9 +95,10 @@ where
     }
 }
 
-/// Hessian of the Holder table test function
+/// Hessian of the Holder table test function.
 ///
-/// This function has a discontinuity at `sqrt(x_1^2+x_2^2) = PI`, and hence can return `NaN`.
+/// The test function has a discontinuity at $\sqrt{x_1^2+x_2^2} = \pi$,
+/// hence the Hessian can be [NaN](num::Float::nan)-valued.
 pub fn holder_table_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
