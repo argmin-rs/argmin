@@ -5,29 +5,33 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Eggholder test function
+//! # Eggholder test function.
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = -(x_2 + 47) * sin( sqrt( abs( x_2 + x_1/2 + 47 ) ) ) -
-//!                x_1 * sin( sqrt( abs( x_1 - (x_2 + 47) ) ) )`
+//! $$
+//! f(x_1, x_2) = -(x_2 + 47) \cdot \sin\left( \sqrt{\left| x_2 + \frac{x_1}{2} + 47 \right|} \right) -
+//!                x_1 \cdot \sin\left(\sqrt{\left|x_1 - (x_2 + 47)\right|}\right)
+//! $$
 //!
-//! where `x_i \in [-512, 512]`.
+//! where $x_i \in [-512,\\,512]$.
 //!
-//! The global minimum is at * `f(x_1, x_2) = f(512, 404.2319) = -959.6407`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(512,\\,404.2319) = -959.6407$.
 
 use num::{Float, FromPrimitive};
 
-/// Eggholder test function
+/// Eggholder test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = -(x_2 + 47) * sin( sqrt( abs( x_2 + x_1/2 + 47 ) ) ) -
-///                x_1 * sin( sqrt( abs( x_1 - (x_2 + 47) ) ) )`
+/// $$
+/// f(x_1, x_2) = -(x_2 + 47) \cdot \sin\left( \sqrt{\left| x_2 + \frac{x_1}{2} + 47 \right|} \right) -
+///                x_1 \cdot \sin\left(\sqrt{\left|x_1 - (x_2 + 47)\right|}\right)
+/// $$
 ///
-/// where `x_i \in [-512, 512]`.
+/// where $x_i \in [-512,\\,512]$.
 ///
-/// The global minimum is at * `f(x_1, x_2) = f(512, 404.2319) = -959.6407`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(512,\\,404.2319) = -959.6407$.
 pub fn eggholder<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -42,7 +46,7 @@ where
         - x1 * (x1 - (x2 + n47)).abs().sqrt().sin()
 }
 
-/// Derivative of Eggholder test function
+/// Derivative of Eggholder test function.
 pub fn eggholder_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -96,13 +100,15 @@ where
     ]
 }
 
-/// Hessian of Eggholder test function
+/// Hessian of Eggholder test function.
 ///
-/// This function can return NaN elements under the following conditions:
+/// This function can return [`NaN`](num::Float::nan)-valued elements under the following conditions:
 ///
-/// * |x1 - x2 - 47| <= EPS && x1 != 0
-/// * |x2 - x1 + 47| <= EPS && x1 != 0
-/// * |x1/2 + x2 + 47| <= EPS && |x2 + 47| != 0
+/// * $|x_1 - x_2 - 47| <= \epsilon$ and $x_1 \neq 0$
+/// * $|x_2 - x_1 + 47| <= \epsilon$ and $x_1 \neq 0$
+/// * $\left|\frac{x_1}{2} + x_2 + 47\right| <= \epsilon$ and $|x_2 + 47| \neq 0$
+///
+/// where $\epsilon$ is `T`'s [epsilon](num::Float::epsilon).
 pub fn eggholder_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
