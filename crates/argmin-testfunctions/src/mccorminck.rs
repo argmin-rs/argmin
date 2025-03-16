@@ -5,27 +5,31 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # McCorminck test function
+//! # McCormick test function
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = sin(x_1 + x_2) + (x_1 - x_2)^2 - 1.5*x_1 + 2.5*x_2 + 1`
+//! $$
+//! f(x_1,\\,x_2) = \sin(x_1 + x_2) + (x_1 - x_2)^2 - 1.5x_1 + 2.5x_2 + 1
+//! $$
 //!
-//! where `x_1 \in [-1.5, 4]` and `x_2 \in [-3, 4]`.
+//! where $x_1 \in [-1.5,\\,4]$ and $x_2 \in [-3,\\,4]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(-0.54719, -1.54719) = -1.913228`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(-0.54719,\\,-1.54719) = -1.913228$.
 
 use num::{Float, FromPrimitive};
 
-/// McCorminck test function
+/// McCormick test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = sin(x_1 + x_2) + (x_1 - x_2)^2 - 1.5*x_1 + 2.5*x_2 + 1`
+/// $$
+/// f(x_1,\\,x_2) = \sin(x_1 + x_2) + (x_1 - x_2)^2 - 1.5x_1 + 2.5x_2 + 1
+/// $$
 ///
-/// where `x_1 \in [-1.5, 4]` and `x_2 \in [-3, 4]`.
+/// where $x_1 \in [-1.5,\\,4]$ and $x_2 \in [-3,\\,4]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(-0.54719, -1.54719) = -1.913228`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(-0.54719,\\,-1.54719) = -1.913228$.
 pub fn mccorminck<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -36,7 +40,7 @@ where
         + T::from_f64(1.0).unwrap()
 }
 
-/// Derivative of McCorminck test function
+/// Derivative of McCormick test function.
 pub fn mccorminck_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -53,7 +57,7 @@ where
     ]
 }
 
-/// Hessian of McCorminck test function
+/// Hessian of McCormick test function.
 pub fn mccorminck_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
