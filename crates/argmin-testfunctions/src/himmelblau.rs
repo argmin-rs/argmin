@@ -5,35 +5,39 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-//! # Himmelblau test function
+//! # Himmelblau's test function.
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = (x_1^2 + x_2 - 11)^2 + (x_1 + x_2^2 - 7)^2`
+//! $$
+//! f(x_1,\\,x_2) = (x_1^2 + x_2 - 11)^2 + (x_1 + x_2^2 - 7)^2
+//! $$
 //!
-//! where `x_i \in [-5, 5]`.
+//! where $x_i \in [-5,\\,5]$.
 //!
 //! The global minima are at
-//!  * `f(x_1, x_2) = f(3, 2) = 0`.
-//!  * `f(x_1, x_2) = f(-2.805118, 3.131312) = 0`.
-//!  * `f(x_1, x_2) = f(-3.779310, -3.283186) = 0`.
-//!  * `f(x_1, x_2) = f(3.584428, -1.848126) = 0`.
+//!  * $f(x_1,\\,x_2) = f(3,\\,2) = 0$.
+//!  * $f(x_1,\\,x_2) = f(-2.805118,\\,3.131312) = 0$.
+//!  * $f(x_1,\\,x_2) = f(-3.779310,\\,-3.283186) = 0$.
+//!  * $f(x_1,\\,x_2) = f(3.584428,\\,-1.848126) = 0$.
 
 use num::{Float, FromPrimitive};
 
-/// Himmelblau test function
+/// Himmelblau's test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = (x_1^2 + x_2 - 11)^2 + (x_1 + x_2^2 - 7)^2`
+/// $$
+/// f(x_1,\\,x_2) = (x_1^2 + x_2 - 11)^2 + (x_1 + x_2^2 - 7)^2
+/// $$
 ///
-/// where `x_i \in [-5, 5]`.
+/// where $x_i \in [-5,\\,5]$.
 ///
 /// The global minima are at
-///  * `f(x_1, x_2) = f(3, 2) = 0`.
-///  * `f(x_1, x_2) = f(-2.805118, 3.131312) = 0`.
-///  * `f(x_1, x_2) = f(-3.779310, -3.283186) = 0`.
-///  * `f(x_1, x_2) = f(3.584428, -1.848126) = 0`.
+///  * $f(x_1,\\,x_2) = f(3,\\,2) = 0$.
+///  * $f(x_1,\\,x_2) = f(-2.805118,\\,3.131312) = 0$.
+///  * $f(x_1,\\,x_2) = f(-3.779310,\\,-3.283186) = 0$.
+///  * $f(x_1,\\,x_2) = f(3.584428,\\,-1.848126) = 0$.
 pub fn himmelblau<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -44,7 +48,7 @@ where
     (x1.powi(2) + x2 - n11).powi(2) + (x1 + x2.powi(2) - n7).powi(2)
 }
 
-/// Derivative of Himmelblau test function
+/// Derivative of Himmelblau's test function.
 pub fn himmelblau_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -62,7 +66,7 @@ where
     ]
 }
 
-/// Hessian of Himmelblau test function
+/// Hessian of Himmelblau's test function.
 pub fn himmelblau_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
