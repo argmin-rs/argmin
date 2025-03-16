@@ -11,33 +11,39 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = (1/2.427) * log([1 + (\bar{x}_1 + \bar{x}_2 + 1)^2 * (19 - 14*\bar{x}_2 +
-//!                3*\bar{x}_1^2 - 14*\bar{x}_2 + 6*\bar{x}_1*\bar{x}_2 + 3*\bar{x}_2^2)]
-//!                * [30 + (2*\bar{x}_1 - 3*\bar{x}_2)^2(18 - 32 * \bar{x}_1 + 12* \bar{x}_1^2 +
-//!                48 * \bar{x}_2 - 36 * \bar{x}_1 * \bar{x}_2 + 27 * \bar{x}_2^2) ] - 8.693)`
+//! $$
+//! f(x_1,\\,x_2) = \frac{1}{2.427}\biggl[
+//!                    \log\Bigl[\bigl(1 + (\bar{x}_1 + \bar{x}_2 + 1)^2(19 - 14\bar{x}_1 +
+//!                    3\bar{x}_1^2 - 14\bar{x}_2 + 6\bar{x}_1\bar{x}_2 + 3\bar{x}_2^2)\bigr) \\\\
+//!                    \times\bigl(30 + (2\bar{x}_1 - 3\bar{x}_2)^2(18 - 32\bar{x}_1 + 12\bar{x}_1^2 +
+//!                    48\bar{x}_2 - 36\bar{x}_1\bar{x}_2 + 27\bar{x}_2^2)\bigr)\Bigr]
+//!                 - 8.693\biggr]
+//! $$
 //!
-//! where `\bar{x}_i = 4*x_i - 2` and `x_i \in [0, 1]`.
+//! where $\bar{x}_i = 4x_i - 2$ and $x_i \in [0, 1]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(0.5, 0.25) = 3.3851993182036826`.
-
-//  (1/2.427) * (log_10([1 + ((4*x_1-2) + (4*x_2-2) + 1)^2 * (19 - 14*(4*x_1-2) + 3*(4*x_1-2)^2 - 14*(4*x_2-2) + 6*(4*x_1-2)*(4*x_2-2) + 3*(4*x_2-2)^2)]    * [30 + (2*(4*x_1-2) - 3*(4*x_2-2))^2*(18 - 32 * (4*x_1-2) + 12* (4*x_1-2)^2 +   48 * (4*x_2-2) - 36 * (4*x_1-2) * (4*x_2-2) + 27 * (4*x_2-2)^2) ]) - 8.693)
+//! The global minimum is at $f(x_1,\\,x_2) = f(0.5,\\,0.25) = 3.3851993182036826$.
 
 use num::{Float, FromPrimitive};
 
-/// Picheny test function
+/// Picheny test function.
 ///
-/// Variation of the Goldstein-Price test function.
+/// Variation on the [Goldstein-Price test function](crate::goldsteinprice::goldsteinprice) introduced by [Picheny et al. (2012)](https://hal.science/hal-00658212).
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = (1/2.427) * log([1 + (\bar{x}_1 + \bar{x}_2 + 1)^2 * (19 - 14*\bar{x}_2 +
-///                3*\bar{x}_1^2 - 14*\bar{x}_2 6*\bar{x}_1*\bar{x}_2 + 3*\bar{x}_2^2)]
-///                * [30 + (2*\bar{x}_1 - 3*\bar{x}_2)^2(18 - 32 * \bar{x}_1 + 12* \bar{x}_1^2 +
-///                48 * \bar{x}_2 - 36 * \bar{x}_1 * \bar{x}_2 + 27 * \bar{x}_2^2) ] - 8.693)`
+/// $$
+/// f(x_1,\\,x_2) = \frac{1}{2.427}\biggl[
+///                    \log\Bigl[\bigl(1 + (\bar{x}_1 + \bar{x}_2 + 1)^2(19 - 14\bar{x}_1 +
+///                    3\bar{x}_1^2 - 14\bar{x}_2 + 6\bar{x}_1\bar{x}_2 + 3\bar{x}_2^2)\bigr) \\\\
+///                    \times\bigl(30 + (2\bar{x}_1 - 3\bar{x}_2)^2(18 - 32\bar{x}_1 + 12\bar{x}_1^2 +
+///                    48\bar{x}_2 - 36\bar{x}_1\bar{x}_2 + 27\bar{x}_2^2)\bigr)\Bigr]
+///                 - 8.693\biggr]
+/// $$
 ///
-/// where `\bar{x}_i = 4*x_i - 2` and `x_i \in [0, 1]`.
+/// where $\bar{x}_i = 4x_i - 2$ and $x_i \in [0, 1]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(0.5, 0.25) = 3.3851993182036826`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(0.5,\\,0.25) = 3.3851993182036826$.
 pub fn picheny<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -70,7 +76,7 @@ where
         .log10()
             - T::from_f64(8.693).unwrap())
 }
-/// Derivative of Picheny test function
+/// Derivative of Picheny test function.
 pub fn picheny_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -207,7 +213,7 @@ where
     [a, b]
 }
 
-/// Hessian of Picheny test function
+/// Hessian of Picheny test function.
 pub fn picheny_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
