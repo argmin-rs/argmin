@@ -9,23 +9,27 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = 0.26 * (x_1^2 + x_2^2) - 0.48 * x_1 * x_2`
+//! $$
+//! f(x_1,\\,x_2) = 0.26 (x_1^2 + x_2^2) - 0.48 x_1 x_2
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10,\\,10]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 
 use num::{Float, FromPrimitive};
 
-/// Matyas test function
+/// Matyas test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = 0.26 * (x_1^2 + x_2^2) - 0.48 * x_1 * x_2`
+/// $$
+/// f(x_1,\\,x_2) = 0.26 (x_1^2 + x_2^2) - 0.48 x_1 x_2
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10,\\,10]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 pub fn matyas<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -38,7 +42,7 @@ where
     n026 * (x1.powi(2) + x2.powi(2)) - n048 * x1 * x2
 }
 
-/// Derivative of Matyas test function
+/// Derivative of Matyas test function.
 pub fn matyas_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -51,9 +55,18 @@ where
     [n0_52 * x1 - n0_48 * x2, n0_52 * x2 - n0_48 * x1]
 }
 
-/// Hessian of Matyas test function
+/// Hessian of Matyas test function.
 ///
-/// Returns [[0.52, -0.48], [-0.48, 0.52]] for any input.
+/// Returns
+/// $$
+/// \left(
+/// \begin{matrix}
+/// 0.52 & -0.48 \\\\
+/// -0.48 & 0.52
+/// \end{matrix}
+/// \right)
+/// $$
+/// for any input.
 pub fn matyas_hessian<T>(_param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
