@@ -9,38 +9,44 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2, ..., x_n) = sin^2(pi * w1) + \sum_{i=1}^{d-1}(w_i -1)^2 * (1+10*sin^2(pi*wi+1)) +
-//! (w_d - 1)^2 * (1 + sin^2(2*pi*w_d))`
+//! $$
+//! f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sin^2(\pi w_1) + \sum_{i=1}^{d-1}(w_i -1)^2 \left[1+10\sin^2(\pi w_i+1)\right] +
+//! (w_d - 1)^2\left[1 + \sin^2(2\pi w_d)\right]
+//! $$
 //!
-//! where `w_i = 1 + (x_i - 1)/4` and `x_i \in [-10, 10]`.
+//! where $w_i = 1 + \frac{x_i - 1}{4}$ and $x_i \in [-10, 10]$.
 //!
-//! The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(1,\\,1,\\,\ldots,\\,1) = 0$.
 //!
 //! # Levy test function No. 13
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = sin^2(3 * pi * x_1) + (x_1 - 1)^2 * (1 + sin^2(3 * pi * x_2)) + (x_2 - 1)^2 *
-//! (1 + sin^2(2 * pi * x_2))`
+//! $$
+//! f(x_1,\\,x_2) = \sin^2(3\pi x_1) + (x_1 - 1)^2\left[1 + \sin^2(3\pi x_2)\right] + (x_2 - 1)^2
+//! \left[1 + \sin^2(2\pi x_2)\right]
+//! $$
 //!
-//! where `x_i \in [-10, 10]`.
+//! where $x_i \in [-10, 10]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(1, 1) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(1,\\,1) = 0$.
 
 use num::{Float, FromPrimitive};
 use std::f64::consts::PI;
 use std::iter::Sum;
 
-/// Levy test function
+/// Levy test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = sin^2(pi * w1) + \sum_{i=1}^{d-1}(w_i -1)^2 * (1+10*sin^2(pi*wi+1)) +
-/// (w_d - 1)^2 * (1 + sin^2(2*pi*w_d))`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sin^2(\pi w_1) + \sum_{i=1}^{d-1}(w_i -1)^2 \left[1+10\sin^2(\pi w_i+1)\right] +
+/// (w_d - 1)^2\left[1 + \sin^2(2\pi w_d)\right]
+/// $$
 ///
-/// where `w_i = 1 + (x_i - 1)/4` and `x_i \in [-10, 10]`.
+/// where $w_i = 1 + \frac{x_i - 1}{4}$ and $x_i \in [-10, 10]$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(1,\\,1,\\,\ldots,\\,1) = 0$.
 pub fn levy<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -65,7 +71,7 @@ where
         + (w(param[plen - 1]) - n1).powi(2) * (n1 + (n2 * pi * w(param[plen - 1])).sin().powi(2))
 }
 
-/// Derivative of Levy test function
+/// Derivative of Levy test function.
 pub fn levy_derivative<T>(param: &[T]) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum,
@@ -100,7 +106,7 @@ where
         .collect()
 }
 
-/// Derivative of Levy test function
+/// Derivative of Levy test function.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -142,7 +148,7 @@ where
     out
 }
 
-/// Hessian of Levy test function
+/// Hessian of Levy test function.
 pub fn levy_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum,
@@ -188,7 +194,7 @@ where
     out
 }
 
-/// Hessian of Levy test function
+/// Hessian of Levy test function.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -236,16 +242,18 @@ where
     out
 }
 
-/// Levy test function No. 13
+/// Levy test function No. 13.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = sin^2(3 * pi * x_1) + (x_1 - 1)^2 * (1 + sin^2(3 * pi * x_2)) + (x_2 - 1)^2 *
-/// (1 + sin^2(2 * pi * x_2))`
+/// $$
+/// f(x_1,\\,x_2) = \sin^2(3\pi x_1) + (x_1 - 1)^2\left[1 + \sin^2(3\pi x_2)\right] + (x_2 - 1)^2
+/// \left[1 + \sin^2(2\pi x_2)\right]
+/// $$
 ///
-/// where `x_i \in [-10, 10]`.
+/// where $x_i \in [-10, 10]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(1, 1) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(1,\\,1) = 0$.
 pub fn levy_n13<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -262,7 +270,7 @@ where
         + (x2 - n1).powi(2) * (n1 + (n2 * pi * x2).sin().powi(2))
 }
 
-/// Derivative of Levy test function No. 13
+/// Derivative of Levy test function No. 13.
 pub fn levy_n13_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive + Sum,
@@ -296,7 +304,7 @@ where
     ]
 }
 
-/// Hessian of Levy test function No. 13
+/// Hessian of Levy test function No. 13.
 pub fn levy_n13_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive + Sum,
