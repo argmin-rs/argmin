@@ -9,25 +9,31 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2, ..., x_n) = a * n + \sum_{i=1}^{n} \left[ x_i^2 - a * cos(2 * pi * x_i) \right]`
+//! $$
+//! f(x_1,\\,x_2,\\,\ldots,\\,x_d) = a\cdot d + \sum_{i=1}^{d} \left[ x_i^2 - a\cos(2\pi x_i) \right]
+//! $$
 //!
-//! where `x_i \in [-5.12, 5.12]` and `a = 10`
+//! where $x_i \in [-5.12,\\,5.12]$ and $a = 10$.
 //!
-//! The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(0,\\,0,\\,\ldots,\\,0) = 0$.
 
 use num::{Float, FromPrimitive};
 use std::f64::consts::PI;
 use std::iter::Sum;
 
-/// Rastrigin test function
+/// Rastrigin test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = a * n + \sum_{i=1}^{n} \left[ x_i^2 - a * cos(2 * pi * x_i) \right]`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = a\cdot d + \sum_{i=1}^{d} \left[ x_i^2 - a\cos(2\pi x_i) \right]
+/// $$
 ///
-/// where `x_i \in [-5.12, 5.12]` and `a = 10`
+/// where $x_i \in [-5.12,\\,5.12]$ and $a = 10$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(0,\\,0,\\,\ldots,\\,0) = 0$.
+///
+/// See [`rastrigin_a`] for a variant where the parameter `a` can be chosen freely.
 pub fn rastrigin<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -35,9 +41,9 @@ where
     rastrigin_a(param, T::from_f64(10.0).unwrap())
 }
 
-/// Rastrigin test function
+/// Rastrigin test function.
 ///
-/// The same as `rastrigin`; however, it allows to set the parameter a.
+/// The same as [`rastrigin`]; however, it allows to set the parameter a.
 pub fn rastrigin_a<T>(param: &[T], a: T) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -49,7 +55,7 @@ where
             .sum()
 }
 
-/// Derivative of Rastrigin test function where `a` can be chosen freely
+/// Derivative of Rastrigin test function where the parameter `a` can be chosen freely.
 pub fn rastrigin_a_derivative<T>(param: &[T], a: T) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum + Into<f64>,
@@ -62,7 +68,7 @@ where
         .collect()
 }
 
-/// Derivative of Rastrigin test function
+/// Derivative of Rastrigin test function with `a = 10`.
 pub fn rastrigin_derivative<T>(param: &[T]) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum + Into<f64>,
@@ -70,7 +76,7 @@ where
     rastrigin_a_derivative(param, T::from_f64(10.0).unwrap())
 }
 
-/// Derivative of Rastrigin test function where `a` can be chosen freely
+/// Derivative of Rastrigin test function where the parameter `a` can be chosen freely.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -88,7 +94,7 @@ where
     result
 }
 
-/// Derivative of Rastrigin test function
+/// Derivative of Rastrigin test function with `a = 10`.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -99,7 +105,7 @@ where
     rastrigin_a_derivative_const(param, T::from_f64(10.0).unwrap())
 }
 
-/// Hessian of Rastrigin test function where `a` can be chosen freely
+/// Hessian of Rastrigin test function where the parameter `a` can be chosen freely.
 pub fn rastrigin_a_hessian<T>(param: &[T], a: T) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum + Into<f64>,
@@ -118,7 +124,7 @@ where
     hessian
 }
 
-/// Hessian of Rastrigin test function
+/// Hessian of Rastrigin test function with `a = 10`.
 pub fn rastrigin_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum + Into<f64>,
@@ -126,7 +132,7 @@ where
     rastrigin_a_hessian(param, T::from_f64(10.0).unwrap())
 }
 
-/// Hessian of Rastrigin test function where `a` can be chosen freely
+/// Hessian of Rastrigin test function where `a` can be chosen freely.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -147,7 +153,7 @@ where
     hessian
 }
 
-/// Hessian of Rastrigin test function
+/// Hessian of Rastrigin test function with `a = 10`.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
