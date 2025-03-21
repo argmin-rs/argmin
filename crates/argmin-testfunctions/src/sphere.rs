@@ -9,24 +9,28 @@
 //!
 //! Defined as
 //!
-//! `f(x) = \sum_{i=1}^n x_i^2`
+//! $$
+//! f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sum_{i=1}^d x_i^2
+//! $$
 //!
-//! where `x_i \in (-\infty, \infty)`
+//! where $x_i \in (-\infty, \infty)$ and $d > 0$.
 //!
-//! The minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(0,\\,0,\\,\ldots,\\,0) = 0$.
 
 use num::{Float, FromPrimitive};
 use std::iter::Sum;
 
-/// Sphere test function
+/// Sphere test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^n x_i^2
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sum_{i=1}^d x_i^2
+/// $$
 ///
-/// where `x_i \in (-\infty, \infty)` and `n > 0`.
+/// where $x_i \in (-\infty, \infty)$ and $d > 0$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(0, 0, ..., 0) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\,x_d) = f(0,\\,0,\\,\ldots,\\,0) = 0$.
 pub fn sphere<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -34,13 +38,15 @@ where
     param.iter().map(|x| x.powi(2)).sum()
 }
 
-/// Derivative of sphere test function
+/// Derivative of sphere test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = (2 * x_1, 2 * x_2, ... 2 * x_n)`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = (2x_1,\\,2x_2,\\,\ldots,\\,2x_d)
+/// $$
 ///
-/// where `x_i \in (-\infty, \infty)` and `n > 0`.
+/// where $x_i \in (-\infty, \infty)$ and $d > 0$.
 pub fn sphere_derivative<T>(param: &[T]) -> Vec<T>
 where
     T: Float + FromPrimitive,
@@ -49,13 +55,15 @@ where
     param.iter().map(|x| num2 * *x).collect()
 }
 
-/// Derivative of sphere test function
+/// Derivative of sphere test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = (2 * x_1, 2 * x_2, ... 2 * x_n)`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = (2x_1,\\,2x_2,\\,\ldots,\\,2x_d)
+/// $$
 ///
-/// where `x_i \in (-\infty, \infty)` and `n > 0`.
+/// where $x_i \in (-\infty, \infty)$ and $d > 0$.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -71,7 +79,7 @@ where
     deriv
 }
 
-/// Hessian of sphere test function
+/// Hessian of sphere test function.
 pub fn sphere_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive,
@@ -84,7 +92,7 @@ where
     hessian
 }
 
-/// Hessian of sphere test function
+/// Hessian of sphere test function.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
