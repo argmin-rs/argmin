@@ -199,7 +199,7 @@ where
     /// # }
     /// ```
     pub fn new(initial_temperature: F) -> Result<Self, Error> {
-        SimulatedAnnealing::new_with_rng(initial_temperature, Xoshiro256PlusPlus::from_entropy())
+        SimulatedAnnealing::new_with_rng(initial_temperature, Xoshiro256PlusPlus::from_os_rng())
     }
 }
 
@@ -511,7 +511,7 @@ where
         // `1 / (1 + exp((next_cost - prev_cost) / current_temperature))`,
         //
         // which will always be between 0 and 0.5.
-        let prob: f64 = self.rng.gen();
+        let prob: f64 = self.rng.random();
         let prob = float!(prob);
         let accepted = (new_cost < prev_cost)
             || (float!(1.0) / (float!(1.0) + ((new_cost - prev_cost) / self.cur_temp).exp())
