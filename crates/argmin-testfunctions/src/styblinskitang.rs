@@ -9,26 +9,30 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2, ..., x_n) = 1/2 * \sum_{i=1}^{n} \left[ x_i^4 - 16 * x_i^2 + 5 * x_i \right]`
+//! $$
+//! f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \frac{1}{2}\sum_{i=1}^{d} \left(x_i^4 - 16x_i^2 + 5x_i\right)
+//! $$
 //!
-//! where `x_i \in [-5, 5]`.
+//! where $x_i \in [-5, 5]$.
 //!
-//! The global minimum is at `f(x_1, x_2, ..., x_n) = f(-2.903534, -2.903534, ..., -2.903534) =
-//! -39.16616*n`.
+//! The global minimum is at $f(x_1, x_2, ..., x_d) = f(-2.903534,\\,-2.903534,\\,\ldots,\\,-2.903534) =
+//! -39.16616d$.
 
 use num::{Float, FromPrimitive};
 use std::iter::Sum;
 
-/// Styblinski-Tang test function
+/// Styblinski-Tang test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = 1/2 * \sum_{i=1}^{n} \left[ x_i^4 - 16 * x_i^2 + 5 * x_i \right]`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \frac{1}{2}\sum_{i=1}^{d} \left(x_i^4 - 16x_i^2 + 5x_i\right)
+/// $$
 ///
-/// where `x_i \in [-5, 5]`.
+/// where $x_i \in [-5, 5]$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(-2.903534, -2.903534, ..., -2.903534) =
-/// -39.16616*n`.
+/// The global minimum is at $f(x_1, x_2, ..., x_d) = f(-2.903534,\\,-2.903534,\\,\ldots,\\,-2.903534) =
+/// -39.16616d$.
 pub fn styblinski_tang<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -42,7 +46,7 @@ where
             .sum()
 }
 
-/// Derivative of Styblinski-Tang test function
+/// Derivative of Styblinski-Tang test function.
 pub fn styblinski_tang_derivative<T>(param: &[T]) -> Vec<T>
 where
     T: Float + FromPrimitive + Sum,
@@ -57,7 +61,7 @@ where
         .collect()
 }
 
-/// Derivative of Styblinski-Tang test function
+/// Derivative of Styblinski-Tang test function.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
@@ -81,7 +85,7 @@ where
     out
 }
 
-/// Hessian of Styblinski-Tang test function
+/// Hessian of Styblinski-Tang test function.
 pub fn styblinski_tang_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive + Sum,
@@ -102,7 +106,7 @@ where
     out
 }
 
-/// Hessian of Styblinski-Tang test function
+/// Hessian of Styblinski-Tang test function.
 ///
 /// This is the const generics version, which requires the number of parameters to be known
 /// at compile time.
