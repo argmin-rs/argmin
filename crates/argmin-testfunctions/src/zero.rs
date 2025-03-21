@@ -11,7 +11,7 @@
 
 use num::{Float, FromPrimitive};
 
-/// Zero test function
+/// Zero test function.
 ///
 /// Always returns `0.0`. This is only for performance tests.
 pub fn zero<T>(_param: &[T]) -> T
@@ -21,7 +21,7 @@ where
     T::from_f64(0.0).unwrap()
 }
 
-/// Derivative of zero test function
+/// Derivative of zero test function.
 ///
 /// Always returns a vector with the length of param, full of `0.0`. This is only for performance
 /// tests.
@@ -32,7 +32,7 @@ where
     vec![T::from_f64(0.0).unwrap(); param.len()]
 }
 
-/// Derivative of zero test function (const version)
+/// Derivative of zero test function (const version).
 ///
 /// Always returns an array with the length of param, full of `0.0`. This is only for performance
 /// tests.
@@ -43,9 +43,9 @@ where
     [T::from_f64(0.0).unwrap(); N]
 }
 
-/// Hessian of zero test function
+/// Hessian of zero test function.
 ///
-/// Always returns a matrix with size NxN, full of `0.0`. This is only for performance tests.
+/// Always returns a matrix with size `N` by `N`, full of `0.0`. This is only for performance tests.
 pub fn zero_hessian<T>(param: &[T]) -> Vec<Vec<T>>
 where
     T: Float + FromPrimitive,
@@ -53,9 +53,9 @@ where
     vec![vec![T::from_f64(0.0).unwrap(); param.len()]; param.len()]
 }
 
-/// Hessian of zero test function (const version)
+/// Hessian of zero test function (const version).
 ///
-/// Always returns a matrix with size NxN, full of `0.0`. This is only for performance tests.
+/// Always returns a matrix with size `N` by `N`, full of `0.0`. This is only for performance tests.
 pub fn zero_hessian_const<const N: usize, T>(_param: &[T; N]) -> [[T; N]; N]
 where
     T: Float + FromPrimitive,
