@@ -24,7 +24,7 @@ use crate::core::{
     ArgminFloat, CostFunction, Error, PopulationState, Problem, Solver, SyncAlias, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
-use rand::{Rng, SeedableRng};
+use rand::{Rng, RngCore, SeedableRng};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -102,7 +102,7 @@ where
             weight_social: float!(0.5 + 2.0f64.ln()),
             bounds,
             num_particles,
-            rng_generator: rand::rngs::StdRng::from_entropy(),
+            rng_generator: rand::rngs::StdRng::from_os_rng(),
         }
     }
 }
@@ -146,7 +146,7 @@ impl<P, F, R> ParticleSwarm<P, F, R>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
     F: ArgminFloat,
-    R: Rng,
+    R: Rng + RngCore,
 {
     /// Set inertia factor on particle velocity
     ///

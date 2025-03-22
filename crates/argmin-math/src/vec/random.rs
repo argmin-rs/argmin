@@ -25,9 +25,9 @@ macro_rules! make_random {
                         if a == b {
                             a.clone()
                         } else if a < b {
-                            rng.gen_range(a.clone()..b.clone())
+                            rng.random_range(a.clone()..b.clone())
                         } else {
-                            rng.gen_range(b.clone()..a.clone())
+                            rng.random_range(b.clone()..a.clone())
                         }
                     })
                     .collect()
