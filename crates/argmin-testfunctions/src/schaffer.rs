@@ -9,33 +9,40 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = 0.5 + (sin^2(x_1^2 - x_2^2) - 0.5) / (1 + 0.001*(x_1^2 + x_2^2))^2`
+//! $$
+//! f(x_1,\\,x_2) = 0.5 + \frac{\sin^2(x_1^2 - x_2^2) - 0.5}{\left[1 + 0.001(x_1^2 + x_2^2)\right]^2}
+//! $$
 //!
-//! where `x_i \in [-100, 100]`.
+//! where $x_i \in [-100, 100]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 //!
 //! # Schaffer test function No. 4
 //!
+
 //! Defined as
 //!
-//! `f(x_1, x_2) = 0.5 + (cos(sin(abs(x_1^2 - x_2^2)))^2 - 0.5) / (1 + 0.001*(x_1^2 + x_2^2))^2`
+//! $$
+//! f(x_1,\\,x_2) = 0.5 + \frac{\cos^2(\sin(\left|x_1^2 - x_2^2\right|)) - 0.5}{\left[1 + 0.001(x_1^2 + x_2^2)\right]^2}
+//! $$
 //!
-//! where `x_i \in [-100, 100]`.
+//! where $x_i \in [-100, 100]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(0, 1.25313) = 0.291992`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(0,\\,1.25313) = 0.291992$.
 
 use num::{Float, FromPrimitive};
 
-/// Schaffer test function No. 2
+/// Schaffer test function No. 2.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = 0.5 + (sin^2(x_1^2 - x_2^2) - 0.5) / (1 + 0.001*(x_1^2 + x_2^2))^2`
+/// $$
+/// f(x_1,\\,x_2) = 0.5 + \frac{\sin^2(x_1^2 - x_2^2) - 0.5}{\left[1 + 0.001(x_1^2 + x_2^2)\right]^2}
+/// $$
 ///
-/// where `x_i \in [-100, 100]`.
+/// where $x_i \in [-100, 100]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 pub fn schaffer_n2<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -135,11 +142,13 @@ where
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = 0.5 + (cos(sin(abs(x_1^2 - x_2^2)))^2 - 0.5) / (1 + 0.001*(x_1^2 + x_2^2))^2`
+/// $$
+/// f(x_1,\\,x_2) = 0.5 + \frac{\cos^2(\sin(\left|x_1^2 - x_2^2\right|)) - 0.5}{\left[1 + 0.001(x_1^2 + x_2^2)\right]^2}
+/// $$
 ///
-/// where `x_i \in [-100, 100]`.
+/// where $x_i \in [-100, 100]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(0, 1.25313) = 0.291992`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(0,\\,1.25313) = 0.291992$.
 pub fn schaffer_n4<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,

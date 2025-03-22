@@ -7,30 +7,32 @@
 
 //! # Rosenbrock function
 //!
-//! In 2D, it is defined as
+//! Defined as
 //!
-//! `f(x_1, x_2) = (a - x_1)^2 + b * (x_2 - x_1^2)^2`
+//! $$
+//! f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sum_{i=1}^{d-1} \left[ (a - x_i)^2 + b(x_{i+1} - x_i^2)^2 \right]
+//! $$
 //!
-//! where `x_i \in (-\infty, \infty)`. The parameters a and b usually are: `a = 1` and `b = 100`.
+//! where $x_i \in (-\infty, \infty)$. Typically, $a = 1$ and $b = 100$.
 //!
-//! The multidimensional Rosenbrock function is defined as:
-//!
-//! `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
-//!
-//! The minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\, x_d) = f(1,\\,1,\\,\ldots,\\,1) = 0$.
 
 use num::{Float, FromPrimitive};
 use std::{iter::Sum, ops::AddAssign};
 
-/// Multidimensional Rosenbrock test function
+/// Multidimensional Rosenbrock test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
+/// $$
+/// f(x_1,\\,x_2,\\,\ldots,\\,x_d) = \sum_{i=1}^{d-1} \left[ (a - x_i)^2 + b(x_{i+1} - x_i^2)^2 \right]
+/// $$
 ///
-/// where `x_i \in (-\infty, \infty)`. The parameters a and b are: `a = 1` and `b = 100`.
+/// where $x_i \in (-\infty, \infty)$, $a = 1$, and $b = 100$.
 ///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2,\\,\ldots,\\, x_d) = f(1,\\,1,\\,\ldots,\\,1) = 0$.
+///
+/// See [`rosenbrock_ab`] for a variant that allows choosing `a` and `b` freely.
 pub fn rosenbrock<T>(param: &[T]) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -42,15 +44,9 @@ where
     )
 }
 
-/// Multidimensional Rosenbrock test function
+/// Multidimensional Rosenbrock test function.
 ///
-/// Defined as
-///
-/// `f(x_1, x_2, ..., x_n) = \sum_{i=1}^{n-1} \left[ (a - x_i)^2 + b * (x_{i+1} - x_i^2)^2 \right]`
-///
-/// where `x_i \in (-\infty, \infty)`. The parameters a and b can be chosen freely.
-///
-/// The global minimum is at `f(x_1, x_2, ..., x_n) = f(1, 1, ..., 1) = 0`.
+/// Same as [`rosenbrock`] but with free choice of the parameters `a` and `b`.
 pub fn rosenbrock_ab<T>(param: &[T], a: T, b: T) -> T
 where
     T: Float + FromPrimitive + Sum,
@@ -61,7 +57,7 @@ where
         .map(|(&xi, &xi1)| (a - xi).powi(2) + b * (xi1 - xi.powi(2)).powi(2))
         .sum()
 }
-/// Derivative of the multidimensional Rosenbrock test function
+/// Derivative of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
 pub fn rosenbrock_derivative<T>(param: &[T]) -> Vec<T>
@@ -75,7 +71,7 @@ where
     )
 }
 
-/// Derivative of the multidimensional Rosenbrock test function
+/// Derivative of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` can be chosen freely.
 pub fn rosenbrock_ab_derivative<T>(param: &[T], a: T, b: T) -> Vec<T>
@@ -103,7 +99,7 @@ where
     result
 }
 
-/// Hessian of the multidimensional Rosenbrock test function
+/// Hessian of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
 pub fn rosenbrock_hessian<T>(param: &[T]) -> Vec<Vec<T>>
@@ -117,7 +113,7 @@ where
     )
 }
 
-/// Hessian of the multidimensional Rosenbrock test function
+/// Hessian of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` can be chosen freely.
 pub fn rosenbrock_ab_hessian<T>(param: &[T], a: T, b: T) -> Vec<Vec<T>>
@@ -144,7 +140,7 @@ where
     hessian
 }
 
-/// Derivative of the multidimensional Rosenbrock test function
+/// Derivative of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
 ///
@@ -161,7 +157,7 @@ where
     )
 }
 
-/// Derivative of the multidimensional Rosenbrock test function
+/// Derivative of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` can be chosen freely.
 ///
@@ -190,7 +186,7 @@ where
     result
 }
 
-/// Hessian of the multidimensional Rosenbrock test function
+/// Hessian of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` are set to `1.0` and `100.0`, respectively.
 ///
@@ -207,7 +203,7 @@ where
     )
 }
 
-/// Hessian of the multidimensional Rosenbrock test function
+/// Hessian of the multidimensional Rosenbrock test function.
 ///
 /// The parameters `a` and `b` can be chosen freely.
 ///

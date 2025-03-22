@@ -9,23 +9,27 @@
 //!
 //! Defined as
 //!
-//! `f(x_1, x_2) = 2*x_1^2 - 1.05*x_1^4 + x_1^6/6 + x_1*x_2 + x_2^2`
+//! $$
+//! f(x_1,\\,x_2) = 2x_1^2 - 1.05x_1^4 + \frac{x_1^6}{6} + x_1x_2 + x_2^2
+//! $$
 //!
-//! where `x_i \in [-5, 5]`.
+//! where $x_i \in [-5, 5]$.
 //!
-//! The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+//! The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 
 use num::{Float, FromPrimitive};
 
-/// Three-hump camel test function
+/// Three-hump camel test function.
 ///
 /// Defined as
 ///
-/// `f(x_1, x_2) = 2*x_1^2 - 1.05*x_1^4 + x_1^6/6 + x_1*x_2 + x_2^2`
+/// $$
+/// f(x_1,\\,x_2) = 2x_1^2 - 1.05x_1^4 + \frac{x_1^6}{6} + x_1x_2 + x_2^2
+/// $$
 ///
-/// where `x_i \in [-5, 5]`.
+/// where $x_i \in [-5, 5]$.
 ///
-/// The global minimum is at `f(x_1, x_2) = f(0, 0) = 0`.
+/// The global minimum is at $f(x_1,\\,x_2) = f(0,\\,0) = 0$.
 pub fn threehumpcamel<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
@@ -38,7 +42,7 @@ where
         + x2.powi(2)
 }
 
-/// Derivative of Three-hump camel test function
+/// Derivative of Three-hump camel test function.
 pub fn threehumpcamel_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
@@ -52,7 +56,7 @@ where
     [x1.powi(5) - n4_2 * x1.powi(3) + n4 * x1 + x2, n2 * x2 + x1]
 }
 
-/// Hessian of Three-hump camel test function
+/// Hessian of Three-hump camel test function.
 pub fn threehumpcamel_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
