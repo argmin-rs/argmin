@@ -43,7 +43,7 @@ argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
 [features]
 default = []
 wasm-bindgen = ["getrandom/js"]
-serde1 = ["serde"]
+serde1 = ["serde", "rand_xoshiro/serde"]
 _ndarrayl = ["argmin-math/ndarray_latest"]
 # When adding new features, please consider adding them to either `full` (for users)
 # or `_full_dev` (only for local development, testing and computing test coverage).

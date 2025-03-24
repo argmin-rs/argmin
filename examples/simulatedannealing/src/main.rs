@@ -11,7 +11,7 @@ use argmin::{
 };
 use argmin_observer_slog::SlogLogger;
 use argmin_testfunctions::rosenbrock;
-use rand::{distributions::Uniform, prelude::*};
+use rand::{distr::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
@@ -32,7 +32,7 @@ impl Rosenbrock {
         Rosenbrock {
             lower_bound,
             upper_bound,
-            rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
+            rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_os_rng())),
         }
     }
 }
@@ -55,7 +55,7 @@ impl Anneal for Rosenbrock {
     fn anneal(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
         let mut rng = self.rng.lock().unwrap();
-        let distr = Uniform::from(0..param.len());
+        let distr = Uniform::try_from(0..param.len()).unwrap();
         // Perform modifications to a degree proportional to the current temperature `temp`.
         for _ in 0..(temp.floor() as u64 + 1) {
             // Compute random index of the parameter vector using the supplied random number
@@ -63,7 +63,7 @@ impl Anneal for Rosenbrock {
             let idx = rng.sample(distr);
 
             // Compute random number in [0.1, 0.1].
-            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
+            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1).unwrap());
 
             // modify previous parameter value at random position `idx` by `val`
             param_n[idx] += val;
