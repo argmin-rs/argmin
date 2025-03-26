@@ -25,5 +25,5 @@ uuid = { version = "1.3.0", features = ["v4"] }
 
 [dev-dependencies]
 argmin_testfunctions = { version = "*", path = "../argmin-testfunctions" }
-rand = "0.8.5"
-rand_xoshiro = "0.6.0"
+rand = "0.9"
+rand_xoshiro = "0.7"
