@@ -41,7 +41,7 @@ argmin-observer-paramwriter = { path = "../argmin-observer-paramwriter" }
 argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
 
 [features]
-default = []
+default = ["rand"]
 wasm-bindgen = ["getrandom/js"]
 serde1 = ["serde", "rand_xoshiro/serde1"]
 _ndarrayl = ["argmin-math/ndarray_latest"]
