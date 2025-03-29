@@ -24,6 +24,7 @@ use crate::core::{
     ArgminFloat, CostFunction, Error, PopulationState, Problem, Solver, SyncAlias, KV,
 };
 use argmin_math::{ArgminAdd, ArgminMinMax, ArgminMul, ArgminRandom, ArgminSub, ArgminZeroLike};
+#[cfg(feature = "rand")]
 use rand::{Rng, SeedableRng};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -106,6 +107,7 @@ where
         }
     }
 }
+
 impl<P, F, R0> ParticleSwarm<P, F, R0>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,

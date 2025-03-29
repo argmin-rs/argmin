@@ -8,6 +8,7 @@
 use crate::core::{
     CostFunction, Error, Gradient, Hessian, IterState, Jacobian, Operator, Problem, Solver, KV,
 };
+#[cfg(feature = "rand")]
 use crate::solver::simulatedannealing::Anneal;
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -178,6 +179,7 @@ impl Jacobian for TestProblem {
     }
 }
 
+#[cfg(feature = "rand")]
 impl Anneal for TestProblem {
     type Param = Vec<f64>;
     type Output = Vec<f64>;
