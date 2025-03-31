@@ -42,6 +42,7 @@ argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
 
 [features]
 default = ["rand"]
+rand = ["dep:rand", "argmin-math/rand"]
 wasm-bindgen = ["getrandom/js"]
 serde1 = ["serde", "rand_xoshiro/serde1"]
 _ndarrayl = ["argmin-math/ndarray_latest"]

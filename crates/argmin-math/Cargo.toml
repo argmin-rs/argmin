@@ -61,7 +61,7 @@ latest_all = ["primitives", "vec", "rand", "nalgebra_latest", "ndarray_latest"]
 primitives = ["num-complex_0_4"]
 
 # vec
-vec = ["primitives", "num-complex_0_4"]
+vec = ["rand", "primitives", "num-complex_0_4"]
 
 # nalgebra
 nalgebra_all = ["primitives"]
