@@ -107,7 +107,6 @@ where
         }
     }
 }
-
 impl<P, F, R0> ParticleSwarm<P, F, R0>
 where
     P: Clone + SyncAlias + ArgminSub<P, P> + ArgminMul<F, P> + ArgminRandom + ArgminZeroLike,
