@@ -16,5 +16,6 @@ pub mod neldermead;
 pub mod newton;
 pub mod particleswarm;
 pub mod quasinewton;
+pub mod shubertpiyavskii;
 pub mod simulatedannealing;
 pub mod trustregion;

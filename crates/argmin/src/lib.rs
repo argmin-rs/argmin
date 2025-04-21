@@ -45,7 +45,7 @@
 //!   - [Cauchy point method](`crate::solver::trustregion::CauchyPoint`)
 //!   - [Dogleg method](`crate::solver::trustregion::Dogleg`)
 //!   - [Steihaug method](`crate::solver::trustregion::Steihaug`)
-//!   
+//!
 //! - [Steepest descent](`crate::solver::gradientdescent::SteepestDescent`)
 //!
 //! - [Conjugate gradient methods](`crate::solver::conjugategradient`)
@@ -68,6 +68,8 @@
 //!   - [Gauss-Newton method with linesearch](`crate::solver::gaussnewton::GaussNewtonLS`)
 //!
 //! - [Golden-section search](`crate::solver::goldensectionsearch::GoldenSectionSearch`)
+//!
+//! - [Shubert-Piyavskii method](`crate::solver::shubertpiyavskii::ShubertPiyavskii`)
 //!
 //! - [Landweber iteration](`crate::solver::landweber::Landweber`)
 //!
