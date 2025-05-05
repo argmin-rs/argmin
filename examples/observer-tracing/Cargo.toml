@@ -1,0 +1,15 @@
+[package]
+name = "example-observer-tracing"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+argmin = { version = "*", path = "../../crates/argmin" }
+argmin-math = { version = "*", features = ["vec"], path = "../../crates/argmin-math" }
+argmin-observer-tracing = { version = "*", path = "../../crates/argmin-observer-tracing" }
+argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"
+tracing-subscriber = { version = "0.3.18", features = ["registry", "env-filter"] }
