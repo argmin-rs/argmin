@@ -45,6 +45,7 @@ default = ["rand"]
 rand = ["dep:rand", "argmin-math/rand"]
 wasm-bindgen = ["getrandom/js"]
 serde1 = ["serde", "rand_xoshiro/serde1"]
+
 _ndarrayl = ["argmin-math/ndarray_latest"]
 # When adding new features, please consider adding them to either `full` (for users)
 # or `_full_dev` (only for local development, testing and computing test coverage).
