@@ -456,8 +456,7 @@ where
             Err(e) => {
                 return Ok((
                     state.terminate_with(TerminationReason::SolverExit(format!(
-                        "Line search terminated with: '{}'",
-                        e,
+                        "Line search terminated with: '{e}'",
                     ))),
                     Some(kv!("gamma" => gamma;)),
                 ))
