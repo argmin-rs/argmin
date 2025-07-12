@@ -174,7 +174,7 @@ impl MyContext {
                                 .collect(),
                         )
                         .color(Color32::LIGHT_GREEN)
-                        .name(format!("Best (iter: {})", iter));
+                        .name(format!("Best (iter: {iter})"));
 
                         Plot::new("Best Parameter Vector")
                             .legend(Legend::default())
@@ -201,7 +201,7 @@ impl MyContext {
                                 .collect(),
                         )
                         .color(Color32::LIGHT_BLUE)
-                        .name(format!("Current (iter: {})", iter));
+                        .name(format!("Current (iter: {iter})"));
 
                         Plot::new("Current Parameter Vector")
                             .legend(Legend::default())
@@ -283,7 +283,7 @@ impl MyContext {
                 ui.label(format!("Solver: {}", run.solver));
                 run.settings
                     .iter()
-                    .map(|(k, v)| ui.label(format!("{}: {}", k, v)))
+                    .map(|(k, v)| ui.label(format!("{k}: {v}")))
                     .count();
                 ui.label(format!("Maximum number of iterations: {}", run.max_iter));
                 ui.label(format!(
@@ -299,7 +299,7 @@ impl MyContext {
                 ));
                 ui.label(format!("Elapsed time: {}", run.time));
                 if let TerminationStatus::Terminated(reason) = &run.termination_status {
-                    ui.label(format!("Termination reason: {}", reason));
+                    ui.label(format!("Termination reason: {reason}"));
                 }
             });
         }
