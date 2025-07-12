@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/kv.rs`."><title>kv.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.1 (4eb161250 2025-03-15)" data-channel="1.85.1" data-search-js="search-75f5ac3e.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/kv.rs`."><title>kv.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1a91846b.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.88.0 (6b00bc388 2025-06-23)" data-channel="1.88.0" data-search-js="search-f7877310.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-4e99c027.js"></script><script defer src="../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-7ef8a74a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script>
@@ -12,902 +12,452 @@
     });
 </script>
 
-</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin/core/</div>kv.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
-<a href="#1" id="1">1</a>
-<a href="#2" id="2">2</a>
-<a href="#3" id="3">3</a>
-<a href="#4" id="4">4</a>
-<a href="#5" id="5">5</a>
-<a href="#6" id="6">6</a>
-<a href="#7" id="7">7</a>
-<a href="#8" id="8">8</a>
-<a href="#9" id="9">9</a>
-<a href="#10" id="10">10</a>
-<a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-<a href="#14" id="14">14</a>
-<a href="#15" id="15">15</a>
-<a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a>
-<a href="#18" id="18">18</a>
-<a href="#19" id="19">19</a>
-<a href="#20" id="20">20</a>
-<a href="#21" id="21">21</a>
-<a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-<a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
-<a href="#36" id="36">36</a>
-<a href="#37" id="37">37</a>
-<a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-<a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
-<a href="#46" id="46">46</a>
-<a href="#47" id="47">47</a>
-<a href="#48" id="48">48</a>
-<a href="#49" id="49">49</a>
-<a href="#50" id="50">50</a>
-<a href="#51" id="51">51</a>
-<a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
-<a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a></pre></div><pre class="rust"><code><span class="comment">// Copyright 2018-2024 argmin developers
-//
-// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
-// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
-// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
-// copied, modified, or distributed except according to those terms.
-
-</span><span class="kw">use </span>std::collections::HashMap;
-<span class="kw">use </span>std::fmt;
-<span class="kw">use </span>std::fmt::{Debug, Display};
-
-<span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
-</span><span class="kw">use </span>serde::{Deserialize, Serialize};
-
-<span class="doccomment">/// Types available for use in [`KV`](KV).
-///
-/// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
-/// be converted to 64 bit. Preferably the `From` impls are used to create a `KvValue`:
-///
-/// ```
-/// # use argmin::core::KvValue;
-/// let x: KvValue = 1u64.into();
-/// assert_eq!(x, KvValue::Uint(1u64));
-///
-/// let x: KvValue = 2u32.into();
-/// assert_eq!(x, KvValue::Uint(2u64));
-///
-/// let x: KvValue = 2i64.into();
-/// assert_eq!(x, KvValue::Int(2i64));
-///
-/// let x: KvValue = 2i32.into();
-/// assert_eq!(x, KvValue::Int(2i64));
-///
-/// let x: KvValue = 1.0f64.into();
-/// assert_eq!(x, KvValue::Float(1f64));
-///
-/// let x: KvValue = 1.0f32.into();
-/// assert_eq!(x, KvValue::Float(1f64));
-///
-/// let x: KvValue = true.into();
-/// assert_eq!(x, KvValue::Bool(true));
-///
-/// let x: KvValue = "a str".into();
-/// assert_eq!(x, KvValue::Str("a str".to_string()));
-///
-/// let x: KvValue = "a String".to_string().into();
-/// assert_eq!(x, KvValue::Str("a String".to_string()));
-/// ```
-</span><span class="attr">#[derive(Clone, PartialEq, Debug)]
-#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
-</span><span class="kw">pub enum </span>KvValue {
-    <span class="doccomment">/// Floating point values
-    </span>Float(f64),
-    <span class="doccomment">/// Signed integers
-    </span>Int(i64),
-    <span class="doccomment">/// Unsigned integers
-    </span>Uint(u64),
-    <span class="doccomment">/// Boolean values
-    </span>Bool(bool),
-    <span class="doccomment">/// Strings
-    </span>Str(String),
-}
-
-<span class="kw">impl </span>KvValue {
-    <span class="doccomment">/// Returns the kind of the `KvValue`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Float(1.0).kind(), "Float");
-    /// assert_eq!(KvValue::Int(1).kind(), "Int");
-    /// assert_eq!(KvValue::Uint(1).kind(), "Uint");
-    /// assert_eq!(KvValue::Bool(true).kind(), "Bool");
-    /// assert_eq!(KvValue::Str("string".to_string()).kind(), "Str");
-    /// ```
-    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
-        <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Float(<span class="kw">_</span>) =&gt; <span class="string">"Float"</span>,
-            KvValue::Int(<span class="kw">_</span>) =&gt; <span class="string">"Int"</span>,
-            KvValue::Uint(<span class="kw">_</span>) =&gt; <span class="string">"Uint"</span>,
-            KvValue::Bool(<span class="kw">_</span>) =&gt; <span class="string">"Bool"</span>,
-            KvValue::Str(<span class="kw">_</span>) =&gt; <span class="string">"Str"</span>,
-        }
-    }
-
-    <span class="doccomment">/// Extract float from `KvValue`
-    ///
-    /// Returns `Some(&lt;float&gt;)` if `KvValue` is of kind `Float`.
-    ///
-    /// **Note:** For `KvValue::Int` and `KvValue::Uint`integer values are cast to f64, therefore
-    /// this operation may be lossy!
-    ///
-    /// `KvValue::Bool` is turned into `1.0f64` if true and `0.0f64` if false.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Int(1).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Uint(1).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Bool(true).get_float(), Some(1.0));
-    /// assert_eq!(KvValue::Str("not a number".to_string()).get_float(), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Float(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x),
-            KvValue::Int(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
-            KvValue::Uint(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
-            KvValue::Bool(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">1.0</span>),
-            KvValue::Bool(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">0.0</span>),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="doccomment">/// Extract int from `KvValue`
-    ///
-    /// Returns `Some(&lt;int&gt;)` if `KvValue` is of kind `Int` and `None` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Int(1).get_int(), Some(1i64));
-    /// assert_eq!(KvValue::Float(1.0).get_int(), None);
-    /// assert_eq!(KvValue::Uint(1).get_int(), None);
-    /// assert_eq!(KvValue::Bool(true).get_int(), None);
-    /// assert_eq!(KvValue::Str("not an int".to_string()).get_int(), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
-        <span class="kw">if let </span>KvValue::Int(x) = <span class="kw-2">*</span><span class="self">self </span>{
-            <span class="prelude-val">Some</span>(x)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
-
-    <span class="doccomment">/// Extract unsigned int from `KvValue`
-    ///
-    /// Returns `Some(&lt;unsigned int&gt;)` if `KvValue` is of kind `Uint` and `None` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Uint(1).get_uint(), Some(1u64));
-    /// assert_eq!(KvValue::Int(1).get_uint(), None);
-    /// assert_eq!(KvValue::Float(1.0).get_uint(), None);
-    /// assert_eq!(KvValue::Bool(true).get_uint(), None);
-    /// assert_eq!(KvValue::Str("not an uint".to_string()).get_uint(), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get_uint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="kw">if let </span>KvValue::Uint(x) = <span class="kw-2">*</span><span class="self">self </span>{
-            <span class="prelude-val">Some</span>(x)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
-
-    <span class="doccomment">/// Extract bool from `KvValue`
-    ///
-    /// Returns `Some(&lt;bool&gt;)` if `KvValue` is of kind `Bool` and `None` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Bool(true).get_bool(), Some(true));
-    /// assert_eq!(KvValue::Float(1.0).get_bool(), None);
-    /// assert_eq!(KvValue::Int(1).get_bool(), None);
-    /// assert_eq!(KvValue::Uint(1).get_bool(), None);
-    /// assert_eq!(KvValue::Str("not a bool".to_string()).get_bool(), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
-        <span class="kw">if let </span>KvValue::Bool(x) = <span class="kw-2">*</span><span class="self">self </span>{
-            <span class="prelude-val">Some</span>(x)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
-
-    <span class="doccomment">/// Extract String from `KvValue`
-    ///
-    /// Returns `Some(&lt;string&gt;)` if `KvValue` is of kind `Str` and `None` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Str("a string".to_string()).get_string(), Some("a string".to_string()));
-    /// assert_eq!(KvValue::Float(1.0).get_string(), None);
-    /// assert_eq!(KvValue::Int(1).get_string(), None);
-    /// assert_eq!(KvValue::Uint(1).get_string(), None);
-    /// assert_eq!(KvValue::Bool(true).get_string(), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">if let </span>KvValue::Str(x) = <span class="self">self </span>{
-            <span class="prelude-val">Some</span>(x.clone())
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
-
-    <span class="doccomment">/// Get String representation of `KvValue`
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KvValue;
-    /// assert_eq!(KvValue::Str("a string".to_string()).as_string(), "a string".to_string());
-    /// assert_eq!(KvValue::Float(1.0).as_string(), "1".to_string());
-    /// assert_eq!(KvValue::Int(1).as_string(), "1".to_string());
-    /// assert_eq!(KvValue::Uint(1).as_string(), "1".to_string());
-    /// assert_eq!(KvValue::Bool(true).as_string(), "true".to_string());
-    /// ```
-    </span><span class="kw">pub fn </span>as_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Str(x) =&gt; x.clone(),
-            KvValue::Float(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
-            KvValue::Bool(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
-            KvValue::Int(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
-            KvValue::Uint(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: f64) -&gt; KvValue {
-        KvValue::Float(x)
-    }
-}
-
-<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: f32) -&gt; KvValue {
-        KvValue::Float(f64::from(x))
-    }
-}
-
-<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: i64) -&gt; KvValue {
-        KvValue::Int(x)
-    }
-}
-
-<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: u64) -&gt; KvValue {
-        KvValue::Uint(x)
-    }
-}
-
-<span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: i32) -&gt; KvValue {
-        KvValue::Int(i64::from(x))
-    }
-}
-
-<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: u32) -&gt; KvValue {
-        KvValue::Uint(u64::from(x))
-    }
-}
-
-<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: bool) -&gt; KvValue {
-        KvValue::Bool(x)
-    }
-}
-
-<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: String) -&gt; KvValue {
-        KvValue::Str(x)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; KvValue {
-        KvValue::Str(x.to_string())
-    }
-}
-
-<span class="kw">impl </span>Display <span class="kw">for </span>KvValue {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="kw">match </span><span class="self">self </span>{
-            KvValue::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
-            KvValue::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
-            KvValue::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
-            KvValue::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
-            KvValue::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
-        };
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="doccomment">/// A simple key-value storage
-///
-/// Keeps pairs of `(&amp;'static str, KvValue)` and is used to pass key-value pairs to
-/// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
-/// Typically constructed using the [`kv!`](`crate::kv`) macro.
-///
-/// # Example
-///
-/// ```
-/// use argmin::kv;
-///
-/// let kv = kv!(
-///     "key1" =&gt; "value1";
-///     "key2" =&gt; "value2";
-///     "key3" =&gt; 1234;
-/// );
-/// # assert_eq!(kv.kv.len(), 3);
-/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
-/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
-/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
-/// ```
-</span><span class="attr">#[derive(Clone, Default, PartialEq)]
-#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
-</span><span class="kw">pub struct </span>KV {
-    <span class="doccomment">/// The actual key value storage
-    </span><span class="kw">pub </span>kv: HashMap&lt;String, KvValue&gt;,
-}
-
-<span class="kw">impl </span>Debug <span class="kw">for </span>KV {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">writeln!</span>(f, <span class="string">"{self}"</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-<span class="kw">impl </span>Display <span class="kw">for </span>KV {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">writeln!</span>(f, <span class="string">"KV"</span>)<span class="question-mark">?</span>;
-        <span class="kw">for </span>(key, val) <span class="kw">in </span><span class="self">self</span>.kv.iter() {
-            <span class="macro">writeln!</span>(f, <span class="string">"   {key}: {val}"</span>)<span class="question-mark">?</span>;
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-}
-
-<span class="kw">impl </span>KV {
-    <span class="doccomment">/// Constructor a new empty `KV`
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::KV;
-    /// #
-    /// let kv = KV::new();
-    /// # assert_eq!(kv.kv.len(), 0);
-    /// ```
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        KV { kv: HashMap::new() }
-    }
-
-    <span class="doccomment">/// Insert a key-value pair
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{KV, KvValue};
-    /// let mut kv = KV::new();
-    /// kv.insert("key1", KvValue::Str("value".to_string()));
-    /// kv.insert("key2", KvValue::Int(1234));
-    /// # assert_eq!(kv.kv.len(), 2);
-    /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
-    /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
-    /// ```
-    </span><span class="kw">pub fn </span>insert&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: T, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.kv.insert(key.as_ref().into(), val);
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Retrieve an element from the KV by key
-    ///
-    /// Returns `Some(&lt;reference to KvValue&gt;)` if `key` is present and `None` otherwise.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{KV, KvValue};
-    /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KvValue::Float(12.0));
-    ///
-    /// assert_eq!(kv1.get("key1"), Some(&amp;KvValue::Float(12.0)));
-    /// assert_eq!(kv1.get("non_existing"), None);
-    /// ```
-    </span><span class="kw">pub fn </span>get&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
-        <span class="self">self</span>.kv.get(key.as_ref())
-    }
-
-    <span class="doccomment">/// Returns all available keys and their `KvValue` kind
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{KV, KvValue};
-    /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
-    ///
-    /// assert_eq!(kv1.keys(), vec![("key1".to_string(), "Str")]);
-    /// ```
-    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str)&gt; {
-        <span class="self">self</span>.kv.iter().map(|(k, v)| (k.clone(), v.kind())).collect()
-    }
-
-    <span class="doccomment">/// Merge with another `KV`
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use argmin::core::{KV, KvValue};
-    /// let mut kv1 = KV::new();
-    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
-    /// # assert_eq!(kv1.kv.len(), 1);
-    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
-    ///
-    /// let mut kv2 = KV::new();
-    /// kv2.insert("key2", KvValue::Str("value2".to_string()));
-    /// # assert_eq!(kv2.kv.len(), 1);
-    /// # assert_eq!(format!("{}", kv2.get("key2").unwrap()), "value2");
-    ///
-    /// let kv1 = kv1.merge(kv2);
-    /// # assert_eq!(kv1.kv.len(), 2);
-    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
-    /// # assert_eq!(format!("{}", kv1.get("key2").unwrap()), "value2");
-    /// ```
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, other: KV) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.kv.extend(other.kv);
-        <span class="self">self
-    </span>}
-}
-
-<span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>c = KV::new();
-        <span class="kw">for </span>i <span class="kw">in </span>iter {
-            c.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
-        }
-        c
-    }
-}
-
-<span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
-    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
-        <span class="kw">for </span>i <span class="kw">in </span>iter {
-            <span class="self">self</span>.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
-        }
-    }
-}
-</code></pre></div></section></main></body></html>
+</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin/core/</div>kv.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2018-2024 argmin developers
+<a href=#2 id=2 data-nosnippet>2</a>//
+<a href=#3 id=3 data-nosnippet>3</a>// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+<a href=#4 id=4 data-nosnippet>4</a>// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+<a href=#5 id=5 data-nosnippet>5</a>// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+<a href=#6 id=6 data-nosnippet>6</a>// copied, modified, or distributed except according to those terms.
+<a href=#7 id=7 data-nosnippet>7</a>
+<a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">use </span>std::collections::HashMap;
+<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>std::fmt;
+<a href=#10 id=10 data-nosnippet>10</a><span class="kw">use </span>std::fmt::{Debug, Display};
+<a href=#11 id=11 data-nosnippet>11</a>
+<a href=#12 id=12 data-nosnippet>12</a><span class="attr">#[cfg(feature = <span class="string">"serde1"</span>)]
+<a href=#13 id=13 data-nosnippet>13</a></span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<a href=#14 id=14 data-nosnippet>14</a>
+<a href=#15 id=15 data-nosnippet>15</a><span class="doccomment">/// Types available for use in [`KV`](KV).
+<a href=#16 id=16 data-nosnippet>16</a>///
+<a href=#17 id=17 data-nosnippet>17</a>/// `Float`, `Int` and `Uint` are all 64bit. The corresponding 32bit variants must be
+<a href=#18 id=18 data-nosnippet>18</a>/// be converted to 64 bit. Preferably the `From` impls are used to create a `KvValue`:
+<a href=#19 id=19 data-nosnippet>19</a>///
+<a href=#20 id=20 data-nosnippet>20</a>/// ```
+<a href=#21 id=21 data-nosnippet>21</a>/// # use argmin::core::KvValue;
+<a href=#22 id=22 data-nosnippet>22</a>/// let x: KvValue = 1u64.into();
+<a href=#23 id=23 data-nosnippet>23</a>/// assert_eq!(x, KvValue::Uint(1u64));
+<a href=#24 id=24 data-nosnippet>24</a>///
+<a href=#25 id=25 data-nosnippet>25</a>/// let x: KvValue = 2u32.into();
+<a href=#26 id=26 data-nosnippet>26</a>/// assert_eq!(x, KvValue::Uint(2u64));
+<a href=#27 id=27 data-nosnippet>27</a>///
+<a href=#28 id=28 data-nosnippet>28</a>/// let x: KvValue = 2i64.into();
+<a href=#29 id=29 data-nosnippet>29</a>/// assert_eq!(x, KvValue::Int(2i64));
+<a href=#30 id=30 data-nosnippet>30</a>///
+<a href=#31 id=31 data-nosnippet>31</a>/// let x: KvValue = 2i32.into();
+<a href=#32 id=32 data-nosnippet>32</a>/// assert_eq!(x, KvValue::Int(2i64));
+<a href=#33 id=33 data-nosnippet>33</a>///
+<a href=#34 id=34 data-nosnippet>34</a>/// let x: KvValue = 1.0f64.into();
+<a href=#35 id=35 data-nosnippet>35</a>/// assert_eq!(x, KvValue::Float(1f64));
+<a href=#36 id=36 data-nosnippet>36</a>///
+<a href=#37 id=37 data-nosnippet>37</a>/// let x: KvValue = 1.0f32.into();
+<a href=#38 id=38 data-nosnippet>38</a>/// assert_eq!(x, KvValue::Float(1f64));
+<a href=#39 id=39 data-nosnippet>39</a>///
+<a href=#40 id=40 data-nosnippet>40</a>/// let x: KvValue = true.into();
+<a href=#41 id=41 data-nosnippet>41</a>/// assert_eq!(x, KvValue::Bool(true));
+<a href=#42 id=42 data-nosnippet>42</a>///
+<a href=#43 id=43 data-nosnippet>43</a>/// let x: KvValue = "a str".into();
+<a href=#44 id=44 data-nosnippet>44</a>/// assert_eq!(x, KvValue::Str("a str".to_string()));
+<a href=#45 id=45 data-nosnippet>45</a>///
+<a href=#46 id=46 data-nosnippet>46</a>/// let x: KvValue = "a String".to_string().into();
+<a href=#47 id=47 data-nosnippet>47</a>/// assert_eq!(x, KvValue::Str("a String".to_string()));
+<a href=#48 id=48 data-nosnippet>48</a>/// ```
+<a href=#49 id=49 data-nosnippet>49</a></span><span class="attr">#[derive(Clone, PartialEq, Debug)]
+<a href=#50 id=50 data-nosnippet>50</a>#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
+<a href=#51 id=51 data-nosnippet>51</a></span><span class="kw">pub enum </span>KvValue {
+<a href=#52 id=52 data-nosnippet>52</a>    <span class="doccomment">/// Floating point values
+<a href=#53 id=53 data-nosnippet>53</a>    </span>Float(f64),
+<a href=#54 id=54 data-nosnippet>54</a>    <span class="doccomment">/// Signed integers
+<a href=#55 id=55 data-nosnippet>55</a>    </span>Int(i64),
+<a href=#56 id=56 data-nosnippet>56</a>    <span class="doccomment">/// Unsigned integers
+<a href=#57 id=57 data-nosnippet>57</a>    </span>Uint(u64),
+<a href=#58 id=58 data-nosnippet>58</a>    <span class="doccomment">/// Boolean values
+<a href=#59 id=59 data-nosnippet>59</a>    </span>Bool(bool),
+<a href=#60 id=60 data-nosnippet>60</a>    <span class="doccomment">/// Strings
+<a href=#61 id=61 data-nosnippet>61</a>    </span>Str(String),
+<a href=#62 id=62 data-nosnippet>62</a>}
+<a href=#63 id=63 data-nosnippet>63</a>
+<a href=#64 id=64 data-nosnippet>64</a><span class="kw">impl </span>KvValue {
+<a href=#65 id=65 data-nosnippet>65</a>    <span class="doccomment">/// Returns the kind of the `KvValue`
+<a href=#66 id=66 data-nosnippet>66</a>    ///
+<a href=#67 id=67 data-nosnippet>67</a>    /// # Examples
+<a href=#68 id=68 data-nosnippet>68</a>    ///
+<a href=#69 id=69 data-nosnippet>69</a>    /// ```
+<a href=#70 id=70 data-nosnippet>70</a>    /// # use argmin::core::KvValue;
+<a href=#71 id=71 data-nosnippet>71</a>    /// assert_eq!(KvValue::Float(1.0).kind(), "Float");
+<a href=#72 id=72 data-nosnippet>72</a>    /// assert_eq!(KvValue::Int(1).kind(), "Int");
+<a href=#73 id=73 data-nosnippet>73</a>    /// assert_eq!(KvValue::Uint(1).kind(), "Uint");
+<a href=#74 id=74 data-nosnippet>74</a>    /// assert_eq!(KvValue::Bool(true).kind(), "Bool");
+<a href=#75 id=75 data-nosnippet>75</a>    /// assert_eq!(KvValue::Str("string".to_string()).kind(), "Str");
+<a href=#76 id=76 data-nosnippet>76</a>    /// ```
+<a href=#77 id=77 data-nosnippet>77</a>    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
+<a href=#78 id=78 data-nosnippet>78</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#79 id=79 data-nosnippet>79</a>            KvValue::Float(<span class="kw">_</span>) =&gt; <span class="string">"Float"</span>,
+<a href=#80 id=80 data-nosnippet>80</a>            KvValue::Int(<span class="kw">_</span>) =&gt; <span class="string">"Int"</span>,
+<a href=#81 id=81 data-nosnippet>81</a>            KvValue::Uint(<span class="kw">_</span>) =&gt; <span class="string">"Uint"</span>,
+<a href=#82 id=82 data-nosnippet>82</a>            KvValue::Bool(<span class="kw">_</span>) =&gt; <span class="string">"Bool"</span>,
+<a href=#83 id=83 data-nosnippet>83</a>            KvValue::Str(<span class="kw">_</span>) =&gt; <span class="string">"Str"</span>,
+<a href=#84 id=84 data-nosnippet>84</a>        }
+<a href=#85 id=85 data-nosnippet>85</a>    }
+<a href=#86 id=86 data-nosnippet>86</a>
+<a href=#87 id=87 data-nosnippet>87</a>    <span class="doccomment">/// Extract float from `KvValue`
+<a href=#88 id=88 data-nosnippet>88</a>    ///
+<a href=#89 id=89 data-nosnippet>89</a>    /// Returns `Some(&lt;float&gt;)` if `KvValue` is of kind `Float`.
+<a href=#90 id=90 data-nosnippet>90</a>    ///
+<a href=#91 id=91 data-nosnippet>91</a>    /// **Note:** For `KvValue::Int` and `KvValue::Uint`integer values are cast to f64, therefore
+<a href=#92 id=92 data-nosnippet>92</a>    /// this operation may be lossy!
+<a href=#93 id=93 data-nosnippet>93</a>    ///
+<a href=#94 id=94 data-nosnippet>94</a>    /// `KvValue::Bool` is turned into `1.0f64` if true and `0.0f64` if false.
+<a href=#95 id=95 data-nosnippet>95</a>    ///
+<a href=#96 id=96 data-nosnippet>96</a>    /// # Example
+<a href=#97 id=97 data-nosnippet>97</a>    ///
+<a href=#98 id=98 data-nosnippet>98</a>    /// ```
+<a href=#99 id=99 data-nosnippet>99</a>    /// # use argmin::core::KvValue;
+<a href=#100 id=100 data-nosnippet>100</a>    /// assert_eq!(KvValue::Float(1.0).get_float(), Some(1.0));
+<a href=#101 id=101 data-nosnippet>101</a>    /// assert_eq!(KvValue::Int(1).get_float(), Some(1.0));
+<a href=#102 id=102 data-nosnippet>102</a>    /// assert_eq!(KvValue::Uint(1).get_float(), Some(1.0));
+<a href=#103 id=103 data-nosnippet>103</a>    /// assert_eq!(KvValue::Bool(true).get_float(), Some(1.0));
+<a href=#104 id=104 data-nosnippet>104</a>    /// assert_eq!(KvValue::Str("not a number".to_string()).get_float(), None);
+<a href=#105 id=105 data-nosnippet>105</a>    /// ```
+<a href=#106 id=106 data-nosnippet>106</a>    </span><span class="kw">pub fn </span>get_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#108 id=108 data-nosnippet>108</a>            KvValue::Float(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x),
+<a href=#109 id=109 data-nosnippet>109</a>            KvValue::Int(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
+<a href=#110 id=110 data-nosnippet>110</a>            KvValue::Uint(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x <span class="kw">as </span>f64),
+<a href=#111 id=111 data-nosnippet>111</a>            KvValue::Bool(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">1.0</span>),
+<a href=#112 id=112 data-nosnippet>112</a>            KvValue::Bool(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">0.0</span>),
+<a href=#113 id=113 data-nosnippet>113</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+<a href=#114 id=114 data-nosnippet>114</a>        }
+<a href=#115 id=115 data-nosnippet>115</a>    }
+<a href=#116 id=116 data-nosnippet>116</a>
+<a href=#117 id=117 data-nosnippet>117</a>    <span class="doccomment">/// Extract int from `KvValue`
+<a href=#118 id=118 data-nosnippet>118</a>    ///
+<a href=#119 id=119 data-nosnippet>119</a>    /// Returns `Some(&lt;int&gt;)` if `KvValue` is of kind `Int` and `None` otherwise.
+<a href=#120 id=120 data-nosnippet>120</a>    ///
+<a href=#121 id=121 data-nosnippet>121</a>    /// # Example
+<a href=#122 id=122 data-nosnippet>122</a>    ///
+<a href=#123 id=123 data-nosnippet>123</a>    /// ```
+<a href=#124 id=124 data-nosnippet>124</a>    /// # use argmin::core::KvValue;
+<a href=#125 id=125 data-nosnippet>125</a>    /// assert_eq!(KvValue::Int(1).get_int(), Some(1i64));
+<a href=#126 id=126 data-nosnippet>126</a>    /// assert_eq!(KvValue::Float(1.0).get_int(), None);
+<a href=#127 id=127 data-nosnippet>127</a>    /// assert_eq!(KvValue::Uint(1).get_int(), None);
+<a href=#128 id=128 data-nosnippet>128</a>    /// assert_eq!(KvValue::Bool(true).get_int(), None);
+<a href=#129 id=129 data-nosnippet>129</a>    /// assert_eq!(KvValue::Str("not an int".to_string()).get_int(), None);
+<a href=#130 id=130 data-nosnippet>130</a>    /// ```
+<a href=#131 id=131 data-nosnippet>131</a>    </span><span class="kw">pub fn </span>get_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="kw">if let </span>KvValue::Int(x) = <span class="kw-2">*</span><span class="self">self </span>{
+<a href=#133 id=133 data-nosnippet>133</a>            <span class="prelude-val">Some</span>(x)
+<a href=#134 id=134 data-nosnippet>134</a>        } <span class="kw">else </span>{
+<a href=#135 id=135 data-nosnippet>135</a>            <span class="prelude-val">None
+<a href=#136 id=136 data-nosnippet>136</a>        </span>}
+<a href=#137 id=137 data-nosnippet>137</a>    }
+<a href=#138 id=138 data-nosnippet>138</a>
+<a href=#139 id=139 data-nosnippet>139</a>    <span class="doccomment">/// Extract unsigned int from `KvValue`
+<a href=#140 id=140 data-nosnippet>140</a>    ///
+<a href=#141 id=141 data-nosnippet>141</a>    /// Returns `Some(&lt;unsigned int&gt;)` if `KvValue` is of kind `Uint` and `None` otherwise.
+<a href=#142 id=142 data-nosnippet>142</a>    ///
+<a href=#143 id=143 data-nosnippet>143</a>    /// # Example
+<a href=#144 id=144 data-nosnippet>144</a>    ///
+<a href=#145 id=145 data-nosnippet>145</a>    /// ```
+<a href=#146 id=146 data-nosnippet>146</a>    /// # use argmin::core::KvValue;
+<a href=#147 id=147 data-nosnippet>147</a>    /// assert_eq!(KvValue::Uint(1).get_uint(), Some(1u64));
+<a href=#148 id=148 data-nosnippet>148</a>    /// assert_eq!(KvValue::Int(1).get_uint(), None);
+<a href=#149 id=149 data-nosnippet>149</a>    /// assert_eq!(KvValue::Float(1.0).get_uint(), None);
+<a href=#150 id=150 data-nosnippet>150</a>    /// assert_eq!(KvValue::Bool(true).get_uint(), None);
+<a href=#151 id=151 data-nosnippet>151</a>    /// assert_eq!(KvValue::Str("not an uint".to_string()).get_uint(), None);
+<a href=#152 id=152 data-nosnippet>152</a>    /// ```
+<a href=#153 id=153 data-nosnippet>153</a>    </span><span class="kw">pub fn </span>get_uint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+<a href=#154 id=154 data-nosnippet>154</a>        <span class="kw">if let </span>KvValue::Uint(x) = <span class="kw-2">*</span><span class="self">self </span>{
+<a href=#155 id=155 data-nosnippet>155</a>            <span class="prelude-val">Some</span>(x)
+<a href=#156 id=156 data-nosnippet>156</a>        } <span class="kw">else </span>{
+<a href=#157 id=157 data-nosnippet>157</a>            <span class="prelude-val">None
+<a href=#158 id=158 data-nosnippet>158</a>        </span>}
+<a href=#159 id=159 data-nosnippet>159</a>    }
+<a href=#160 id=160 data-nosnippet>160</a>
+<a href=#161 id=161 data-nosnippet>161</a>    <span class="doccomment">/// Extract bool from `KvValue`
+<a href=#162 id=162 data-nosnippet>162</a>    ///
+<a href=#163 id=163 data-nosnippet>163</a>    /// Returns `Some(&lt;bool&gt;)` if `KvValue` is of kind `Bool` and `None` otherwise.
+<a href=#164 id=164 data-nosnippet>164</a>    ///
+<a href=#165 id=165 data-nosnippet>165</a>    /// # Example
+<a href=#166 id=166 data-nosnippet>166</a>    ///
+<a href=#167 id=167 data-nosnippet>167</a>    /// ```
+<a href=#168 id=168 data-nosnippet>168</a>    /// # use argmin::core::KvValue;
+<a href=#169 id=169 data-nosnippet>169</a>    /// assert_eq!(KvValue::Bool(true).get_bool(), Some(true));
+<a href=#170 id=170 data-nosnippet>170</a>    /// assert_eq!(KvValue::Float(1.0).get_bool(), None);
+<a href=#171 id=171 data-nosnippet>171</a>    /// assert_eq!(KvValue::Int(1).get_bool(), None);
+<a href=#172 id=172 data-nosnippet>172</a>    /// assert_eq!(KvValue::Uint(1).get_bool(), None);
+<a href=#173 id=173 data-nosnippet>173</a>    /// assert_eq!(KvValue::Str("not a bool".to_string()).get_bool(), None);
+<a href=#174 id=174 data-nosnippet>174</a>    /// ```
+<a href=#175 id=175 data-nosnippet>175</a>    </span><span class="kw">pub fn </span>get_bool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+<a href=#176 id=176 data-nosnippet>176</a>        <span class="kw">if let </span>KvValue::Bool(x) = <span class="kw-2">*</span><span class="self">self </span>{
+<a href=#177 id=177 data-nosnippet>177</a>            <span class="prelude-val">Some</span>(x)
+<a href=#178 id=178 data-nosnippet>178</a>        } <span class="kw">else </span>{
+<a href=#179 id=179 data-nosnippet>179</a>            <span class="prelude-val">None
+<a href=#180 id=180 data-nosnippet>180</a>        </span>}
+<a href=#181 id=181 data-nosnippet>181</a>    }
+<a href=#182 id=182 data-nosnippet>182</a>
+<a href=#183 id=183 data-nosnippet>183</a>    <span class="doccomment">/// Extract String from `KvValue`
+<a href=#184 id=184 data-nosnippet>184</a>    ///
+<a href=#185 id=185 data-nosnippet>185</a>    /// Returns `Some(&lt;string&gt;)` if `KvValue` is of kind `Str` and `None` otherwise.
+<a href=#186 id=186 data-nosnippet>186</a>    ///
+<a href=#187 id=187 data-nosnippet>187</a>    /// # Example
+<a href=#188 id=188 data-nosnippet>188</a>    ///
+<a href=#189 id=189 data-nosnippet>189</a>    /// ```
+<a href=#190 id=190 data-nosnippet>190</a>    /// # use argmin::core::KvValue;
+<a href=#191 id=191 data-nosnippet>191</a>    /// assert_eq!(KvValue::Str("a string".to_string()).get_string(), Some("a string".to_string()));
+<a href=#192 id=192 data-nosnippet>192</a>    /// assert_eq!(KvValue::Float(1.0).get_string(), None);
+<a href=#193 id=193 data-nosnippet>193</a>    /// assert_eq!(KvValue::Int(1).get_string(), None);
+<a href=#194 id=194 data-nosnippet>194</a>    /// assert_eq!(KvValue::Uint(1).get_string(), None);
+<a href=#195 id=195 data-nosnippet>195</a>    /// assert_eq!(KvValue::Bool(true).get_string(), None);
+<a href=#196 id=196 data-nosnippet>196</a>    /// ```
+<a href=#197 id=197 data-nosnippet>197</a>    </span><span class="kw">pub fn </span>get_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#198 id=198 data-nosnippet>198</a>        <span class="kw">if let </span>KvValue::Str(x) = <span class="self">self </span>{
+<a href=#199 id=199 data-nosnippet>199</a>            <span class="prelude-val">Some</span>(x.clone())
+<a href=#200 id=200 data-nosnippet>200</a>        } <span class="kw">else </span>{
+<a href=#201 id=201 data-nosnippet>201</a>            <span class="prelude-val">None
+<a href=#202 id=202 data-nosnippet>202</a>        </span>}
+<a href=#203 id=203 data-nosnippet>203</a>    }
+<a href=#204 id=204 data-nosnippet>204</a>
+<a href=#205 id=205 data-nosnippet>205</a>    <span class="doccomment">/// Get String representation of `KvValue`
+<a href=#206 id=206 data-nosnippet>206</a>    ///
+<a href=#207 id=207 data-nosnippet>207</a>    /// # Example
+<a href=#208 id=208 data-nosnippet>208</a>    ///
+<a href=#209 id=209 data-nosnippet>209</a>    /// ```
+<a href=#210 id=210 data-nosnippet>210</a>    /// # use argmin::core::KvValue;
+<a href=#211 id=211 data-nosnippet>211</a>    /// assert_eq!(KvValue::Str("a string".to_string()).as_string(), "a string".to_string());
+<a href=#212 id=212 data-nosnippet>212</a>    /// assert_eq!(KvValue::Float(1.0).as_string(), "1".to_string());
+<a href=#213 id=213 data-nosnippet>213</a>    /// assert_eq!(KvValue::Int(1).as_string(), "1".to_string());
+<a href=#214 id=214 data-nosnippet>214</a>    /// assert_eq!(KvValue::Uint(1).as_string(), "1".to_string());
+<a href=#215 id=215 data-nosnippet>215</a>    /// assert_eq!(KvValue::Bool(true).as_string(), "true".to_string());
+<a href=#216 id=216 data-nosnippet>216</a>    /// ```
+<a href=#217 id=217 data-nosnippet>217</a>    </span><span class="kw">pub fn </span>as_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+<a href=#218 id=218 data-nosnippet>218</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#219 id=219 data-nosnippet>219</a>            KvValue::Str(x) =&gt; x.clone(),
+<a href=#220 id=220 data-nosnippet>220</a>            KvValue::Float(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+<a href=#221 id=221 data-nosnippet>221</a>            KvValue::Bool(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+<a href=#222 id=222 data-nosnippet>222</a>            KvValue::Int(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+<a href=#223 id=223 data-nosnippet>223</a>            KvValue::Uint(x) =&gt; <span class="macro">format!</span>(<span class="string">"{x}"</span>),
+<a href=#224 id=224 data-nosnippet>224</a>        }
+<a href=#225 id=225 data-nosnippet>225</a>    }
+<a href=#226 id=226 data-nosnippet>226</a>}
+<a href=#227 id=227 data-nosnippet>227</a>
+<a href=#228 id=228 data-nosnippet>228</a><span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>KvValue {
+<a href=#229 id=229 data-nosnippet>229</a>    <span class="kw">fn </span>from(x: f64) -&gt; KvValue {
+<a href=#230 id=230 data-nosnippet>230</a>        KvValue::Float(x)
+<a href=#231 id=231 data-nosnippet>231</a>    }
+<a href=#232 id=232 data-nosnippet>232</a>}
+<a href=#233 id=233 data-nosnippet>233</a>
+<a href=#234 id=234 data-nosnippet>234</a><span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>KvValue {
+<a href=#235 id=235 data-nosnippet>235</a>    <span class="kw">fn </span>from(x: f32) -&gt; KvValue {
+<a href=#236 id=236 data-nosnippet>236</a>        KvValue::Float(f64::from(x))
+<a href=#237 id=237 data-nosnippet>237</a>    }
+<a href=#238 id=238 data-nosnippet>238</a>}
+<a href=#239 id=239 data-nosnippet>239</a>
+<a href=#240 id=240 data-nosnippet>240</a><span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>KvValue {
+<a href=#241 id=241 data-nosnippet>241</a>    <span class="kw">fn </span>from(x: i64) -&gt; KvValue {
+<a href=#242 id=242 data-nosnippet>242</a>        KvValue::Int(x)
+<a href=#243 id=243 data-nosnippet>243</a>    }
+<a href=#244 id=244 data-nosnippet>244</a>}
+<a href=#245 id=245 data-nosnippet>245</a>
+<a href=#246 id=246 data-nosnippet>246</a><span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>KvValue {
+<a href=#247 id=247 data-nosnippet>247</a>    <span class="kw">fn </span>from(x: u64) -&gt; KvValue {
+<a href=#248 id=248 data-nosnippet>248</a>        KvValue::Uint(x)
+<a href=#249 id=249 data-nosnippet>249</a>    }
+<a href=#250 id=250 data-nosnippet>250</a>}
+<a href=#251 id=251 data-nosnippet>251</a>
+<a href=#252 id=252 data-nosnippet>252</a><span class="kw">impl </span>From&lt;i32&gt; <span class="kw">for </span>KvValue {
+<a href=#253 id=253 data-nosnippet>253</a>    <span class="kw">fn </span>from(x: i32) -&gt; KvValue {
+<a href=#254 id=254 data-nosnippet>254</a>        KvValue::Int(i64::from(x))
+<a href=#255 id=255 data-nosnippet>255</a>    }
+<a href=#256 id=256 data-nosnippet>256</a>}
+<a href=#257 id=257 data-nosnippet>257</a>
+<a href=#258 id=258 data-nosnippet>258</a><span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>KvValue {
+<a href=#259 id=259 data-nosnippet>259</a>    <span class="kw">fn </span>from(x: u32) -&gt; KvValue {
+<a href=#260 id=260 data-nosnippet>260</a>        KvValue::Uint(u64::from(x))
+<a href=#261 id=261 data-nosnippet>261</a>    }
+<a href=#262 id=262 data-nosnippet>262</a>}
+<a href=#263 id=263 data-nosnippet>263</a>
+<a href=#264 id=264 data-nosnippet>264</a><span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>KvValue {
+<a href=#265 id=265 data-nosnippet>265</a>    <span class="kw">fn </span>from(x: bool) -&gt; KvValue {
+<a href=#266 id=266 data-nosnippet>266</a>        KvValue::Bool(x)
+<a href=#267 id=267 data-nosnippet>267</a>    }
+<a href=#268 id=268 data-nosnippet>268</a>}
+<a href=#269 id=269 data-nosnippet>269</a>
+<a href=#270 id=270 data-nosnippet>270</a><span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>KvValue {
+<a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">fn </span>from(x: String) -&gt; KvValue {
+<a href=#272 id=272 data-nosnippet>272</a>        KvValue::Str(x)
+<a href=#273 id=273 data-nosnippet>273</a>    }
+<a href=#274 id=274 data-nosnippet>274</a>}
+<a href=#275 id=275 data-nosnippet>275</a>
+<a href=#276 id=276 data-nosnippet>276</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>KvValue {
+<a href=#277 id=277 data-nosnippet>277</a>    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; KvValue {
+<a href=#278 id=278 data-nosnippet>278</a>        KvValue::Str(x.to_string())
+<a href=#279 id=279 data-nosnippet>279</a>    }
+<a href=#280 id=280 data-nosnippet>280</a>}
+<a href=#281 id=281 data-nosnippet>281</a>
+<a href=#282 id=282 data-nosnippet>282</a><span class="kw">impl </span>Display <span class="kw">for </span>KvValue {
+<a href=#283 id=283 data-nosnippet>283</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#284 id=284 data-nosnippet>284</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#285 id=285 data-nosnippet>285</a>            KvValue::Float(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+<a href=#286 id=286 data-nosnippet>286</a>            KvValue::Int(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+<a href=#287 id=287 data-nosnippet>287</a>            KvValue::Uint(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+<a href=#288 id=288 data-nosnippet>288</a>            KvValue::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+<a href=#289 id=289 data-nosnippet>289</a>            KvValue::Str(x) =&gt; <span class="macro">write!</span>(f, <span class="string">"{x}"</span>)<span class="question-mark">?</span>,
+<a href=#290 id=290 data-nosnippet>290</a>        };
+<a href=#291 id=291 data-nosnippet>291</a>        <span class="prelude-val">Ok</span>(())
+<a href=#292 id=292 data-nosnippet>292</a>    }
+<a href=#293 id=293 data-nosnippet>293</a>}
+<a href=#294 id=294 data-nosnippet>294</a>
+<a href=#295 id=295 data-nosnippet>295</a><span class="doccomment">/// A simple key-value storage
+<a href=#296 id=296 data-nosnippet>296</a>///
+<a href=#297 id=297 data-nosnippet>297</a>/// Keeps pairs of `(&amp;'static str, KvValue)` and is used to pass key-value pairs to
+<a href=#298 id=298 data-nosnippet>298</a>/// [`Observers`](`crate::core::observers`) in each iteration of an optimization algorithm.
+<a href=#299 id=299 data-nosnippet>299</a>/// Typically constructed using the [`kv!`](`crate::kv`) macro.
+<a href=#300 id=300 data-nosnippet>300</a>///
+<a href=#301 id=301 data-nosnippet>301</a>/// # Example
+<a href=#302 id=302 data-nosnippet>302</a>///
+<a href=#303 id=303 data-nosnippet>303</a>/// ```
+<a href=#304 id=304 data-nosnippet>304</a>/// use argmin::kv;
+<a href=#305 id=305 data-nosnippet>305</a>///
+<a href=#306 id=306 data-nosnippet>306</a>/// let kv = kv!(
+<a href=#307 id=307 data-nosnippet>307</a>///     "key1" =&gt; "value1";
+<a href=#308 id=308 data-nosnippet>308</a>///     "key2" =&gt; "value2";
+<a href=#309 id=309 data-nosnippet>309</a>///     "key3" =&gt; 1234;
+<a href=#310 id=310 data-nosnippet>310</a>/// );
+<a href=#311 id=311 data-nosnippet>311</a>/// # assert_eq!(kv.kv.len(), 3);
+<a href=#312 id=312 data-nosnippet>312</a>/// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value1");
+<a href=#313 id=313 data-nosnippet>313</a>/// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
+<a href=#314 id=314 data-nosnippet>314</a>/// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
+<a href=#315 id=315 data-nosnippet>315</a>/// ```
+<a href=#316 id=316 data-nosnippet>316</a></span><span class="attr">#[derive(Clone, Default, PartialEq)]
+<a href=#317 id=317 data-nosnippet>317</a>#[cfg_attr(feature = <span class="string">"serde1"</span>, derive(Serialize, Deserialize))]
+<a href=#318 id=318 data-nosnippet>318</a></span><span class="kw">pub struct </span>KV {
+<a href=#319 id=319 data-nosnippet>319</a>    <span class="doccomment">/// The actual key value storage
+<a href=#320 id=320 data-nosnippet>320</a>    </span><span class="kw">pub </span>kv: HashMap&lt;String, KvValue&gt;,
+<a href=#321 id=321 data-nosnippet>321</a>}
+<a href=#322 id=322 data-nosnippet>322</a>
+<a href=#323 id=323 data-nosnippet>323</a><span class="kw">impl </span>Debug <span class="kw">for </span>KV {
+<a href=#324 id=324 data-nosnippet>324</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#325 id=325 data-nosnippet>325</a>        <span class="macro">writeln!</span>(f, <span class="string">"{self}"</span>)<span class="question-mark">?</span>;
+<a href=#326 id=326 data-nosnippet>326</a>        <span class="prelude-val">Ok</span>(())
+<a href=#327 id=327 data-nosnippet>327</a>    }
+<a href=#328 id=328 data-nosnippet>328</a>}
+<a href=#329 id=329 data-nosnippet>329</a><span class="kw">impl </span>Display <span class="kw">for </span>KV {
+<a href=#330 id=330 data-nosnippet>330</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#331 id=331 data-nosnippet>331</a>        <span class="macro">writeln!</span>(f, <span class="string">"KV"</span>)<span class="question-mark">?</span>;
+<a href=#332 id=332 data-nosnippet>332</a>        <span class="kw">for </span>(key, val) <span class="kw">in </span><span class="self">self</span>.kv.iter() {
+<a href=#333 id=333 data-nosnippet>333</a>            <span class="macro">writeln!</span>(f, <span class="string">"   {key}: {val}"</span>)<span class="question-mark">?</span>;
+<a href=#334 id=334 data-nosnippet>334</a>        }
+<a href=#335 id=335 data-nosnippet>335</a>        <span class="prelude-val">Ok</span>(())
+<a href=#336 id=336 data-nosnippet>336</a>    }
+<a href=#337 id=337 data-nosnippet>337</a>}
+<a href=#338 id=338 data-nosnippet>338</a>
+<a href=#339 id=339 data-nosnippet>339</a><span class="kw">impl </span>KV {
+<a href=#340 id=340 data-nosnippet>340</a>    <span class="doccomment">/// Constructor a new empty `KV`
+<a href=#341 id=341 data-nosnippet>341</a>    ///
+<a href=#342 id=342 data-nosnippet>342</a>    /// # Example
+<a href=#343 id=343 data-nosnippet>343</a>    ///
+<a href=#344 id=344 data-nosnippet>344</a>    /// ```
+<a href=#345 id=345 data-nosnippet>345</a>    /// # use argmin::core::KV;
+<a href=#346 id=346 data-nosnippet>346</a>    /// #
+<a href=#347 id=347 data-nosnippet>347</a>    /// let kv = KV::new();
+<a href=#348 id=348 data-nosnippet>348</a>    /// # assert_eq!(kv.kv.len(), 0);
+<a href=#349 id=349 data-nosnippet>349</a>    /// ```
+<a href=#350 id=350 data-nosnippet>350</a>    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#351 id=351 data-nosnippet>351</a>        KV { kv: HashMap::new() }
+<a href=#352 id=352 data-nosnippet>352</a>    }
+<a href=#353 id=353 data-nosnippet>353</a>
+<a href=#354 id=354 data-nosnippet>354</a>    <span class="doccomment">/// Insert a key-value pair
+<a href=#355 id=355 data-nosnippet>355</a>    ///
+<a href=#356 id=356 data-nosnippet>356</a>    /// # Example
+<a href=#357 id=357 data-nosnippet>357</a>    ///
+<a href=#358 id=358 data-nosnippet>358</a>    /// ```
+<a href=#359 id=359 data-nosnippet>359</a>    /// # use argmin::core::{KV, KvValue};
+<a href=#360 id=360 data-nosnippet>360</a>    /// let mut kv = KV::new();
+<a href=#361 id=361 data-nosnippet>361</a>    /// kv.insert("key1", KvValue::Str("value".to_string()));
+<a href=#362 id=362 data-nosnippet>362</a>    /// kv.insert("key2", KvValue::Int(1234));
+<a href=#363 id=363 data-nosnippet>363</a>    /// # assert_eq!(kv.kv.len(), 2);
+<a href=#364 id=364 data-nosnippet>364</a>    /// # assert_eq!(format!("{}", kv.get("key1").unwrap()), "value");
+<a href=#365 id=365 data-nosnippet>365</a>    /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "1234");
+<a href=#366 id=366 data-nosnippet>366</a>    /// ```
+<a href=#367 id=367 data-nosnippet>367</a>    </span><span class="kw">pub fn </span>insert&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: T, val: KvValue) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+<a href=#368 id=368 data-nosnippet>368</a>        <span class="self">self</span>.kv.insert(key.as_ref().into(), val);
+<a href=#369 id=369 data-nosnippet>369</a>        <span class="self">self
+<a href=#370 id=370 data-nosnippet>370</a>    </span>}
+<a href=#371 id=371 data-nosnippet>371</a>
+<a href=#372 id=372 data-nosnippet>372</a>    <span class="doccomment">/// Retrieve an element from the KV by key
+<a href=#373 id=373 data-nosnippet>373</a>    ///
+<a href=#374 id=374 data-nosnippet>374</a>    /// Returns `Some(&lt;reference to KvValue&gt;)` if `key` is present and `None` otherwise.
+<a href=#375 id=375 data-nosnippet>375</a>    ///
+<a href=#376 id=376 data-nosnippet>376</a>    /// # Example
+<a href=#377 id=377 data-nosnippet>377</a>    ///
+<a href=#378 id=378 data-nosnippet>378</a>    /// ```
+<a href=#379 id=379 data-nosnippet>379</a>    /// # use argmin::core::{KV, KvValue};
+<a href=#380 id=380 data-nosnippet>380</a>    /// let mut kv1 = KV::new();
+<a href=#381 id=381 data-nosnippet>381</a>    /// kv1.insert("key1", KvValue::Float(12.0));
+<a href=#382 id=382 data-nosnippet>382</a>    ///
+<a href=#383 id=383 data-nosnippet>383</a>    /// assert_eq!(kv1.get("key1"), Some(&amp;KvValue::Float(12.0)));
+<a href=#384 id=384 data-nosnippet>384</a>    /// assert_eq!(kv1.get("non_existing"), None);
+<a href=#385 id=385 data-nosnippet>385</a>    /// ```
+<a href=#386 id=386 data-nosnippet>386</a>    </span><span class="kw">pub fn </span>get&lt;T: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KvValue&gt; {
+<a href=#387 id=387 data-nosnippet>387</a>        <span class="self">self</span>.kv.get(key.as_ref())
+<a href=#388 id=388 data-nosnippet>388</a>    }
+<a href=#389 id=389 data-nosnippet>389</a>
+<a href=#390 id=390 data-nosnippet>390</a>    <span class="doccomment">/// Returns all available keys and their `KvValue` kind
+<a href=#391 id=391 data-nosnippet>391</a>    ///
+<a href=#392 id=392 data-nosnippet>392</a>    /// # Example
+<a href=#393 id=393 data-nosnippet>393</a>    ///
+<a href=#394 id=394 data-nosnippet>394</a>    /// ```
+<a href=#395 id=395 data-nosnippet>395</a>    /// # use argmin::core::{KV, KvValue};
+<a href=#396 id=396 data-nosnippet>396</a>    /// let mut kv1 = KV::new();
+<a href=#397 id=397 data-nosnippet>397</a>    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
+<a href=#398 id=398 data-nosnippet>398</a>    ///
+<a href=#399 id=399 data-nosnippet>399</a>    /// assert_eq!(kv1.keys(), vec![("key1".to_string(), "Str")]);
+<a href=#400 id=400 data-nosnippet>400</a>    /// ```
+<a href=#401 id=401 data-nosnippet>401</a>    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str)&gt; {
+<a href=#402 id=402 data-nosnippet>402</a>        <span class="self">self</span>.kv.iter().map(|(k, v)| (k.clone(), v.kind())).collect()
+<a href=#403 id=403 data-nosnippet>403</a>    }
+<a href=#404 id=404 data-nosnippet>404</a>
+<a href=#405 id=405 data-nosnippet>405</a>    <span class="doccomment">/// Merge with another `KV`
+<a href=#406 id=406 data-nosnippet>406</a>    ///
+<a href=#407 id=407 data-nosnippet>407</a>    /// # Example
+<a href=#408 id=408 data-nosnippet>408</a>    ///
+<a href=#409 id=409 data-nosnippet>409</a>    /// ```
+<a href=#410 id=410 data-nosnippet>410</a>    /// # use argmin::core::{KV, KvValue};
+<a href=#411 id=411 data-nosnippet>411</a>    /// let mut kv1 = KV::new();
+<a href=#412 id=412 data-nosnippet>412</a>    /// kv1.insert("key1", KvValue::Str("value1".to_string()));
+<a href=#413 id=413 data-nosnippet>413</a>    /// # assert_eq!(kv1.kv.len(), 1);
+<a href=#414 id=414 data-nosnippet>414</a>    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
+<a href=#415 id=415 data-nosnippet>415</a>    ///
+<a href=#416 id=416 data-nosnippet>416</a>    /// let mut kv2 = KV::new();
+<a href=#417 id=417 data-nosnippet>417</a>    /// kv2.insert("key2", KvValue::Str("value2".to_string()));
+<a href=#418 id=418 data-nosnippet>418</a>    /// # assert_eq!(kv2.kv.len(), 1);
+<a href=#419 id=419 data-nosnippet>419</a>    /// # assert_eq!(format!("{}", kv2.get("key2").unwrap()), "value2");
+<a href=#420 id=420 data-nosnippet>420</a>    ///
+<a href=#421 id=421 data-nosnippet>421</a>    /// let kv1 = kv1.merge(kv2);
+<a href=#422 id=422 data-nosnippet>422</a>    /// # assert_eq!(kv1.kv.len(), 2);
+<a href=#423 id=423 data-nosnippet>423</a>    /// # assert_eq!(format!("{}", kv1.get("key1").unwrap()), "value1");
+<a href=#424 id=424 data-nosnippet>424</a>    /// # assert_eq!(format!("{}", kv1.get("key2").unwrap()), "value2");
+<a href=#425 id=425 data-nosnippet>425</a>    /// ```
+<a href=#426 id=426 data-nosnippet>426</a>    </span><span class="attr">#[must_use]
+<a href=#427 id=427 data-nosnippet>427</a>    </span><span class="kw">pub fn </span>merge(<span class="kw-2">mut </span><span class="self">self</span>, other: KV) -&gt; <span class="self">Self </span>{
+<a href=#428 id=428 data-nosnippet>428</a>        <span class="self">self</span>.kv.extend(other.kv);
+<a href=#429 id=429 data-nosnippet>429</a>        <span class="self">self
+<a href=#430 id=430 data-nosnippet>430</a>    </span>}
+<a href=#431 id=431 data-nosnippet>431</a>}
+<a href=#432 id=432 data-nosnippet>432</a>
+<a href=#433 id=433 data-nosnippet>433</a><span class="kw">impl </span>std::iter::FromIterator&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+<a href=#434 id=434 data-nosnippet>434</a>    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
+<a href=#435 id=435 data-nosnippet>435</a>        <span class="kw">let </span><span class="kw-2">mut </span>c = KV::new();
+<a href=#436 id=436 data-nosnippet>436</a>        <span class="kw">for </span>i <span class="kw">in </span>iter {
+<a href=#437 id=437 data-nosnippet>437</a>            c.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
+<a href=#438 id=438 data-nosnippet>438</a>        }
+<a href=#439 id=439 data-nosnippet>439</a>        c
+<a href=#440 id=440 data-nosnippet>440</a>    }
+<a href=#441 id=441 data-nosnippet>441</a>}
+<a href=#442 id=442 data-nosnippet>442</a>
+<a href=#443 id=443 data-nosnippet>443</a><span class="kw">impl </span>std::iter::Extend&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt; <span class="kw">for </span>KV {
+<a href=#444 id=444 data-nosnippet>444</a>    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, KvValue)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+<a href=#445 id=445 data-nosnippet>445</a>        <span class="kw">for </span>i <span class="kw">in </span>iter {
+<a href=#446 id=446 data-nosnippet>446</a>            <span class="self">self</span>.insert(i.<span class="number">0</span>, i.<span class="number">1</span>);
+<a href=#447 id=447 data-nosnippet>447</a>        }
+<a href=#448 id=448 data-nosnippet>448</a>    }
+<a href=#449 id=449 data-nosnippet>449</a>}</code></pre></div></section></main></body></html>
