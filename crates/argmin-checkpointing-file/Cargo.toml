@@ -20,3 +20,7 @@ serde = "1.0.195"
 
 [dev-dependencies]
 argmin = { version = "0.10.0", path = "../argmin", features = ["serde1"] }
+
+[features]
+default = ["rand"]
+rand = ["argmin/rand"]

@@ -17,6 +17,7 @@ mod l1norm;
 mod l2norm;
 mod minmax;
 mod mul;
+#[cfg(feature = "rand")]
 mod random;
 //@note(geo-ant):
 // scaled addition and subtraction rely on a blanket implementation
@@ -40,6 +41,7 @@ pub use l1norm::*;
 pub use l2norm::*;
 pub use minmax::*;
 pub use mul::*;
+#[cfg(feature = "rand")]
 pub use random::*;
 //@note(geo-ant) see above
 // pub use scaledadd::*;

@@ -15,6 +15,7 @@ mod l1norm;
 mod l2norm;
 mod minmax;
 mod mul;
+#[cfg(feature = "rand")]
 mod random;
 mod scaledadd;
 mod scaledsub;
@@ -31,6 +32,7 @@ pub use l1norm::*;
 pub use l2norm::*;
 pub use minmax::*;
 pub use mul::*;
+#[cfg(feature = "rand")]
 pub use random::*;
 pub use scaledadd::*;
 pub use scaledsub::*;

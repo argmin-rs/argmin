@@ -8,6 +8,7 @@ mod l1norm;
 mod l2norm;
 mod minmax;
 mod mul;
+#[cfg(feature = "rand")]
 mod random;
 mod signum;
 mod sub;

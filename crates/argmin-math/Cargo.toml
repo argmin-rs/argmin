@@ -43,7 +43,7 @@ num-complex_0_3 = { package = "num-complex", version = "0.3", optional = true, d
 num-complex_0_2 = { package = "num-complex", version = "0.2", optional = true, default-features = false, features = ["std"] }
 num-traits = { version = "0.2" }
 num-integer = { version = "0.1" }
-rand = { version = "0.8.3" }
+rand = { version = "0.8.3", optional = true }
 anyhow = { version = "1.0" }
 thiserror = { version = "1.0" }
 
@@ -54,14 +54,14 @@ paste = "1"
 approx = "0.5.0"
 
 [features]
-default = ["primitives", "vec"]
-latest_all = ["primitives", "vec", "nalgebra_latest", "ndarray_latest"]
+default = ["primitives", "vec", "rand"]
+latest_all = ["primitives", "vec", "rand", "nalgebra_latest", "ndarray_latest"]
 
 # primitives
 primitives = ["num-complex_0_4"]
 
 # vec
-vec = ["primitives", "num-complex_0_4"]
+vec = ["rand", "primitives", "num-complex_0_4"]
 
 # nalgebra
 nalgebra_all = ["primitives"]

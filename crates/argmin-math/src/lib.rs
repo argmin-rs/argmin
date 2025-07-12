@@ -280,6 +280,7 @@ mod faer_tests;
 // Re-export of types appearing in the api as recommended here: https://www.lurklurk.org/effective-rust/re-export.html
 pub use anyhow::Error;
 use cfg_if::cfg_if;
+#[cfg(feature = "rand")]
 pub use rand::Rng;
 
 /// Dot/scalar product of `T` and `self`
@@ -385,6 +386,7 @@ pub trait ArgminInv<T> {
 }
 
 /// Create a random number
+#[cfg(feature = "rand")]
 pub trait ArgminRandom {
     /// Get a random element between min and max,
     fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> Self;

@@ -203,6 +203,8 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh 
       - name: Build target wasm32-unknown-unknown
+        run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-unknown-unknown --no-default-features
+      - name: Build target wasm32-unknown-unknown with feature wasm-bindgen
         run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-unknown-unknown --features wasm-bindgen
       - name: Build target wasm32-wasip1 with feature wasm-bindgen
         run: cargo build --workspace --exclude argmin-observer-spectator --exclude spectator --exclude argmin-observer-paramwriter --exclude "example-*" --exclude argmin-testfunctions-py --target wasm32-wasip1 --features wasm-bindgen
