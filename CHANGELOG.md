@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [argmin-math unreleased]
 
+## [argmin-testfunctions v0.3.0] 2025-09-28
+
+* (BREAKING) Fixed typo McCorminck to McCormick (@JosiahKane, #616, typo found by @airwoodix)
+* Added LaTeX support and rendering of all Formulas (huge thanks to @airwoodix, #530, #581)
+
 ## [argmin v0.10.0] 2024-02-27
 
 ### Added

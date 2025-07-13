@@ -1,6 +1,6 @@
 [package]
 name = "argmin-testfunctions-py"
-version = "0.0.1"
+version = "0.3.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
@@ -18,6 +18,6 @@ name = "argmin_testfunctions_py"
 crate-type = ["cdylib"]
 
 [dependencies]
-argmin_testfunctions = { version = "0.2.0", path = "../../crates/argmin-testfunctions" }
+argmin_testfunctions = { version = "0.3.0", path = "../../crates/argmin-testfunctions" }
 paste = "1"
 pyo3 = "0.26"
