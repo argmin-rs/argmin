@@ -44,8 +44,11 @@ yanked = "warn"
 # A list of advisory IDs to ignore. Note that ignored advisories will still
 # output a note when they are encountered.
 ignore = [
+    # ignore unmaintained `proc-macro-error`
     "RUSTSEC-2024-0370",
+    # ignore unmaintained `instant`
     "RUSTSEC-2024-0384",
+    # ignore unmaintained `derivative`
     "RUSTSEC-2024-0388",
     # ignore unmaintained `paste`
     "RUSTSEC-2024-0436",
