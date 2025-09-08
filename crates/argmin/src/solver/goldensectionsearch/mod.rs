@@ -342,9 +342,7 @@ mod tests {
         assert_error!(
             res,
             ArgminError,
-            concat!(
-                "Invalid parameter: \"`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].\"",
-            )
+            "Invalid parameter: \"`GoldenSectionSearch`: Initial estimate must be ∈ [min_bound, max_bound].\""
         );
     }
 
