@@ -130,7 +130,7 @@ impl MyContext {
                         });
                 });
                 egui::ScrollArea::vertical()
-                    .id_source("fufu")
+                    .id_salt("fufu")
                     .show(ui, |ui| {
                         ui.vertical(|ui| {
                             let height = ui.available_height();
@@ -252,7 +252,7 @@ impl MyContext {
             ui.horizontal_top(|ui| {
                 ui.checkbox(&mut run.func_cumulative, "Cumulative");
                 egui::ScrollArea::vertical()
-                    .id_source("func_counts")
+                    .id_salt("func_counts")
                     .show(ui, |ui| {
                         ui.vertical(|ui| {
                             ui.set_max_height(ui.available_height());
