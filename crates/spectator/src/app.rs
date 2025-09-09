@@ -15,7 +15,10 @@ use eframe::{
     egui::{self, CentralPanel, Id, LayerId, Ui, UiBuilder, WidgetText},
     epaint::Color32,
 };
-use egui_dock::{DockArea, DockState, Node, dock_state::tree::node::LeafNode, Style, TabViewer, tab_viewer::OnCloseResponse};
+use egui_dock::{
+    dock_state::tree::node::LeafNode, tab_viewer::OnCloseResponse, DockArea, DockState, Node,
+    Style, TabViewer,
+};
 use egui_extras::{Column, TableBuilder};
 use egui_plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints};
 
@@ -55,7 +58,10 @@ impl PlotterApp {
         let mut open_tabs = HashSet::new();
 
         for node in dock_state.main_surface().iter() {
-            if let Node::Leaf {0: LeafNode{ tabs, .. }} = node {
+            if let Node::Leaf {
+                0: LeafNode { tabs, .. },
+            } = node
+            {
                 for tab in tabs {
                     open_tabs.insert(tab.clone());
                 }
@@ -129,31 +135,29 @@ impl MyContext {
                             });
                         });
                 });
-                egui::ScrollArea::vertical()
-                    .id_salt("fufu")
-                    .show(ui, |ui| {
-                        ui.vertical(|ui| {
-                            let height = ui.available_height();
+                egui::ScrollArea::vertical().id_salt("fufu").show(ui, |ui| {
+                    ui.vertical(|ui| {
+                        let height = ui.available_height();
 
-                            let metric_names = run.get_selected_metrics();
-                            let num_metrics = metric_names.len() as f32;
+                        let metric_names = run.get_selected_metrics();
+                        let num_metrics = metric_names.len() as f32;
 
-                            for name in metric_names {
-                                if let Some(metric) = run.metrics.get(&name) {
-                                    ui.group(|ui| {
-                                        // dodgy
-                                        ui.set_max_height(height / num_metrics - 20.0);
-                                        let curve: PlotPoints = metric.get_data().clone().into();
-                                        let line = Line::new(&name, curve);
-                                        Plot::new(&name)
-                                            .allow_scroll(false)
-                                            .legend(Legend::default())
-                                            .show(ui, |plot_ui| plot_ui.line(line));
-                                    });
-                                }
+                        for name in metric_names {
+                            if let Some(metric) = run.metrics.get(&name) {
+                                ui.group(|ui| {
+                                    // dodgy
+                                    ui.set_max_height(height / num_metrics - 20.0);
+                                    let curve: PlotPoints = metric.get_data().clone().into();
+                                    let line = Line::new(&name, curve);
+                                    Plot::new(&name)
+                                        .allow_scroll(false)
+                                        .legend(Legend::default())
+                                        .show(ui, |plot_ui| plot_ui.line(line));
+                                });
                             }
-                        });
+                        }
                     });
+                });
             });
         }
     }
