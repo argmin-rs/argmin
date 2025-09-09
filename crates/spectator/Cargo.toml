@@ -18,7 +18,7 @@ exclude = []
 anyhow = "1.0"
 argmin = { version = "0.10.0", path = "../argmin", default-features = false, features = ["serde1"] }
 bytes = "1.4.0"
-clap = { version = "4.1.7", features = ["derive"] }
+clap = { version = "4.1.7", default-features = false, features = ["derive", "std", "color", "usage", "error-context", "suggestions"] }
 dashmap = { version = "6.0", features = ["serde"], optional = true }
 eframe = { version = "0.32", features = ["ron", "persistence"], optional = true }
 egui_dock = { version = "0.17", optional = true }
