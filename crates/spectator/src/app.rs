@@ -15,7 +15,7 @@ use eframe::{
     egui::{self, CentralPanel, Id, LayerId, Ui, WidgetText},
     epaint::Color32,
 };
-use egui_dock::{DockArea, DockState, Node, Style, TabViewer};
+use egui_dock::{DockArea, DockState, Node, Style, TabViewer, tab_viewer::OnCloseResponse};
 use egui_extras::{Column, TableBuilder};
 use egui_plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints};
 
@@ -100,9 +100,9 @@ impl TabViewer for MyContext {
         tab.as_str().into()
     }
 
-    fn on_close(&mut self, tab: &mut Self::Tab) -> bool {
+    fn on_close(&mut self, tab: &mut Self::Tab) -> OnCloseResponse {
         self.open_tabs.remove(tab);
-        true
+        OnCloseResponse::Close
     }
 }
 
