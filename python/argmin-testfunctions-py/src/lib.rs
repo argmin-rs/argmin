@@ -76,7 +76,7 @@ macro_rules! add_function {
     };
 }
 
-func!(name = ackley, function = ackley_abc, a: f64 = 20.0, b: f64 = 0.2, c: f64 = 6.2831853071795864769252867665590057683943387987502116419498891846);
+func!(name = ackley, function = ackley_abc, a: f64 = 20.0, b: f64 = 0.2, c: f64 = core::f64::consts::TAU);
 func!(beale, num = 2);
 func!(booth, num = 2);
 func!(bukin_n6, num = 2);
