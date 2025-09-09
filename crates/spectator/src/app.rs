@@ -144,7 +144,7 @@ impl MyContext {
                                         // dodgy
                                         ui.set_max_height(height / num_metrics - 20.0);
                                         let curve: PlotPoints = metric.get_data().clone().into();
-                                        let line = Line::new(curve).name(&name);
+                                        let line = Line::new(&name, curve);
                                         Plot::new(&name)
                                             .allow_scroll(false)
                                             .legend(Legend::default())
@@ -167,14 +167,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            format!("Best (iter: {iter})"),
                             best_param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_GREEN)
-                        .name(format!("Best (iter: {iter})"));
+                        .color(Color32::LIGHT_GREEN);
 
                         Plot::new("Best Parameter Vector")
                             .legend(Legend::default())
@@ -194,14 +194,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            format!("Current (iter: {iter})"),
                             param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_BLUE)
-                        .name(format!("Current (iter: {iter})"));
+                        .color(Color32::LIGHT_BLUE);
 
                         Plot::new("Current Parameter Vector")
                             .legend(Legend::default())
@@ -221,14 +221,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            "Initial",
                             init_param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_RED)
-                        .name("Initial");
+                        .color(Color32::LIGHT_RED);
 
                         Plot::new("Initial Parameter Vector")
                             .legend(Legend::default())
@@ -266,7 +266,7 @@ impl MyContext {
                                         if let Some(counts) = run.func_counts.get(name) {
                                             let curve: PlotPoints =
                                                 counts.get_data(run.func_cumulative).into();
-                                            let line = Line::new(curve).name(name);
+                                            let line = Line::new(name, curve);
                                             plot_ui.line(line)
                                         }
                                     }
