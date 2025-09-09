@@ -12,10 +12,10 @@ use std::{
 
 use argmin::core::TerminationStatus;
 use eframe::{
-    egui::{self, CentralPanel, Id, LayerId, Ui, WidgetText},
+    egui::{self, CentralPanel, Id, LayerId, Ui, UiBuilder, WidgetText},
     epaint::Color32,
 };
-use egui_dock::{DockArea, DockState, Node, Style, TabViewer, tab_viewer::OnCloseResponse};
+use egui_dock::{DockArea, DockState, Node, dock_state::tree::node::LeafNode, Style, TabViewer, tab_viewer::OnCloseResponse};
 use egui_extras::{Column, TableBuilder};
 use egui_plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints};
 
@@ -55,7 +55,7 @@ impl PlotterApp {
         let mut open_tabs = HashSet::new();
 
         for node in dock_state.main_surface().iter() {
-            if let Node::Leaf { tabs, .. } = node {
+            if let Node::Leaf {0: LeafNode{ tabs, .. }} = node {
                 for tab in tabs {
                     open_tabs.insert(tab.clone());
                 }
@@ -342,9 +342,9 @@ impl eframe::App for PlotterApp {
         CentralPanel::default().show(ctx, |_ui| {
             let layer_id = LayerId::background();
             let max_rect = ctx.available_rect();
-            let clip_rect = ctx.available_rect();
             let id = Id::new("egui_dock::DockArea");
-            let mut ui = Ui::new(ctx.clone(), layer_id, id, max_rect, clip_rect);
+            let ui_builder = UiBuilder::new().layer_id(layer_id).max_rect(max_rect);
+            let mut ui = Ui::new(ctx.clone(), id, ui_builder);
 
             let style = self
                 .context
