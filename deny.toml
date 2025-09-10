@@ -44,9 +44,6 @@ yanked = "warn"
 # A list of advisory IDs to ignore. Note that ignored advisories will still
 # output a note when they are encountered.
 ignore = [
-    "RUSTSEC-2024-0370",
-    "RUSTSEC-2024-0384",
-    "RUSTSEC-2024-0388",
     # ignore unmaintained `paste`
     "RUSTSEC-2024-0436",
 ]
