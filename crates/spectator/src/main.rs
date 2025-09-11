@@ -27,7 +27,7 @@ const DEFAULT_HOST: &str = "0.0.0.0";
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Host address to bind to
-    #[arg(short, long, default_value_t = DEFAULT_HOST.to_string())]
+    #[arg(long, default_value_t = DEFAULT_HOST.to_string())]
     host: String,
 
     /// Port to bind to
