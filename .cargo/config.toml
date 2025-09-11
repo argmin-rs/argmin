@@ -1,2 +1,5 @@
 [build]
 rustdocflags = [ "--html-in-header", "./crates/argmin-testfunctions/katex-header.html" ]
+
+[target.wasm32-unknown-unknown]
+rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
