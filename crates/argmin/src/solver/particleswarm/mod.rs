@@ -103,7 +103,7 @@ where
             weight_social: float!(0.5 + 2.0f64.ln()),
             bounds,
             num_particles,
-            rng_generator: rand::rngs::StdRng::from_entropy(),
+            rng_generator: rand::rngs::StdRng::from_os_rng(),
         }
     }
 }
@@ -115,7 +115,7 @@ where
 {
     /// Set the random number generator
     ///
-    /// Defaults to `rand::rngs::StdRng::from_entropy()`
+    /// Defaults to `rand::rngs::StdRng::from_os_rng()`
     ///
     /// # Example
     /// ```

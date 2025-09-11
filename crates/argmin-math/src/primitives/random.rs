@@ -13,7 +13,7 @@ macro_rules! make_random {
         impl ArgminRandom for $t {
             #[inline]
             fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> $t {
-                rng.gen_range(*min..*max)
+                rng.random_range(*min..*max)
             }
         }
     };

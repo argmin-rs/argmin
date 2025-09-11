@@ -1,6 +1,6 @@
 use crate::ArgminRandom;
 use faer::{unzipped, Entity, Mat};
-use rand::distributions::uniform::SampleUniform;
+use rand::distr::uniform::SampleUniform;
 
 impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
     fn rand_from_range<R: rand::Rng>(min: &Self, max: &Self, rng: &mut R) -> Self {
@@ -25,9 +25,9 @@ impl<E: Entity + PartialOrd + SampleUniform> ArgminRandom for Mat<E> {
             if a == b {
                 a
             } else if a < b {
-                rng.gen_range(a..b)
+                rng.random_range(a..b)
             } else {
-                rng.gen_range(b..a)
+                rng.random_range(b..a)
             }
         })
     }
