@@ -11,7 +11,7 @@ use argmin::{
 };
 use argmin_observer_spectator::SpectatorBuilder;
 use argmin_testfunctions::rosenbrock;
-use rand::{distributions::Uniform, prelude::*};
+use rand::{distr::Uniform, prelude::*};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use std::sync::{Arc, Mutex};
 
@@ -33,7 +33,7 @@ impl Rosenbrock {
         Rosenbrock {
             lower_bound,
             upper_bound,
-            rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_entropy())),
+            rng: Arc::new(Mutex::new(Xoshiro256PlusPlus::from_os_rng())),
         }
     }
 }
@@ -58,10 +58,11 @@ impl Anneal for Rosenbrock {
     fn anneal(&self, param: &Vec<f64>, temp: f64) -> Result<Vec<f64>, Error> {
         let mut param_n = param.clone();
         let mut rng = self.rng.lock().unwrap();
-        let distr = Uniform::from(0..param.len());
+        let id_distr = Uniform::try_from(0..param.len())?;
+        let val_distr = Uniform::new_inclusive(-0.1, 0.1)?;
         for _ in 0..(temp.floor() as u64 + 1) {
-            let idx = rng.sample(distr);
-            let val = rng.sample(Uniform::new_inclusive(-0.1, 0.1));
+            let idx = rng.sample(id_distr);
+            let val = rng.sample(val_distr);
             param_n[idx] += val;
             param_n[idx] = param_n[idx].clamp(self.lower_bound[idx], self.upper_bound[idx]);
         }

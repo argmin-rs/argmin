@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use rand::{distributions::uniform::SampleUniform, Rng};
+use rand::{distr::uniform::SampleUniform, Rng};
 
 use crate::{Allocator, ArgminRandom};
 
@@ -37,9 +37,9 @@ where
                 if a == b {
                     a.clone()
                 } else if a < b {
-                    rng.gen_range(a.clone()..b.clone())
+                    rng.random_range(a.clone()..b.clone())
                 } else {
-                    rng.gen_range(b.clone()..a.clone())
+                    rng.random_range(b.clone()..a.clone())
                 }
             }),
         )

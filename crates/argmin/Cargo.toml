@@ -18,14 +18,14 @@ exclude = []
 anyhow = "1.0"
 paste = "1"
 num-traits = "0.2"
-rand = { version = "0.8.5", optional = true }
-rand_xoshiro = "0.6.0"
+rand = { version = "0.9.2", optional = true }
+rand_xoshiro = "0.7.0"
 thiserror = "1.0"
 web-time = "1.1.0"
 argmin-math = { path = "../argmin-math", version = "0.4", default-features = false, features = ["primitives"] }
 # optional
 ctrlc = { version = "3.2.4", features = ["termination"], optional = true }
-getrandom = { version = "0.2", optional = true }
+getrandom = { version = "0.3", optional = true }
 rayon = { version = "1.6.0", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 
@@ -43,8 +43,8 @@ argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
 [features]
 default = ["rand"]
 rand = ["dep:rand", "argmin-math/rand"]
-wasm-bindgen = ["getrandom/js"]
-serde1 = ["serde", "rand_xoshiro/serde1"]
+wasm-bindgen = ["getrandom/wasm_js"]
+serde1 = ["serde", "rand_xoshiro/serde"]
 _ndarrayl = ["argmin-math/ndarray_latest"]
 # When adding new features, please consider adding them to either `full` (for users)
 # or `_full_dev` (only for local development, testing and computing test coverage).
