@@ -19,7 +19,7 @@
 <a href=#5 id=5 data-nosnippet>5</a>// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
 <a href=#6 id=6 data-nosnippet>6</a>// copied, modified, or distributed except according to those terms.
 <a href=#7 id=7 data-nosnippet>7</a>
-<a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">use </span>rand::{distributions::uniform::SampleUniform, Rng};
+<a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">use </span>rand::{distr::uniform::SampleUniform, Rng};
 <a href=#9 id=9 data-nosnippet>9</a>
 <a href=#10 id=10 data-nosnippet>10</a><span class="kw">use crate</span>::{Allocator, ArgminRandom};
 <a href=#11 id=11 data-nosnippet>11</a>
@@ -51,9 +51,9 @@
 <a href=#37 id=37 data-nosnippet>37</a>                </span><span class="kw">if </span>a == b {
 <a href=#38 id=38 data-nosnippet>38</a>                    a.clone()
 <a href=#39 id=39 data-nosnippet>39</a>                } <span class="kw">else if </span>a &lt; b {
-<a href=#40 id=40 data-nosnippet>40</a>                    rng.gen_range(a.clone()..b.clone())
+<a href=#40 id=40 data-nosnippet>40</a>                    rng.random_range(a.clone()..b.clone())
 <a href=#41 id=41 data-nosnippet>41</a>                } <span class="kw">else </span>{
-<a href=#42 id=42 data-nosnippet>42</a>                    rng.gen_range(b.clone()..a.clone())
+<a href=#42 id=42 data-nosnippet>42</a>                    rng.random_range(b.clone()..a.clone())
 <a href=#43 id=43 data-nosnippet>43</a>                }
 <a href=#44 id=44 data-nosnippet>44</a>            }),
 <a href=#45 id=45 data-nosnippet>45</a>        )

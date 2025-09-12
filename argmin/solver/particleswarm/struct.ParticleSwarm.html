@@ -50,7 +50,7 @@ adapted with <a href="struct.ParticleSwarm.html#method.with_inertia_factor" titl
     self,
     generator: R1,
 ) -&gt; <a class="struct" href="struct.ParticleSwarm.html" title="struct argmin::solver::particleswarm::ParticleSwarm">ParticleSwarm</a>&lt;P, F, R1&gt;</h4></section></summary><div class="docblock"><p>Set the random number generator</p>
-<p>Defaults to <code>rand::rngs::StdRng::from_entropy()</code></p>
+<p>Defaults to <code>rand::rngs::StdRng::from_os_rng()</code></p>
 <h5 id="example-1"><a class="doc-anchor" href="#example-1">§</a>Example</h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>pso: ParticleSwarm&lt;<span class="kw">_</span>, f64, <span class="kw">_</span>&gt; =
     ParticleSwarm::new((lower_bound, upper_bound), <span class="number">40</span>)
