@@ -20,7 +20,7 @@ paste = "1"
 num-traits = "0.2"
 rand = { version = "0.9.2", optional = true }
 rand_xoshiro = "0.7.0"
-thiserror = "1.0"
+thiserror = "2.0"
 web-time = "1.1.0"
 argmin-math = { path = "../argmin-math", version = "0.4", default-features = false, features = ["primitives"] }
 # optional
