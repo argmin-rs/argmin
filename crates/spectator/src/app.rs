@@ -12,10 +12,13 @@ use std::{
 
 use argmin::core::TerminationStatus;
 use eframe::{
-    egui::{self, CentralPanel, Id, LayerId, Ui, WidgetText},
+    egui::{self, CentralPanel, Id, LayerId, Ui, UiBuilder, WidgetText},
     epaint::Color32,
 };
-use egui_dock::{DockArea, DockState, Node, Style, TabViewer};
+use egui_dock::{
+    dock_state::tree::node::LeafNode, tab_viewer::OnCloseResponse, DockArea, DockState, Node,
+    Style, TabViewer,
+};
 use egui_extras::{Column, TableBuilder};
 use egui_plot::{Bar, BarChart, Legend, Line, Plot, PlotPoints};
 
@@ -55,7 +58,10 @@ impl PlotterApp {
         let mut open_tabs = HashSet::new();
 
         for node in dock_state.main_surface().iter() {
-            if let Node::Leaf { tabs, .. } = node {
+            if let Node::Leaf {
+                0: LeafNode { tabs, .. },
+            } = node
+            {
                 for tab in tabs {
                     open_tabs.insert(tab.clone());
                 }
@@ -100,9 +106,9 @@ impl TabViewer for MyContext {
         tab.as_str().into()
     }
 
-    fn on_close(&mut self, tab: &mut Self::Tab) -> bool {
+    fn on_close(&mut self, tab: &mut Self::Tab) -> OnCloseResponse {
         self.open_tabs.remove(tab);
-        true
+        OnCloseResponse::Close
     }
 }
 
@@ -129,31 +135,29 @@ impl MyContext {
                             });
                         });
                 });
-                egui::ScrollArea::vertical()
-                    .id_source("fufu")
-                    .show(ui, |ui| {
-                        ui.vertical(|ui| {
-                            let height = ui.available_height();
+                egui::ScrollArea::vertical().id_salt("fufu").show(ui, |ui| {
+                    ui.vertical(|ui| {
+                        let height = ui.available_height();
 
-                            let metric_names = run.get_selected_metrics();
-                            let num_metrics = metric_names.len() as f32;
+                        let metric_names = run.get_selected_metrics();
+                        let num_metrics = metric_names.len() as f32;
 
-                            for name in metric_names {
-                                if let Some(metric) = run.metrics.get(&name) {
-                                    ui.group(|ui| {
-                                        // dodgy
-                                        ui.set_max_height(height / num_metrics - 20.0);
-                                        let curve: PlotPoints = metric.get_data().clone().into();
-                                        let line = Line::new(curve).name(&name);
-                                        Plot::new(&name)
-                                            .allow_scroll(false)
-                                            .legend(Legend::default())
-                                            .show(ui, |plot_ui| plot_ui.line(line));
-                                    });
-                                }
+                        for name in metric_names {
+                            if let Some(metric) = run.metrics.get(&name) {
+                                ui.group(|ui| {
+                                    // dodgy
+                                    ui.set_max_height(height / num_metrics - 20.0);
+                                    let curve: PlotPoints = metric.get_data().clone().into();
+                                    let line = Line::new(&name, curve);
+                                    Plot::new(&name)
+                                        .allow_scroll(false)
+                                        .legend(Legend::default())
+                                        .show(ui, |plot_ui| plot_ui.line(line));
+                                });
                             }
-                        });
+                        }
                     });
+                });
             });
         }
     }
@@ -167,14 +171,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            format!("Best (iter: {iter})"),
                             best_param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_GREEN)
-                        .name(format!("Best (iter: {iter})"));
+                        .color(Color32::LIGHT_GREEN);
 
                         Plot::new("Best Parameter Vector")
                             .legend(Legend::default())
@@ -183,7 +187,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds([true, true].into())
+                            .auto_bounds([true, true])
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
@@ -194,14 +198,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            format!("Current (iter: {iter})"),
                             param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_BLUE)
-                        .name(format!("Current (iter: {iter})"));
+                        .color(Color32::LIGHT_BLUE);
 
                         Plot::new("Current Parameter Vector")
                             .legend(Legend::default())
@@ -210,7 +214,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds([true, true].into())
+                            .auto_bounds([true, true])
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
@@ -221,14 +225,14 @@ impl MyContext {
                     ui.group(|ui| {
                         ui.set_max_height(height / 3.0);
                         let chart = BarChart::new(
+                            "Initial",
                             init_param
                                 .iter()
                                 .enumerate()
                                 .map(|(x, f)| Bar::new(x as f64, *f).width(0.95))
                                 .collect(),
                         )
-                        .color(Color32::LIGHT_RED)
-                        .name("Initial");
+                        .color(Color32::LIGHT_RED);
 
                         Plot::new("Initial Parameter Vector")
                             .legend(Legend::default())
@@ -237,7 +241,7 @@ impl MyContext {
                             .allow_zoom(false)
                             .allow_boxed_zoom(false)
                             .allow_drag(false)
-                            .auto_bounds([true, true].into())
+                            .auto_bounds([true, true])
                             .set_margin_fraction([0.1, 0.3].into())
                             .reset()
                             .show(ui, |plot_ui| plot_ui.bar_chart(chart));
@@ -252,7 +256,7 @@ impl MyContext {
             ui.horizontal_top(|ui| {
                 ui.checkbox(&mut run.func_cumulative, "Cumulative");
                 egui::ScrollArea::vertical()
-                    .id_source("func_counts")
+                    .id_salt("func_counts")
                     .show(ui, |ui| {
                         ui.vertical(|ui| {
                             ui.set_max_height(ui.available_height());
@@ -266,7 +270,7 @@ impl MyContext {
                                         if let Some(counts) = run.func_counts.get(name) {
                                             let curve: PlotPoints =
                                                 counts.get_data(run.func_cumulative).into();
-                                            let line = Line::new(curve).name(name);
+                                            let line = Line::new(name, curve);
                                             plot_ui.line(line)
                                         }
                                     }
@@ -342,9 +346,9 @@ impl eframe::App for PlotterApp {
         CentralPanel::default().show(ctx, |_ui| {
             let layer_id = LayerId::background();
             let max_rect = ctx.available_rect();
-            let clip_rect = ctx.available_rect();
             let id = Id::new("egui_dock::DockArea");
-            let mut ui = Ui::new(ctx.clone(), layer_id, id, max_rect, clip_rect);
+            let ui_builder = UiBuilder::new().layer_id(layer_id).max_rect(max_rect);
+            let mut ui = Ui::new(ctx.clone(), id, ui_builder);
 
             let style = self
                 .context

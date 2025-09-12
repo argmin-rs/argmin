@@ -27,7 +27,7 @@ const DEFAULT_HOST: &str = "0.0.0.0";
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Host address to bind to
-    #[arg(short, long, default_value_t = DEFAULT_HOST.to_string())]
+    #[arg(long, default_value_t = DEFAULT_HOST.to_string())]
     host: String,
 
     /// Port to bind to
@@ -49,7 +49,7 @@ fn run() -> Result<(), Error> {
     eframe::run_native(
         NAME,
         options,
-        Box::new(move |cc| Box::new(PlotterApp::new(cc, host, port).expect("Failed to start GUI"))),
+        Box::new(move |cc| Ok(Box::new(PlotterApp::new(cc, host, port)?))),
     )
     .expect("Failed to start GUI.");
     Ok(())

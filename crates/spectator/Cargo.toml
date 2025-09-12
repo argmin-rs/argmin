@@ -20,10 +20,10 @@ argmin = { version = "0.10.0", path = "../argmin", default-features = false, fea
 bytes = "1.4.0"
 clap = { version = "4.1.7", features = ["derive"] }
 dashmap = { version = "6.0", features = ["serde"], optional = true }
-eframe = { version = "0.26", features = ["ron", "persistence"], optional = true }
-egui_dock = { version = "0.11", optional = true }
-egui_extras = { version = "0.26", optional = true }
-egui_plot = { version = "0.26", optional = true }
+eframe = { version = "0.32", features = ["ron", "persistence"], optional = true }
+egui_dock = { version = "0.17", optional = true }
+egui_extras = { version = "0.32", optional = true }
+egui_plot = { version = "0.33", optional = true }
 itertools = { version = "0.13", optional = true }
 rmp-serde = "1.1.1"
 serde = { version = "1.0", features = ["derive"] }
