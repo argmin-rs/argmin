@@ -9,7 +9,7 @@ use argmin::core::observers::{Observe, ObserverMode};
 use argmin::core::{ArgminFloat, CostFunction, Error, Executor, PopulationState, State, KV};
 use argmin::solver::particleswarm::{Particle, ParticleSwarm};
 use argmin_testfunctions::himmelblau;
-use gnuplot::{Color, PointSize};
+use gnuplot::{Color, PointSize, RGBString};
 use std::sync::Mutex;
 use web_time::Duration;
 
@@ -76,8 +76,8 @@ impl Visualizer3d {
 
         figure.clear_axes();
 
-        let options_optima = [Color("#ffff00"), PointSize(2.0)];
-        let options_particles = [Color("#ff0000"), PointSize(2.0)];
+        let options_optima = [Color(RGBString("#ffff00")), PointSize(2.0)];
+        let options_particles = [Color(RGBString("#ff0000")), PointSize(2.0)];
         let axes3d = figure.axes3d();
 
         // Draw surface before points
