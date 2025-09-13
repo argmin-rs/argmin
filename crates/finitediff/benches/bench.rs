@@ -168,7 +168,9 @@ mod tests {
         let x = vec![1.0f64; MASSIVENESS];
         let p = vec![1.0f64; MASSIVENESS];
         b.iter(|| {
-            black_box(finitediff::vec::forward_jacobian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::vec::forward_jacobian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -178,7 +180,9 @@ mod tests {
         let x = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         let p = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         b.iter(|| {
-            black_box(finitediff::ndarr::forward_jacobian_vec_prod(&cost_multi_ndarray_f64)(&p, &x));
+            black_box(finitediff::ndarr::forward_jacobian_vec_prod(
+                &cost_multi_ndarray_f64,
+            )(&p, &x));
         });
     }
 
@@ -187,7 +191,9 @@ mod tests {
         let x = vec![1.0f64; MASSIVENESS];
         let p = vec![1.0f64; MASSIVENESS];
         b.iter(|| {
-            black_box(finitediff::vec::central_jacobian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::vec::central_jacobian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -197,7 +203,9 @@ mod tests {
         let x = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         let p = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         b.iter(|| {
-            black_box(finitediff::ndarr::central_jacobian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::ndarr::central_jacobian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -219,7 +227,9 @@ mod tests {
 
         b.iter(|| {
             let p2 = pert.clone();
-            black_box(finitediff::vec::forward_jacobian_pert(&cost_multi_vec_f64)(&x, &p2));
+            black_box(finitediff::vec::forward_jacobian_pert(&cost_multi_vec_f64)(
+                &x, &p2,
+            ));
         });
     }
 
@@ -242,7 +252,9 @@ mod tests {
 
         b.iter(|| {
             let p2 = pert.clone();
-            black_box(finitediff::ndarr::forward_jacobian_pert(&cost_multi_vec_f64)(&x, &p2));
+            black_box(finitediff::ndarr::forward_jacobian_pert(
+                &cost_multi_vec_f64,
+            )(&x, &p2));
         });
     }
 
@@ -264,7 +276,9 @@ mod tests {
 
         b.iter(|| {
             let p2 = pert.clone();
-            black_box(finitediff::vec::central_jacobian_pert(&cost_multi_vec_f64)(&x, &p2));
+            black_box(finitediff::vec::central_jacobian_pert(&cost_multi_vec_f64)(
+                &x, &p2,
+            ));
         });
     }
 
@@ -287,7 +301,9 @@ mod tests {
 
         b.iter(|| {
             let p2 = pert.clone();
-            black_box(finitediff::ndarr::central_jacobian_pert(&cost_multi_vec_f64)(&x, &p2));
+            black_box(finitediff::ndarr::central_jacobian_pert(
+                &cost_multi_vec_f64,
+            )(&x, &p2));
         });
     }
 
@@ -330,7 +346,9 @@ mod tests {
         let x = vec![1.0f64; MASSIVENESS];
         let p = vec![1.0f64; MASSIVENESS];
         b.iter(|| {
-            black_box(finitediff::vec::forward_hessian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::vec::forward_hessian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -340,7 +358,9 @@ mod tests {
         let x = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         let p = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         b.iter(|| {
-            black_box(finitediff::ndarr::forward_hessian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::ndarr::forward_hessian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -349,7 +369,9 @@ mod tests {
         let x = vec![1.0f64; MASSIVENESS];
         let p = vec![1.0f64; MASSIVENESS];
         b.iter(|| {
-            black_box(finitediff::vec::central_hessian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::vec::central_hessian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -359,7 +381,9 @@ mod tests {
         let x = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         let p = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         b.iter(|| {
-            black_box(finitediff::ndarr::central_hessian_vec_prod(&cost_multi_vec_f64)(&p, &x));
+            black_box(finitediff::ndarr::central_hessian_vec_prod(
+                &cost_multi_vec_f64,
+            )(&p, &x));
         });
     }
 
@@ -385,7 +409,9 @@ mod tests {
         let x = vec![1.0f64; MASSIVENESS];
         b.iter(|| {
             let indices = vec![[1, 2], [23, 23], [128, 8]];
-            black_box(finitediff::vec::forward_hessian_nograd_sparse(&cost_vec_f64)(&x, indices));
+            black_box(finitediff::vec::forward_hessian_nograd_sparse(
+                &cost_vec_f64,
+            )(&x, indices));
         });
     }
 
@@ -395,7 +421,9 @@ mod tests {
         let x = ndarray::Array1::from(vec![1.0f64; MASSIVENESS]);
         b.iter(|| {
             let indices = vec![[1, 2], [23, 23], [128, 8]];
-            black_box(finitediff::ndarr::forward_hessian_nograd_sparse(&cost_vec_f64)(&x, indices));
+            black_box(finitediff::ndarr::forward_hessian_nograd_sparse(
+                &cost_vec_f64,
+            )(&x, indices));
         });
     }
 }
