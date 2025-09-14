@@ -24,7 +24,7 @@ For users of the optimization algorithms, adapting your code to the new version 
 If you are using argmin to implement your own algorithms, the changes you will have to make are more severe. 
 I suggest having a look at the source code of argmin to get a sense of how you may have to adapt your own code.
 
-In either case, feel free to get in touch if you run into trouble, either on [Gitter](https://gitter.im/argmin-rs/community) or by opening an [issue](https://github.com/argmin-rs/argmin/issues). 
+In either case, feel free to get in touch if you run into trouble, either on [Discord](https://discord.gg/fYB8AwxxMW) or by opening an [issue](https://github.com/argmin-rs/argmin/issues). 
 
 
 ## argmin-math
