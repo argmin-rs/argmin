@@ -128,6 +128,8 @@ jobs:
       # nalgebra
       - name: argmin-math (nalgebra_latest)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_latest"
+      - name: argmin-math (nalgebra_v0_34)
+        run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_34"
       - name: argmin-math (nalgebra_v0_33)
         run: cargo test -p argmin-math --no-default-features --features "nalgebra_v0_33"
       - name: argmin-math (nalgebra_v0_32)
