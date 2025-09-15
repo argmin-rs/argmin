@@ -170,7 +170,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::vec::forward_jacobian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -182,7 +182,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::ndarr::forward_jacobian_vec_prod(
                 &cost_multi_ndarray_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -193,7 +193,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::vec::central_jacobian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -205,7 +205,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::ndarr::central_jacobian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -348,7 +348,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::vec::forward_hessian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -360,7 +360,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::ndarr::forward_hessian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -371,7 +371,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::vec::central_hessian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
@@ -383,7 +383,7 @@ mod tests {
         b.iter(|| {
             black_box(finitediff::ndarr::central_hessian_vec_prod(
                 &cost_multi_vec_f64,
-            )(&p, &x));
+            )(&x, &p));
         });
     }
 
