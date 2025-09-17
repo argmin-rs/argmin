@@ -46,7 +46,7 @@ use serde::{Deserialize, Serialize};
 /// let x: KvValue = "a String".to_string().into();
 /// assert_eq!(x, KvValue::Str("a String".to_string()));
 /// ```
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub enum KvValue {
     /// Floating point values
@@ -59,6 +59,19 @@ pub enum KvValue {
     Bool(bool),
     /// Strings
     Str(String),
+}
+
+impl Debug for KvValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            KvValue::Float(x) => write!(f, "{x}")?,
+            KvValue::Int(x) => write!(f, "{x}")?,
+            KvValue::Uint(x) => write!(f, "{x}")?,
+            KvValue::Bool(x) => write!(f, "{x}")?,
+            KvValue::Str(x) => write!(f, "{x}")?,
+        }
+        Ok(())
+    }
 }
 
 impl KvValue {
@@ -313,19 +326,20 @@ impl Display for KvValue {
 /// # assert_eq!(format!("{}", kv.get("key2").unwrap()), "value2");
 /// # assert_eq!(format!("{}", kv.get("key3").unwrap()), "1234");
 /// ```
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 #[cfg_attr(feature = "serde1", derive(Serialize, Deserialize))]
 pub struct KV {
     /// The actual key value storage
     pub kv: HashMap<String, KvValue>,
 }
 
-impl Debug for KV {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{self}")?;
-        Ok(())
-    }
-}
+// impl Debug for KV {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         writeln!(f, "{self}")?;
+//         Ok(())
+//     }
+// }
+
 impl Display for KV {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "KV")?;
