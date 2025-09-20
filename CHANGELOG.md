@@ -37,6 +37,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [argmin v0.11.0] 2025-09-28
+
+### Added
+* Added tests to BrentRoot (@GermanHeim)
+
+### Changed
+
+* Adjust Solver to make it object safe [@jjbayer, #487]
+* Replace use of unmaintained instant crate with web_time (@airwoodix, #539)
+* Support WASM without javascript by making rand an optional dependency (@rikhuijzer, #583)
+* Update the version of rand to address compatibility concerns with future Rust editions (@josiahkane, #607)
+* Minor optimisations and clippy fixes [@pacak, #483; @jjbayer, #488; @0e4ef622, #504; @stefan-k, #531, #596, @josiahkane, #603]
+* Counting and timing of function calls is now turned off by default (@pacak)
+
+### Fixed
+
+* Fixed the BFGS gradient type parameters to allow more flexible custom types (@dspyz-matician, #508)
+* Small fixes to the documentation (@stefan-k, #476, #610; @GermanHeim, #570)
+* A number of fixes related to cargo-deny (@Tastaturtaste)
+* Use web-time instead of unmaintained instant crate (@airwoodix)
+* Fixed clippy lints and website build (@0e4ef622)
+
 ## [argmin-math v0.5.0] 2025-09-28
 
 ### Added
@@ -398,6 +420,7 @@ For older versions please see the Git history.
 [argmin-math unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...HEAD
 [argmin_testfunctions unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-testfunctions-v0.3.0...HEAD
 [finitediff unreleased]: https://github.com/argmin-rs/argmin/compare/finitediff-v0.2.0...HEAD
+[argmin v0.11.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.10.0...argmin-v0.11.0
 [argmin v0.10.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin-v0.10.0
 [argmin v0.9.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...argmin-v0.9.0
 [argmin v0.8.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...argmin-v0.8.1
