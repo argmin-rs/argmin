@@ -6,9 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
 ## [argmin unreleased]
+
+### Added
+
 * Added a new GUI observer called Spectator (`argmin-observer-spectator` and `spectator` packages) (@stefan-k, #311)
 
+### Changed
+
+* Replace use of unmaintained instant crate with web_time (@airwoodix, #539)
+* Support WASM without javascript by making rand an optional dependency (@rikhuijzer, #583)
+* Minor optimisations and clippy fixes [@pacak, #483; @jjbayer, #488; @0e4ef622, #504; @stefan-k, #531, #596, @josiahkane, #603, #617]
+* Internal CI fixes [@stefan-k, #573, #582]
+
+### Fixed
+
+* Fixed the BFGS gradient type parameters to allow more flexible custom types (@dspyz-matician, #508)
+* Small fixes to the documentation (@stefan-k, #476, #610; @GermanHein, #570)
+
+
 ## [argmin-math unreleased]
+
+### Added
+
+* Added compatibility with ndarray 0.16 with the ndarray_v0_16 and ndarray_v0_16-nolinalg features, updating latest. [@npatsakula and @amfaber #546]
+* Added compatibility with nalgebra 0.33 and 0.34 with the nalgebra_0_33 and nalgebra_0_34 features, updating latest.[@0e4ef622, #505; @josiahkane, #614]
+* Added compatibility with faer 0.20 and 0.21. [@geo-ant, #549 and #575]
+
+### Changed
+
+* Adjust Solver to make it object safe [@jjbayer, #487]
+* Update the version of rand to address compatibility concerns with future Rust editions (@josiahkane, #607)
+
+## [argmin-testfunctions unreleased]
+
+### Changed
+
+* Updated documentation to render mathematical notation with LaTeX. (@airwoodix, #530, #581)
+* [BREAKING] Fixed spelling from McCorminck to McCormick including in file and symbol names. (@airwoodix #581; @josiahkane, #616)
+
+### Fixed
+
+## [finitediff unreleased]
+
+### Changed
+
+* [BREAKING] Moved to Result based error handling [@stefan-k, #481]
+* Integrated into the main argmin repository [@stefan-k, #479]
 
 ## [argmin v0.10.0] 2024-02-27
 
