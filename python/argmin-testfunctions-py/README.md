@@ -120,9 +120,9 @@ g = matyas_derivative([0.1, 0.2])
 h = matyas_hessian([0.1, 0.2])
 
 # McCorminck
-c = mccorminck([0.1, 0.2])
-g = mccorminck_derivative([0.1, 0.2])
-h = mccorminck_hessian([0.1, 0.2])
+c = mccormick([0.1, 0.2])
+g = mccormick_derivative([0.1, 0.2])
+h = mccormick_hessian([0.1, 0.2])
 
 # Picheny
 c = picheny([0.1, 0.2])
