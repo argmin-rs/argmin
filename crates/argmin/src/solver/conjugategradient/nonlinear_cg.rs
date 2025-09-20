@@ -205,7 +205,7 @@ where
         };
 
         let restart_iter: bool =
-            (state.get_iter() % self.restart_iter == 0) && state.get_iter() != 0;
+            (state.get_iter().is_multiple_of(self.restart_iter)) && state.get_iter() != 0;
 
         if restart_iter || restart_orthogonality {
             self.beta = float!(0.0);

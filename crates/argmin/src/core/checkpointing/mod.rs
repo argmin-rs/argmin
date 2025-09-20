@@ -172,7 +172,9 @@ pub trait Checkpoint<S, I> {
     fn save_cond(&self, solver: &S, state: &I, iter: u64) -> Result<(), Error> {
         match self.frequency() {
             CheckpointingFrequency::Always => self.save(solver, state)?,
-            CheckpointingFrequency::Every(it) if iter % it == 0 => self.save(solver, state)?,
+            CheckpointingFrequency::Every(it) if iter.is_multiple_of(it) => {
+                self.save(solver, state)?
+            }
             CheckpointingFrequency::Never | CheckpointingFrequency::Every(_) => {}
         };
         Ok(())
