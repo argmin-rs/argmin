@@ -89,7 +89,7 @@ func!(holder_table, num = 2);
 func!(levy);
 func!(levy_n13, num = 2);
 func!(matyas, num = 2);
-func!(mccorminck, num = 2);
+func!(mccormick, num = 2);
 func!(picheny, num = 2);
 func!(name = rastrigin, function = rastrigin_a, a: f64 = 10.0);
 func!(name = rosenbrock, function = rosenbrock_ab, a: f64 = 1.0, b: f64 = 100.0);
@@ -114,7 +114,7 @@ fn argmin_testfunctions_py(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()>
     add_function!(m, levy);
     add_function!(m, levy_n13);
     add_function!(m, matyas);
-    add_function!(m, mccorminck);
+    add_function!(m, mccormick);
     add_function!(m, picheny);
     add_function!(m, rastrigin);
     add_function!(m, rosenbrock);

@@ -30,7 +30,7 @@ use num::{Float, FromPrimitive};
 /// where $x_1 \in [-1.5,\\,4]$ and $x_2 \in [-3,\\,4]$.
 ///
 /// The global minimum is at $f(x_1,\\,x_2) = f(-0.54719,\\,-1.54719) = -1.913228$.
-pub fn mccorminck<T>(param: &[T; 2]) -> T
+pub fn mccormick<T>(param: &[T; 2]) -> T
 where
     T: Float + FromPrimitive,
 {
@@ -41,7 +41,7 @@ where
 }
 
 /// Derivative of McCormick test function.
-pub fn mccorminck_derivative<T>(param: &[T; 2]) -> [T; 2]
+pub fn mccormick_derivative<T>(param: &[T; 2]) -> [T; 2]
 where
     T: Float + FromPrimitive,
 {
@@ -58,7 +58,7 @@ where
 }
 
 /// Hessian of McCormick test function.
-pub fn mccorminck_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
+pub fn mccormick_hessian<T>(param: &[T; 2]) -> [[T; 2]; 2]
 where
     T: Float + FromPrimitive,
 {
@@ -82,19 +82,19 @@ mod tests {
     use proptest::prelude::*;
 
     #[test]
-    fn test_mccorminck_optimum() {
+    fn test_mccormick_optimum() {
         assert_relative_eq!(
-            mccorminck(&[-0.54719_f32, -1.54719_f32]),
+            mccormick(&[-0.54719_f32, -1.54719_f32]),
             -1.9132228,
             epsilon = f32::EPSILON
         );
         assert_relative_eq!(
-            mccorminck(&[-0.54719_f64, -1.54719_f64]),
+            mccormick(&[-0.54719_f64, -1.54719_f64]),
             -1.9132229544882274,
             epsilon = f32::EPSILON.into()
         );
 
-        let deriv = mccorminck_derivative(&[-0.54719_f64, -1.54719_f64]);
+        let deriv = mccormick_derivative(&[-0.54719_f64, -1.54719_f64]);
         println!("1: {deriv:?}");
         for i in 0..2 {
             assert_relative_eq!(deriv[i], 0.0, epsilon = 1e-4);
@@ -103,10 +103,10 @@ mod tests {
 
     proptest! {
         #[test]
-        fn test_mccorminck_derivative_finitediff(a in -1.5..4.0, b in -3.0..4.0) {
+        fn test_mccormick_derivative_finitediff(a in -1.5..4.0, b in -3.0..4.0) {
             let param = [a, b];
-            let derivative = mccorminck_derivative(&param);
-            let derivative_fd = Vec::from(param).central_diff(&|x| mccorminck(&[x[0], x[1]]));
+            let derivative = mccormick_derivative(&param);
+            let derivative_fd = Vec::from(param).central_diff(&|x| mccormick(&[x[0], x[1]]));
             for i in 0..derivative.len() {
                 assert_relative_eq!(
                     derivative[i],
@@ -120,11 +120,11 @@ mod tests {
 
     proptest! {
         #[test]
-        fn test_mccorminck_hessian_finitediff(a in -1.5..4.0, b in -3.0..4.0) {
+        fn test_mccormick_hessian_finitediff(a in -1.5..4.0, b in -3.0..4.0) {
             let param = [a, b];
-            let hessian = mccorminck_hessian(&param);
+            let hessian = mccormick_hessian(&param);
             let hessian_fd =
-                Vec::from(param).central_hessian(&|x| mccorminck_derivative(&[x[0], x[1]]).to_vec());
+                Vec::from(param).central_hessian(&|x| mccormick_derivative(&[x[0], x[1]]).to_vec());
             let n = hessian.len();
             // println!("1: {hessian:?} at {a}/{b}");
             // println!("2: {hessian_fd:?} at {a}/{b}");

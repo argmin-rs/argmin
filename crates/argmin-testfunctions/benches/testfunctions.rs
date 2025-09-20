@@ -7,7 +7,7 @@ use argmin_testfunctions::{
     himmelblau, himmelblau_derivative, himmelblau_hessian, holder_table, holder_table_derivative,
     holder_table_hessian, levy, levy_derivative, levy_derivative_const, levy_hessian,
     levy_hessian_const, levy_n13, levy_n13_derivative, levy_n13_hessian, matyas, matyas_derivative,
-    matyas_hessian, mccorminck, mccorminck_derivative, mccorminck_hessian, picheny,
+    matyas_hessian, mccormick, mccormick_derivative, mccormick_hessian, picheny,
     picheny_derivative, picheny_hessian, rastrigin, rastrigin_derivative,
     rastrigin_derivative_const, rastrigin_hessian, rastrigin_hessian_const, rosenbrock,
     rosenbrock_derivative, rosenbrock_derivative_const, rosenbrock_hessian,
@@ -292,17 +292,17 @@ pub fn bm_matyas(c: &mut Criterion) {
     g.finish();
 }
 
-pub fn bm_mccorminck(c: &mut Criterion) {
-    let mut g = c.benchmark_group("mccorminck");
+pub fn bm_mccormick(c: &mut Criterion) {
+    let mut g = c.benchmark_group("mccormick");
     // Test function
-    g.bench_function("mccorminck 2", |b| b.iter(|| mccorminck(black_box(P2))));
+    g.bench_function("mccormick 2", |b| b.iter(|| mccormick(black_box(P2))));
     // Derivative
-    g.bench_function("mccorminck_derivative 2", |b| {
-        b.iter(|| mccorminck_derivative(black_box(P2)))
+    g.bench_function("mccormick_derivative 2", |b| {
+        b.iter(|| mccormick_derivative(black_box(P2)))
     });
     // Hessian
-    g.bench_function("mccorminck_hessian 2", |b| {
-        b.iter(|| mccorminck_hessian(black_box(P2)))
+    g.bench_function("mccormick_hessian 2", |b| {
+        b.iter(|| mccormick_hessian(black_box(P2)))
     });
     g.finish();
 }
@@ -635,7 +635,7 @@ criterion_group!(
     bm_levy,
     bm_levy_n13,
     bm_matyas,
-    bm_mccorminck,
+    bm_mccormick,
     bm_picheny,
     bm_rastrigin,
     bm_rosenbrock,
