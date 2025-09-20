@@ -264,7 +264,9 @@ impl<I: State> Observe<I> for Observers<I> {
             let observer = &mut l.0.lock().unwrap();
             match l.1 {
                 ObserverMode::Always => observer.observe_iter(state, kv),
-                ObserverMode::Every(i) if iter % i == 0 => observer.observe_iter(state, kv),
+                ObserverMode::Every(i) if iter.is_multiple_of(i) => {
+                    observer.observe_iter(state, kv)
+                }
                 ObserverMode::NewBest if state.is_best() => observer.observe_iter(state, kv),
                 ObserverMode::Never | ObserverMode::Every(_) | ObserverMode::NewBest => Ok(()),
             }?
