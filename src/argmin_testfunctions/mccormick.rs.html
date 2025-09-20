@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/mccorminck.rs`."><title>mccorminck.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-68b7e25d.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin-testfunctions/src/mccormick.rs`."><title>mccormick.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="argmin_testfunctions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-68b7e25d.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script>
@@ -12,7 +12,7 @@
     });
 </script>
 
-</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>mccorminck.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2018-2024 argmin developers
+</head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">argmin_testfunctions/</div>mccormick.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2018-2024 argmin developers
 <a href=#2 id=2 data-nosnippet>2</a>//
 <a href=#3 id=3 data-nosnippet>3</a>// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
 <a href=#4 id=4 data-nosnippet>4</a>// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
@@ -44,7 +44,7 @@
 <a href=#30 id=30 data-nosnippet>30</a>/// where $x_1 \in [-1.5,\\,4]$ and $x_2 \in [-3,\\,4]$.
 <a href=#31 id=31 data-nosnippet>31</a>///
 <a href=#32 id=32 data-nosnippet>32</a>/// The global minimum is at $f(x_1,\\,x_2) = f(-0.54719,\\,-1.54719) = -1.913228$.
-<a href=#33 id=33 data-nosnippet>33</a></span><span class="kw">pub fn </span>mccorminck&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
+<a href=#33 id=33 data-nosnippet>33</a></span><span class="kw">pub fn </span>mccormick&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; T
 <a href=#34 id=34 data-nosnippet>34</a><span class="kw">where
 <a href=#35 id=35 data-nosnippet>35</a>    </span>T: Float + FromPrimitive,
 <a href=#36 id=36 data-nosnippet>36</a>{
@@ -55,7 +55,7 @@
 <a href=#41 id=41 data-nosnippet>41</a>}
 <a href=#42 id=42 data-nosnippet>42</a>
 <a href=#43 id=43 data-nosnippet>43</a><span class="doccomment">/// Derivative of McCormick test function.
-<a href=#44 id=44 data-nosnippet>44</a></span><span class="kw">pub fn </span>mccorminck_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [T; <span class="number">2</span>]
+<a href=#44 id=44 data-nosnippet>44</a></span><span class="kw">pub fn </span>mccormick_derivative&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [T; <span class="number">2</span>]
 <a href=#45 id=45 data-nosnippet>45</a><span class="kw">where
 <a href=#46 id=46 data-nosnippet>46</a>    </span>T: Float + FromPrimitive,
 <a href=#47 id=47 data-nosnippet>47</a>{
@@ -72,7 +72,7 @@
 <a href=#58 id=58 data-nosnippet>58</a>}
 <a href=#59 id=59 data-nosnippet>59</a>
 <a href=#60 id=60 data-nosnippet>60</a><span class="doccomment">/// Hessian of McCormick test function.
-<a href=#61 id=61 data-nosnippet>61</a></span><span class="kw">pub fn </span>mccorminck_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
+<a href=#61 id=61 data-nosnippet>61</a></span><span class="kw">pub fn </span>mccormick_hessian&lt;T&gt;(param: <span class="kw-2">&amp;</span>[T; <span class="number">2</span>]) -&gt; [[T; <span class="number">2</span>]; <span class="number">2</span>]
 <a href=#62 id=62 data-nosnippet>62</a><span class="kw">where
 <a href=#63 id=63 data-nosnippet>63</a>    </span>T: Float + FromPrimitive,
 <a href=#64 id=64 data-nosnippet>64</a>{
@@ -96,19 +96,19 @@
 <a href=#82 id=82 data-nosnippet>82</a>    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
 <a href=#83 id=83 data-nosnippet>83</a>
 <a href=#84 id=84 data-nosnippet>84</a>    <span class="attr">#[test]
-<a href=#85 id=85 data-nosnippet>85</a>    </span><span class="kw">fn </span>test_mccorminck_optimum() {
+<a href=#85 id=85 data-nosnippet>85</a>    </span><span class="kw">fn </span>test_mccormick_optimum() {
 <a href=#86 id=86 data-nosnippet>86</a>        <span class="macro">assert_relative_eq!</span>(
-<a href=#87 id=87 data-nosnippet>87</a>            mccorminck(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f32</span>, -<span class="number">1.54719_f32</span>]),
+<a href=#87 id=87 data-nosnippet>87</a>            mccormick(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f32</span>, -<span class="number">1.54719_f32</span>]),
 <a href=#88 id=88 data-nosnippet>88</a>            -<span class="number">1.9132228</span>,
 <a href=#89 id=89 data-nosnippet>89</a>            epsilon = f32::EPSILON
 <a href=#90 id=90 data-nosnippet>90</a>        );
 <a href=#91 id=91 data-nosnippet>91</a>        <span class="macro">assert_relative_eq!</span>(
-<a href=#92 id=92 data-nosnippet>92</a>            mccorminck(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f64</span>, -<span class="number">1.54719_f64</span>]),
+<a href=#92 id=92 data-nosnippet>92</a>            mccormick(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f64</span>, -<span class="number">1.54719_f64</span>]),
 <a href=#93 id=93 data-nosnippet>93</a>            -<span class="number">1.9132229544882274</span>,
 <a href=#94 id=94 data-nosnippet>94</a>            epsilon = f32::EPSILON.into()
 <a href=#95 id=95 data-nosnippet>95</a>        );
 <a href=#96 id=96 data-nosnippet>96</a>
-<a href=#97 id=97 data-nosnippet>97</a>        <span class="kw">let </span>deriv = mccorminck_derivative(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f64</span>, -<span class="number">1.54719_f64</span>]);
+<a href=#97 id=97 data-nosnippet>97</a>        <span class="kw">let </span>deriv = mccormick_derivative(<span class="kw-2">&amp;</span>[-<span class="number">0.54719_f64</span>, -<span class="number">1.54719_f64</span>]);
 <a href=#98 id=98 data-nosnippet>98</a>        <span class="macro">println!</span>(<span class="string">"1: {deriv:?}"</span>);
 <a href=#99 id=99 data-nosnippet>99</a>        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">2 </span>{
 <a href=#100 id=100 data-nosnippet>100</a>            <span class="macro">assert_relative_eq!</span>(deriv[i], <span class="number">0.0</span>, epsilon = <span class="number">1e-4</span>);
@@ -117,10 +117,10 @@
 <a href=#103 id=103 data-nosnippet>103</a>
 <a href=#104 id=104 data-nosnippet>104</a>    <span class="macro">proptest!</span> {
 <a href=#105 id=105 data-nosnippet>105</a>        <span class="attr">#[test]
-<a href=#106 id=106 data-nosnippet>106</a>        </span><span class="kw">fn </span>test_mccorminck_derivative_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
+<a href=#106 id=106 data-nosnippet>106</a>        </span><span class="kw">fn </span>test_mccormick_derivative_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
 <a href=#107 id=107 data-nosnippet>107</a>            <span class="kw">let </span>param = [a, b];
-<a href=#108 id=108 data-nosnippet>108</a>            <span class="kw">let </span>derivative = mccorminck_derivative(<span class="kw-2">&amp;</span>param);
-<a href=#109 id=109 data-nosnippet>109</a>            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| mccorminck(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
+<a href=#108 id=108 data-nosnippet>108</a>            <span class="kw">let </span>derivative = mccormick_derivative(<span class="kw-2">&amp;</span>param);
+<a href=#109 id=109 data-nosnippet>109</a>            <span class="kw">let </span>derivative_fd = Vec::from(param).central_diff(<span class="kw-2">&amp;</span>|x| mccormick(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]));
 <a href=#110 id=110 data-nosnippet>110</a>            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..derivative.len() {
 <a href=#111 id=111 data-nosnippet>111</a>                <span class="macro">assert_relative_eq!</span>(
 <a href=#112 id=112 data-nosnippet>112</a>                    derivative[i],
@@ -134,11 +134,11 @@
 <a href=#120 id=120 data-nosnippet>120</a>
 <a href=#121 id=121 data-nosnippet>121</a>    <span class="macro">proptest!</span> {
 <a href=#122 id=122 data-nosnippet>122</a>        <span class="attr">#[test]
-<a href=#123 id=123 data-nosnippet>123</a>        </span><span class="kw">fn </span>test_mccorminck_hessian_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
+<a href=#123 id=123 data-nosnippet>123</a>        </span><span class="kw">fn </span>test_mccormick_hessian_finitediff(a <span class="kw">in </span>-<span class="number">1.5</span>..<span class="number">4.0</span>, b <span class="kw">in </span>-<span class="number">3.0</span>..<span class="number">4.0</span>) {
 <a href=#124 id=124 data-nosnippet>124</a>            <span class="kw">let </span>param = [a, b];
-<a href=#125 id=125 data-nosnippet>125</a>            <span class="kw">let </span>hessian = mccorminck_hessian(<span class="kw-2">&amp;</span>param);
+<a href=#125 id=125 data-nosnippet>125</a>            <span class="kw">let </span>hessian = mccormick_hessian(<span class="kw-2">&amp;</span>param);
 <a href=#126 id=126 data-nosnippet>126</a>            <span class="kw">let </span>hessian_fd =
-<a href=#127 id=127 data-nosnippet>127</a>                Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| mccorminck_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
+<a href=#127 id=127 data-nosnippet>127</a>                Vec::from(param).central_hessian(<span class="kw-2">&amp;</span>|x| mccormick_derivative(<span class="kw-2">&amp;</span>[x[<span class="number">0</span>], x[<span class="number">1</span>]]).to_vec());
 <a href=#128 id=128 data-nosnippet>128</a>            <span class="kw">let </span>n = hessian.len();
 <a href=#129 id=129 data-nosnippet>129</a>            <span class="comment">// println!("1: {hessian:?} at {a}/{b}");
 <a href=#130 id=130 data-nosnippet>130</a>            // println!("2: {hessian_fd:?} at {a}/{b}");
