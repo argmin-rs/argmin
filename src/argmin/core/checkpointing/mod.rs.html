@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/checkpointing/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-4e99c027.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/argmin/src/core/checkpointing/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="argmin" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
 <script>
@@ -186,56 +186,58 @@
 <a href=#172 id=172 data-nosnippet>172</a>    </span><span class="kw">fn </span>save_cond(<span class="kw-2">&amp;</span><span class="self">self</span>, solver: <span class="kw-2">&amp;</span>S, state: <span class="kw-2">&amp;</span>I, iter: u64) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
 <a href=#173 id=173 data-nosnippet>173</a>        <span class="kw">match </span><span class="self">self</span>.frequency() {
 <a href=#174 id=174 data-nosnippet>174</a>            CheckpointingFrequency::Always =&gt; <span class="self">self</span>.save(solver, state)<span class="question-mark">?</span>,
-<a href=#175 id=175 data-nosnippet>175</a>            CheckpointingFrequency::Every(it) <span class="kw">if </span>iter % it == <span class="number">0 </span>=&gt; <span class="self">self</span>.save(solver, state)<span class="question-mark">?</span>,
-<a href=#176 id=176 data-nosnippet>176</a>            CheckpointingFrequency::Never | CheckpointingFrequency::Every(<span class="kw">_</span>) =&gt; {}
-<a href=#177 id=177 data-nosnippet>177</a>        };
-<a href=#178 id=178 data-nosnippet>178</a>        <span class="prelude-val">Ok</span>(())
-<a href=#179 id=179 data-nosnippet>179</a>    }
-<a href=#180 id=180 data-nosnippet>180</a>
-<a href=#181 id=181 data-nosnippet>181</a>    <span class="doccomment">/// Loads a saved checkpoint
-<a href=#182 id=182 data-nosnippet>182</a>    ///
-<a href=#183 id=183 data-nosnippet>183</a>    /// Returns the solver of type `S` and the `state` of type `I`.
-<a href=#184 id=184 data-nosnippet>184</a>    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;(S, I)&gt;, Error&gt;;
-<a href=#185 id=185 data-nosnippet>185</a>
-<a href=#186 id=186 data-nosnippet>186</a>    <span class="doccomment">/// Indicates how often checkpoints should be saved
-<a href=#187 id=187 data-nosnippet>187</a>    ///
-<a href=#188 id=188 data-nosnippet>188</a>    /// Returns enum `CheckpointingFrequency`.
-<a href=#189 id=189 data-nosnippet>189</a>    </span><span class="kw">fn </span>frequency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CheckpointingFrequency;
-<a href=#190 id=190 data-nosnippet>190</a>}
-<a href=#191 id=191 data-nosnippet>191</a>
-<a href=#192 id=192 data-nosnippet>192</a><span class="doccomment">/// Defines at which intervals a checkpoint is saved.
-<a href=#193 id=193 data-nosnippet>193</a>///
-<a href=#194 id=194 data-nosnippet>194</a>/// # Example
+<a href=#175 id=175 data-nosnippet>175</a>            CheckpointingFrequency::Every(it) <span class="kw">if </span>iter.is_multiple_of(it) =&gt; {
+<a href=#176 id=176 data-nosnippet>176</a>                <span class="self">self</span>.save(solver, state)<span class="question-mark">?
+<a href=#177 id=177 data-nosnippet>177</a>            </span>}
+<a href=#178 id=178 data-nosnippet>178</a>            CheckpointingFrequency::Never | CheckpointingFrequency::Every(<span class="kw">_</span>) =&gt; {}
+<a href=#179 id=179 data-nosnippet>179</a>        };
+<a href=#180 id=180 data-nosnippet>180</a>        <span class="prelude-val">Ok</span>(())
+<a href=#181 id=181 data-nosnippet>181</a>    }
+<a href=#182 id=182 data-nosnippet>182</a>
+<a href=#183 id=183 data-nosnippet>183</a>    <span class="doccomment">/// Loads a saved checkpoint
+<a href=#184 id=184 data-nosnippet>184</a>    ///
+<a href=#185 id=185 data-nosnippet>185</a>    /// Returns the solver of type `S` and the `state` of type `I`.
+<a href=#186 id=186 data-nosnippet>186</a>    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;(S, I)&gt;, Error&gt;;
+<a href=#187 id=187 data-nosnippet>187</a>
+<a href=#188 id=188 data-nosnippet>188</a>    <span class="doccomment">/// Indicates how often checkpoints should be saved
+<a href=#189 id=189 data-nosnippet>189</a>    ///
+<a href=#190 id=190 data-nosnippet>190</a>    /// Returns enum `CheckpointingFrequency`.
+<a href=#191 id=191 data-nosnippet>191</a>    </span><span class="kw">fn </span>frequency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CheckpointingFrequency;
+<a href=#192 id=192 data-nosnippet>192</a>}
+<a href=#193 id=193 data-nosnippet>193</a>
+<a href=#194 id=194 data-nosnippet>194</a><span class="doccomment">/// Defines at which intervals a checkpoint is saved.
 <a href=#195 id=195 data-nosnippet>195</a>///
-<a href=#196 id=196 data-nosnippet>196</a>/// ```
-<a href=#197 id=197 data-nosnippet>197</a>/// use argmin::core::checkpointing::CheckpointingFrequency;
-<a href=#198 id=198 data-nosnippet>198</a>///
-<a href=#199 id=199 data-nosnippet>199</a>/// // A checkpoint every 10 iterations
-<a href=#200 id=200 data-nosnippet>200</a>/// let every_10 = CheckpointingFrequency::Every(10);
-<a href=#201 id=201 data-nosnippet>201</a>///
-<a href=#202 id=202 data-nosnippet>202</a>/// // A checkpoint in each iteration
-<a href=#203 id=203 data-nosnippet>203</a>/// let always = CheckpointingFrequency::Always;
-<a href=#204 id=204 data-nosnippet>204</a>///
-<a href=#205 id=205 data-nosnippet>205</a>/// // The default is `CheckpointingFrequency::Always`
-<a href=#206 id=206 data-nosnippet>206</a>/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);
-<a href=#207 id=207 data-nosnippet>207</a>/// ```
-<a href=#208 id=208 data-nosnippet>208</a></span><span class="attr">#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy, Default)]
-<a href=#209 id=209 data-nosnippet>209</a></span><span class="kw">pub enum </span>CheckpointingFrequency {
-<a href=#210 id=210 data-nosnippet>210</a>    <span class="doccomment">/// Never create checkpoint
-<a href=#211 id=211 data-nosnippet>211</a>    </span>Never,
-<a href=#212 id=212 data-nosnippet>212</a>    <span class="doccomment">/// Create checkpoint every N iterations
-<a href=#213 id=213 data-nosnippet>213</a>    </span>Every(u64),
-<a href=#214 id=214 data-nosnippet>214</a>    <span class="doccomment">/// Create checkpoint in every iteration
-<a href=#215 id=215 data-nosnippet>215</a>    </span><span class="attr">#[default]
-<a href=#216 id=216 data-nosnippet>216</a>    </span>Always,
-<a href=#217 id=217 data-nosnippet>217</a>}
-<a href=#218 id=218 data-nosnippet>218</a>
-<a href=#219 id=219 data-nosnippet>219</a><span class="kw">impl </span>Display <span class="kw">for </span>CheckpointingFrequency {
-<a href=#220 id=220 data-nosnippet>220</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-<a href=#221 id=221 data-nosnippet>221</a>        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-<a href=#222 id=222 data-nosnippet>222</a>            CheckpointingFrequency::Never =&gt; <span class="macro">write!</span>(f, <span class="string">"Never"</span>),
-<a href=#223 id=223 data-nosnippet>223</a>            CheckpointingFrequency::Every(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"Every({i})"</span>),
-<a href=#224 id=224 data-nosnippet>224</a>            CheckpointingFrequency::Always =&gt; <span class="macro">write!</span>(f, <span class="string">"Always"</span>),
-<a href=#225 id=225 data-nosnippet>225</a>        }
-<a href=#226 id=226 data-nosnippet>226</a>    }
-<a href=#227 id=227 data-nosnippet>227</a>}</code></pre></div></section></main></body></html>
+<a href=#196 id=196 data-nosnippet>196</a>/// # Example
+<a href=#197 id=197 data-nosnippet>197</a>///
+<a href=#198 id=198 data-nosnippet>198</a>/// ```
+<a href=#199 id=199 data-nosnippet>199</a>/// use argmin::core::checkpointing::CheckpointingFrequency;
+<a href=#200 id=200 data-nosnippet>200</a>///
+<a href=#201 id=201 data-nosnippet>201</a>/// // A checkpoint every 10 iterations
+<a href=#202 id=202 data-nosnippet>202</a>/// let every_10 = CheckpointingFrequency::Every(10);
+<a href=#203 id=203 data-nosnippet>203</a>///
+<a href=#204 id=204 data-nosnippet>204</a>/// // A checkpoint in each iteration
+<a href=#205 id=205 data-nosnippet>205</a>/// let always = CheckpointingFrequency::Always;
+<a href=#206 id=206 data-nosnippet>206</a>///
+<a href=#207 id=207 data-nosnippet>207</a>/// // The default is `CheckpointingFrequency::Always`
+<a href=#208 id=208 data-nosnippet>208</a>/// assert_eq!(CheckpointingFrequency::default(), CheckpointingFrequency::Always);
+<a href=#209 id=209 data-nosnippet>209</a>/// ```
+<a href=#210 id=210 data-nosnippet>210</a></span><span class="attr">#[derive(Clone, Eq, PartialEq, Debug, Hash, Copy, Default)]
+<a href=#211 id=211 data-nosnippet>211</a></span><span class="kw">pub enum </span>CheckpointingFrequency {
+<a href=#212 id=212 data-nosnippet>212</a>    <span class="doccomment">/// Never create checkpoint
+<a href=#213 id=213 data-nosnippet>213</a>    </span>Never,
+<a href=#214 id=214 data-nosnippet>214</a>    <span class="doccomment">/// Create checkpoint every N iterations
+<a href=#215 id=215 data-nosnippet>215</a>    </span>Every(u64),
+<a href=#216 id=216 data-nosnippet>216</a>    <span class="doccomment">/// Create checkpoint in every iteration
+<a href=#217 id=217 data-nosnippet>217</a>    </span><span class="attr">#[default]
+<a href=#218 id=218 data-nosnippet>218</a>    </span>Always,
+<a href=#219 id=219 data-nosnippet>219</a>}
+<a href=#220 id=220 data-nosnippet>220</a>
+<a href=#221 id=221 data-nosnippet>221</a><span class="kw">impl </span>Display <span class="kw">for </span>CheckpointingFrequency {
+<a href=#222 id=222 data-nosnippet>222</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+<a href=#223 id=223 data-nosnippet>223</a>        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+<a href=#224 id=224 data-nosnippet>224</a>            CheckpointingFrequency::Never =&gt; <span class="macro">write!</span>(f, <span class="string">"Never"</span>),
+<a href=#225 id=225 data-nosnippet>225</a>            CheckpointingFrequency::Every(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"Every({i})"</span>),
+<a href=#226 id=226 data-nosnippet>226</a>            CheckpointingFrequency::Always =&gt; <span class="macro">write!</span>(f, <span class="string">"Always"</span>),
+<a href=#227 id=227 data-nosnippet>227</a>        }
+<a href=#228 id=228 data-nosnippet>228</a>    }
+<a href=#229 id=229 data-nosnippet>229</a>}</code></pre></div></section></main></body></html>
