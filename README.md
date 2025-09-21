@@ -76,14 +76,14 @@
 
 argmin is a numerical optimization library written entirely in Rust.
 
-argmins goal is to offer a wide range of optimization algorithms with a consistent interface.
+argmin's goal is to offer a wide range of optimization algorithms with a consistent interface.
 It is type-agnostic by design, meaning that any type and/or math backend, such as `nalgebra` or `ndarray` can be used -- even your own.
 
 Observers allow one to track the progress of iterations, either by using one of the provided ones for logging to screen or disk or by implementing your own.
 
 An optional checkpointing mechanism helps to mitigate the negative effects of crashes in unstable computing environments.
 
-Due to Rusts powerful generics and traits, most features can be exchanged by your own tailored implementations.
+Due to Rust's powerful generics and traits, most features can be exchanged for your own tailored implementations.
 
 argmin is designed to simplify the implementation of optimization algorithms and as such can also be used as a toolbox for the development of new algorithms. One can focus on the algorithm itself, while the handling of termination, parameter vectors, populations, gradients, Jacobians and Hessians is taken care of by the library.
 
@@ -121,7 +121,7 @@ argmin is designed to simplify the implementation of optimization algorithms and
 
 ### External solvers compatible with argmin
 
-External solvers which implement the `Solver` trait are compatible with argmins `Executor`, 
+External solvers which implement the `Solver` trait are compatible with argmin's `Executor`, 
 and as such can leverage features like checkpointing and observers. 
 
 - [egobox](https://crates.io/crates/egobox-ego)
