@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [argmin-testfunctions unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
 ## [finitediff unreleased]
 
 ### Added
@@ -28,6 +36,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [argmin-math v0.5.0] 2025-09-28
+
+### Added
+* Added compatibility with ndarray 0.16 with the ndarray_v0_16 and ndarray_v0_16-nolinalg features, updating latest. [@npatsakula and @amfaber #546]
+* Added compatibility with nalgebra 0.33 and 0.34 with the nalgebra_0_33 and nalgebra_0_34 features, updating latest. [@0e4ef622, #505; @josiahkane, #614]
+* Added compatibility with faer 0.20 and 0.21. [@geo-ant, #549 and #575]
+
+### Changed
+
+* Update the version of rand to address compatibility concerns with future Rust editions (@josiahkane, #607)
 
 ## [finitediff v0.2.0] 2025-09-28
 
@@ -385,6 +404,7 @@ For older versions please see the Git history.
 [argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0
 [argmin v0.7.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
 [argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
+[argmin-math v0.5.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.4.0...argmin-math-v0.5.0
 [argmin-math v0.4.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...argmin-math-v0.4.0
 [argmin-math v0.3.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.1...argmin-math-v0.3.0
 [argmin-math v0.2.1]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.0...argmin-math-v0.2.1
