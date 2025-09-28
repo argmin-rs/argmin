@@ -22,7 +22,7 @@ rand = { version = "0.9.2", optional = true }
 rand_xoshiro = "0.7.0"
 thiserror = "2.0"
 web-time = "1.1.0"
-argmin-math = { path = "../argmin-math", version = "0.4", default-features = false, features = ["primitives"] }
+argmin-math = { path = "../argmin-math", version = "0.5", default-features = false, features = ["primitives"] }
 # optional
 ctrlc = { version = "3.2.4", features = ["termination"], optional = true }
 getrandom = { version = "0.3", optional = true }
@@ -35,7 +35,7 @@ finitediff = { version = "0.2.0", path = "../finitediff", features = ["ndarray"]
 argmin_testfunctions = { version = "0.3.0", path = "../argmin-testfunctions" }
 ndarray = { version = "0.16", features = ["serde-1"] }
 ndarray-linalg = { version = "0.17", features = ["intel-mkl-static"] }
-argmin-math = { path = "../argmin-math", version = "0.4", features = ["vec"] }
+argmin-math = { path = "../argmin-math", version = "0.5", features = ["vec"] }
 argmin-observer-slog = { path = "../argmin-observer-slog" }
 argmin-observer-paramwriter = { path = "../argmin-observer-paramwriter" }
 argmin-checkpointing-file = { path = "../argmin-checkpointing-file" }
