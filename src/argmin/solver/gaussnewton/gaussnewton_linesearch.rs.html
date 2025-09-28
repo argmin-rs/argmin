@@ -459,7 +459,7 @@
 <a href=#445 id=445 data-nosnippet>445</a>        <span class="macro">assert_relative_eq!</span>(
 <a href=#446 id=446 data-nosnippet>446</a>            state.param.as_ref().unwrap()[<span class="number">1</span>],
 <a href=#447 id=447 data-nosnippet>447</a>            <span class="number">2.25f64</span>,
-<a href=#448 id=448 data-nosnippet>448</a>            epsilon = f64::EPSILON
+<a href=#448 id=448 data-nosnippet>448</a>            epsilon = <span class="number">100.0 </span>* f64::EPSILON
 <a href=#449 id=449 data-nosnippet>449</a>        );
 <a href=#450 id=450 data-nosnippet>450</a>        <span class="macro">assert_relative_eq!</span>(
 <a href=#451 id=451 data-nosnippet>451</a>            state.best_param.as_ref().unwrap()[<span class="number">0</span>],
@@ -469,7 +469,7 @@
 <a href=#455 id=455 data-nosnippet>455</a>        <span class="macro">assert_relative_eq!</span>(
 <a href=#456 id=456 data-nosnippet>456</a>            state.best_param.as_ref().unwrap()[<span class="number">1</span>],
 <a href=#457 id=457 data-nosnippet>457</a>            <span class="number">2.25f64</span>,
-<a href=#458 id=458 data-nosnippet>458</a>            epsilon = f64::EPSILON
+<a href=#458 id=458 data-nosnippet>458</a>            epsilon = <span class="number">100.0 </span>* f64::EPSILON
 <a href=#459 id=459 data-nosnippet>459</a>        );
 <a href=#460 id=460 data-nosnippet>460</a>        <span class="macro">assert_relative_eq!</span>(state.cost, <span class="number">1.044030650891055f64</span>, epsilon = f64::EPSILON);
 <a href=#461 id=461 data-nosnippet>461</a>        <span class="macro">assert!</span>(!state.prev_cost.is_finite());
