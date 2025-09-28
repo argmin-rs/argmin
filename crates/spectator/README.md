@@ -27,11 +27,12 @@
       src="https://img.shields.io/crates/d/spectator?style=flat-square"
       alt="Crates.io downloads"
   /></a>
-  <a href="https://github.com/argmin-rs/argmin/actions"
-    ><img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=argmin CI&style=flat-square"
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
-  /></a>
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/spectator?style=flat-square"
     alt="License"
@@ -43,7 +44,7 @@
   /></a>
 </p>
 
-Spectator is a GUI tool to observe the progress of argmin optimization runs. 
+Spectator is a GUI tool to observe the progress of argmin optimization runs.
 
 ## Installation
 
@@ -80,7 +81,7 @@ spectator --host 127.0.0.1 --port 5498
 The optional options `--host` and `--port` indicate the host and port spectator binds to.
 By default, spectator will bind to `0.0.0.0:5498`.
 
-The argmin optimization run which should be observed needs to use the spectator observer which 
+The argmin optimization run which should be observed needs to use the spectator observer which
 can be found [in the `argmin-observer-spectator` crate](https://crates.io/crates/argmin-observer-spectator).
 
 ## License

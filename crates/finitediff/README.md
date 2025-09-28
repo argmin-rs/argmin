@@ -1,5 +1,10 @@
-[![Build Status](https://travis-ci.org/argmin-rs/finitediff.svg?branch=master)](https://travis-ci.org/argmin-rs/finitediff)
-[![Gitter chat](https://badges.gitter.im/argmin-rs/community.png)](https://gitter.im/argmin-rs/community)
+<!-- [![Build Status](https://travis-ci.org/argmin-rs/finitediff.svg?branch=master)](https://travis-ci.org/argmin-rs/finitediff) -->
+<a href="https://discord.gg/fYB8AwxxMW">
+  <img
+    src="https://img.shields.io/discord/1189119565335109683?style=flat-square&label=argmin%20Discord"
+    alt="argmin Discord"
+  />
+</a>
 
 # finitediff: Finite Differentiation
 
