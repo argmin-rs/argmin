@@ -27,11 +27,12 @@
       src="https://img.shields.io/crates/d/argmin-observer-paramwriter?style=flat-square"
       alt="Crates.io downloads"
   /></a>
-  <a href="https://github.com/argmin-rs/argmin/actions"
-    ><img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=argmin CI&style=flat-square"
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
-  /></a>
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/argmin-observer-paramwriter?style=flat-square"
     alt="License"
@@ -44,9 +45,9 @@
 </p>
 
 This argmin observer writes serialized parameter vectors to files during optimization.
-Details can be found in the documentation ([latest release](https://docs.rs/argmin-observer-paramwriter) or 
+Details can be found in the documentation ([latest release](https://docs.rs/argmin-observer-paramwriter) or
 [current main](https://argmin-rs.github.io/argmin/argmin_observer_paramwriter/index.html))
-or the [argmin book](https://argmin-rs.org/book/). 
+or the [argmin book](https://argmin-rs.org/book/).
 There is also an [example](https://github.com/argmin-rs/argmin/tree/main/examples/paramwriter)
 which illustrates how to use the observer.
 

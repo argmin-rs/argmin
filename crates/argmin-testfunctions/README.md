@@ -27,11 +27,12 @@
       src="https://img.shields.io/crates/d/argmin_testfunctions?style=flat-square"
       alt="Crates.io downloads"
   /></a>
-  <a href="https://github.com/argmin-rs/argmin/actions"
-    ><img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/python.yml?branch=main&label=argmin CI&style=flat-square"
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
-  /></a>
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/argmin?style=flat-square"
     alt="License"
@@ -43,9 +44,9 @@
   /></a>
 </p>
 
-A collection of two- and multidimensional test functions (and their derivatives and Hessians) for optimization algorithms. 
+A collection of two- and multidimensional test functions (and their derivatives and Hessians) for optimization algorithms.
 For two-dimensional test functions, the derivate and Hessian calculation does not allocate. For multi-dimensional tes functions,
-the derivative and Hessian calculation comes in two variants. One variant returns `Vec`s and hence does allocate. This is 
+the derivative and Hessian calculation comes in two variants. One variant returns `Vec`s and hence does allocate. This is
 needed for cases, where the number of parameters is only known at run time. In case the number of parameters are known at
 compile-time, the `_const` variants can be used, which return fixed size arrays and hence do not allocate.
 
@@ -54,7 +55,7 @@ The derivative and Hessian calculation is always named `<test function name>_der
 `<test function name>_derivative_const` and `<test function name>_hessian_const`.
 
 Some functions, such as `ackley`, `rosenbrock` and `rastrigin` come with additional optional parameters which change
-the shape of the functions. These additional parameters are exposed in `ackley_abc`, `rosenbrock_ab` and `rastrigin_a`. 
+the shape of the functions. These additional parameters are exposed in `ackley_abc`, `rosenbrock_ab` and `rastrigin_a`.
 
 All functions are generic over their inputs and work with `[f64]` and `[f32]`.
 
@@ -74,7 +75,7 @@ cargo test
 ```
 
 The test functions derivatives and Hessians are tested against [finitediff](https://crates.io/crates/finitediff) using
-[proptest](https://crates.io/crates/proptest) to sample the functions at various points. 
+[proptest](https://crates.io/crates/proptest) to sample the functions at various points.
 
 All functions are benchmarked using [criterion.rs](https://crates.io/crates/criterion). Run the benchmarks with
 

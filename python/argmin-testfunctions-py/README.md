@@ -20,11 +20,12 @@
   <a href="https://pypi.org/project/argmin-testfunctions-py/">
     <img alt="PyPI" src="https://img.shields.io/pypi/v/argmin-testfunctions-py?style=flat-square">
   </a>
-  <a href="https://github.com/argmin-rs/argmin/actions"
-    ><img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/python.yml?branch=main&label=argmin CI&style=flat-square"
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
-  /></a>
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/argmin?style=flat-square"
     alt="License"
@@ -36,8 +37,8 @@
   /></a>
 </p>
 
-This Python module makes the test functions of the `argmin_testfunctions` Rust crate available in Python. 
-For each test function the derivative and Hessian are available as well. 
+This Python module makes the test functions of the `argmin_testfunctions` Rust crate available in Python.
+For each test function the derivative and Hessian are available as well.
 While most functions are two-dimensional, some allow an arbitrary number of parameters.
 For some functions additional optional parameters are accessible, which can be used to modify the shape of the test function.
 For details on the individual test functions please consult the docs of the Rust library, either for the
