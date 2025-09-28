@@ -58,12 +58,6 @@
       alt="Crates.io downloads"
   /></a>
   <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
-  <img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
-      alt="GitHub Actions workflow status"
-    />
-  </a>
-  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
     <img
       src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
