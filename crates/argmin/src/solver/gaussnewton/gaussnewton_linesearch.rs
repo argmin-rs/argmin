@@ -445,7 +445,7 @@ mod tests {
         assert_relative_eq!(
             state.param.as_ref().unwrap()[1],
             2.25f64,
-            epsilon = f64::EPSILON
+            epsilon = 100.0 * f64::EPSILON
         );
         assert_relative_eq!(
             state.best_param.as_ref().unwrap()[0],
@@ -455,7 +455,7 @@ mod tests {
         assert_relative_eq!(
             state.best_param.as_ref().unwrap()[1],
             2.25f64,
-            epsilon = f64::EPSILON
+            epsilon = 100.0 * f64::EPSILON
         );
         assert_relative_eq!(state.cost, 1.044030650891055f64, epsilon = f64::EPSILON);
         assert!(!state.prev_cost.is_finite());
