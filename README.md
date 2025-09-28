@@ -62,6 +62,12 @@
       src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=argmin CI&style=flat-square"
       alt="GitHub Actions workflow status"
   /></a>
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
+      alt="GitHub Actions workflow status"
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/argmin?style=flat-square"
     alt="License"
@@ -121,8 +127,8 @@ argmin is designed to simplify the implementation of optimization algorithms and
 
 ### External solvers compatible with argmin
 
-External solvers which implement the `Solver` trait are compatible with argmin's `Executor`, 
-and as such can leverage features like checkpointing and observers. 
+External solvers which implement the `Solver` trait are compatible with argmin's `Executor`,
+and as such can leverage features like checkpointing and observers.
 
 - [egobox](https://crates.io/crates/egobox-ego)
 - [cobyla](https://crates.io/crates/cobyla)
