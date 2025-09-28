@@ -6,14 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) (since argmin version 0.5.0).
 
 ## [argmin unreleased]
-* Added a new GUI observer called Spectator (`argmin-observer-spectator` and `spectator` packages) (@stefan-k, #311)
+
+### Added
+
+### Changed
+
+### Fixed
 
 ## [argmin-math unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [finitediff unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+## [finitediff v0.2.0] 2025-09-28
+
+### Changed
+* [BREAKING] Moved to Result based error handling [@stefan-k, #481]
+* Integrated into the main argmin repository [@stefan-k, #479]
+
 ## [argmin-testfunctions v0.3.0] 2025-09-28
 
-* (BREAKING) Fixed typo McCorminck to McCormick (@JosiahKane, #616, typo found by @airwoodix)
+### Added
 * Added LaTeX support and rendering of all Formulas (huge thanks to @airwoodix, #530, #581)
+
+### Changed
+* [BREAKING] Fixed typo McCorminck to McCormick (@JosiahKane, #616, typo found by @airwoodix)
 
 ## [argmin v0.10.0] 2024-02-27
 
@@ -347,9 +375,10 @@ This is a rather large release with many (breaking) changes.
 
 For older versions please see the Git history.
 
-[argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...HEAD
+[argmin unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.10.0...HEAD
 [argmin-math unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...HEAD
-[argmin_testfunctions unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...HEAD
+[argmin_testfunctions unreleased]: https://github.com/argmin-rs/argmin/compare/argmin-testfunctions-v0.3.0...HEAD
+[finitediff unreleased]: https://github.com/argmin-rs/argmin/compare/finitediff-v0.2.0...HEAD
 [argmin v0.10.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin-v0.10.0
 [argmin v0.9.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.1...argmin-v0.9.0
 [argmin v0.8.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.8.0...argmin-v0.8.1
@@ -361,7 +390,10 @@ For older versions please see the Git history.
 [argmin-math v0.2.1]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.0...argmin-math-v0.2.1
 [argmin-math v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.1.0...argmin-math-v0.2.0
 [argmin-math v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-math-v0.1.0
+[finitediff v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.10.0...finitediff-v0.2.0
+[argmin-testfunctions-py v0.3.0]: https://github.com/argmin-rs/argmin/compare/argmin-testfunctions-py-v0.0.1...argmin-testfunctions-py-v0.3.0
 [argmin-testfunctions-py v0.0.1]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin-testfunctions-py-v0.0.1
+[argmin_testfunctions v0.3.0]: https://github.com/argmin-rs/argmin/compare/argmin-testfunctions-v0.2.0...argmin_testfunctions-v0.3.0
 [argmin_testfunctions v0.2.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.9.0...argmin_testfunctions-v0.2.0
 [argmin-observer-slog v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.9.0...argmin-observer-slog-v0.1.0
 [argmin-observer-paramwriter v0.1.0]: https://github.com/argmin-rs/argmin/compare/v0.9.0...argmin-observer-paramwriter-v0.1.0
