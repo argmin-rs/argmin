@@ -36,8 +36,10 @@ ndarray_0_13 = { package = "ndarray", version = "0.13", optional = true }
 #faer
 faer_0_20 = { package = "faer", version = "0.20", optional = true}
 faer_0_21 = { package = "faer", version = "0.21", optional = true}
+faer_0_22 = { package = "faer", version = "0.22", optional = true}
 faer_0_23 = { package = "faer", version = "0.23", optional = true}
 faer_traits_0_21 = {package = "faer-traits", version = "0.21", optional = true}
+faer_traits_0_22 = {package = "faer-traits", version = "0.22", optional = true}
 faer_traits_0_23 = {package = "faer-traits", version = "0.23", optional = true}
 
 # general
@@ -85,6 +87,7 @@ faer_all = ["primitives"]
 faer_latest = ["faer_v0_23"]
 faer_v0_20  = ["faer_0_20", "num-complex_0_4", "faer_all"]
 faer_v0_21  = ["faer_0_21", "num-complex_0_4", "faer_traits_0_21", "faer_all"]
+faer_v0_22  = ["faer_0_22", "num-complex_0_4", "faer_traits_0_22", "faer_all"]
 faer_v0_23  = ["faer_0_23", "num-complex_0_4", "faer_traits_0_23", "faer_all"]
 
 ## With `ndarray-linalg`
