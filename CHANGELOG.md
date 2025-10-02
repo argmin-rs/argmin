@@ -37,6 +37,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [argmin-observer-paramwriter v0.2.0] 2025-10-02
+
+### Added
+* Support for argmin 0.11
+
+## [argmin-observer-slog v0.2.0] 2025-10-02
+
+### Added
+* Support for argmin 0.11
+
+## [argmin-checkpointing-file v0.2.0] 2025-10-02
+
+### Added
+* Support for argmin 0.11
+
 ## [argmin-math v0.5.1] 2025-10-02
 
 ### Added
