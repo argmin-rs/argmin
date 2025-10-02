@@ -37,6 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [argmin-math v0.5.1] 2025-10-02
+
+### Added
+* Support for faer 0.22 and 0.23 (@Ravenslofty, #672)
+
 ## [argmin v0.11.0] 2025-09-28
 
 ### Added
@@ -427,6 +432,7 @@ For older versions please see the Git history.
 [argmin v0.8.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.7.0...argmin-v0.8.0
 [argmin v0.7.0]: https://github.com/argmin-rs/argmin/compare/argmin-v0.6.0...argmin-v0.7.0
 [argmin v0.6.0]: https://github.com/argmin-rs/argmin/compare/v0.5.1...argmin-v0.6.0
+[argmin-math v0.5.1]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.5.0...argmin-math-v0.5.1
 [argmin-math v0.5.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.4.0...argmin-math-v0.5.0
 [argmin-math v0.4.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.3.0...argmin-math-v0.4.0
 [argmin-math v0.3.0]: https://github.com/argmin-rs/argmin/compare/argmin-math-v0.2.1...argmin-math-v0.3.0
