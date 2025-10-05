@@ -27,11 +27,12 @@
       src="https://img.shields.io/crates/d/argmin-observer-spectator?style=flat-square"
       alt="Crates.io downloads"
   /></a>
-  <a href="https://github.com/argmin-rs/argmin/actions"
-    ><img
-      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=argmin CI&style=flat-square"
+  <a href="https://github.com/argmin-rs/argmin/actions/workflows/ci.yml">
+    <img
+      src="https://img.shields.io/github/actions/workflow/status/argmin-rs/argmin/ci.yml?branch=main&label=CI&style=flat-square"
       alt="GitHub Actions workflow status"
-  /></a>
+    />
+  </a>
   <img
     src="https://img.shields.io/crates/l/argmin-observer-spectator?style=flat-square"
     alt="License"
