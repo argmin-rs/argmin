@@ -10,6 +10,7 @@ pub mod conjugategradient;
 pub mod gaussnewton;
 pub mod goldensectionsearch;
 pub mod gradientdescent;
+pub mod itp;
 pub mod landweber;
 pub mod linesearch;
 pub mod neldermead;
