@@ -401,6 +401,12 @@ where
                 }
             }
         } else {
+            if xr_cost.is_nan() {
+                return Err(argmin_error!(
+                    ConditionViolated,
+                    format!("`NelderMead`: Cost function returned NaN")
+                ));
+            }
             return Err(argmin_error!(
                 PotentialBug,
                 "`NelderMead`: Reached unreachable point."
