@@ -1028,7 +1028,7 @@ where
     /// # assert_eq!(state.last_best_iter, 0);
     /// # assert_eq!(state.max_iters, u64::MAX);
     /// # assert_eq!(state.counts.len(), 0);
-    /// # assert_eq!(state.time.unwrap(), Duration::ZERO);
+    /// # assert!(state.time.is_none());
     /// # assert_eq!(state.termination_status, TerminationStatus::NotTerminated);
     /// ```
     fn new() -> Self {
@@ -1057,7 +1057,7 @@ where
             max_iters: u64::MAX,
             counts: HashMap::new(),
             counting_enabled: false,
-            time: Some(Duration::ZERO),
+            time: None,
             termination_status: TerminationStatus::NotTerminated,
         }
     }
@@ -1330,7 +1330,7 @@ where
     /// # use argmin::core::{IterState, State, ArgminFloat};
     /// # let mut state: IterState<Vec<f64>, (), (), (), (), f64> = IterState::new();
     /// let time = state.get_time();
-    /// # assert_eq!(time.unwrap(), Duration::ZERO);
+    /// # assert!(time.is_none());
     /// ```
     fn get_time(&self) -> Option<Duration> {
         self.time

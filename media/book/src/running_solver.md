@@ -112,8 +112,8 @@ let termination_status = res.state().get_termination_status();
 // Optionally, check why the optimizer terminated (if status is terminated) 
 let termination_reason = res.state().get_termination_reason();
 
-// Time needed for optimization
-let time_needed = res.state().get_time().unwrap();
+// Time needed for optimization (only available if timer was enabled)
+let time_needed = res.state().get_time();
 
 // Total number of iterations needed
 let num_iterations = res.state().get_iter();
