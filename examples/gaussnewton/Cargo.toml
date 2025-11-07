@@ -10,4 +10,4 @@ argmin = { version = "*", path = "../../crates/argmin" }
 argmin-math = { version = "*", features = ["ndarray_latest"], path = "../../crates/argmin-math" }
 argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
 ndarray = "0.16"
-ndarray-linalg = { version = "0.17.0", features = ["intel-mkl"] }
+ndarray-linalg = { version = "0.18.0", features = ["intel-mkl"] }
