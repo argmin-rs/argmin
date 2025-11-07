@@ -19,6 +19,8 @@ dynamic = ["version"]
 authors = [
     { name = "Stefan Kroboth", email = "stefan.kroboth@gmail.com" }
 ]
+readme = "README.md"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+exclude = [{ path = "/README.md", format = "sdist" }]
