@@ -15,7 +15,7 @@ use std::fmt;
 /// Consists of the problem and the final state of the solver.
 /// Both can be accessed via deconstructing or via the methods
 /// [`problem`](`OptimizationResult::problem`) and [`state`](`OptimizationResult::state`).
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct OptimizationResult<O, S, I> {
     /// Problem
     pub problem: Problem<O>,

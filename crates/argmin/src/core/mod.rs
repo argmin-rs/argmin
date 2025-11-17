@@ -47,7 +47,10 @@ pub use executor::Executor;
 pub use float::ArgminFloat;
 pub use kv::{KvValue, KV};
 pub use parallelization::{SendAlias, SyncAlias};
-pub use problem::{CostFunction, Gradient, Hessian, Jacobian, LinearProgram, Operator, Problem};
+pub use problem::{
+    CostFunction, Gradient, Hessian, Jacobian, LinearProgram, MultiObjectiveCostFunction, Operator,
+    Problem,
+};
 pub use result::OptimizationResult;
 pub use solver::Solver;
 pub use state::{IterState, LinearProgramState, PopulationState, State};

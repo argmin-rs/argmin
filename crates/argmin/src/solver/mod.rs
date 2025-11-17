@@ -15,6 +15,8 @@ pub mod linesearch;
 pub mod neldermead;
 pub mod newton;
 #[cfg(feature = "rand")]
+pub mod nsgaii;
+#[cfg(feature = "rand")]
 pub mod particleswarm;
 pub mod quasinewton;
 #[cfg(feature = "rand")]

@@ -381,6 +381,49 @@ pub trait CostFunction {
     bulk!(cost, Self::Param, Self::Output);
 }
 
+/// Defines the computation of multiple objective functions for multi-objective optimization.
+///
+/// This trait is used by multi-objective optimization algorithms to evaluate multiple conflicting 
+/// objectives simultaneously.
+///
+/// # Example
+///
+/// ```
+/// use argmin::core::{MultiObjectiveCostFunction, Error};
+///
+/// struct BiObjectiveProblem {}
+///
+/// impl MultiObjectiveCostFunction for BiObjectiveProblem {
+///     type Param = Vec<f64>;
+///     type Output = Vec<f64>;
+///
+///     /// Compute two objectives
+///     fn objectives(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+///         let f1 = param[0].powi(2) + param[1].powi(2);
+///         let f2 = (param[0] - 1.0).powi(2) + (param[1] - 1.0).powi(2);
+///         Ok(vec![f1, f2])
+///     }
+///
+///     fn num_objectives(&self) -> usize {
+///         2
+///     }
+/// }
+/// ```
+pub trait MultiObjectiveCostFunction {
+    /// Type of the parameter vector
+    type Param;
+    /// Type of the return value (typically a vector of objective values)
+    type Output;
+
+    /// Compute all objective functions
+    fn objectives(&self, param: &Self::Param) -> Result<Self::Output, Error>;
+
+    /// Returns the number of objectives
+    fn num_objectives(&self) -> usize;
+
+    bulk!(objectives, Self::Param, Self::Output);
+}
+
 /// Defines the computation of the gradient.
 ///
 /// # Example

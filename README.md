@@ -118,6 +118,7 @@ argmin is designed to simplify the implementation of optimization algorithms and
 - Nelder-Mead method
 - Simulated Annealing
 - Particle Swarm Optimization
+- NSGA-II
 
 ### External solvers compatible with argmin
 
