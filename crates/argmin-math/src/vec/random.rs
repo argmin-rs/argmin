@@ -61,7 +61,7 @@ make_random!(u64);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use paste::item;
+    use pastey::item;
     use rand::SeedableRng;
 
     macro_rules! make_test {

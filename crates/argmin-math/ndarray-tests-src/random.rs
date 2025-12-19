@@ -11,7 +11,7 @@ mod tests {
     use super::*;
     use argmin_math::ArgminRandom;
     use ndarray::{array, Array1, Array2};
-    use paste::item;
+    use pastey::item;
     use rand::SeedableRng;
 
     macro_rules! make_test {

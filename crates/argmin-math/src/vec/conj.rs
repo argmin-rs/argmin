@@ -44,7 +44,7 @@ make_conj!(Complex<f64>);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

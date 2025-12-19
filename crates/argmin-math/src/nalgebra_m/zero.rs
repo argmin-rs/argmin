@@ -29,7 +29,7 @@ mod tests {
     use super::*;
     use approx::assert_relative_eq;
     use nalgebra::{DVector, Matrix2, Vector2, Vector4};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

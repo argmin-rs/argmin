@@ -50,7 +50,7 @@ where
 mod tests {
     use super::*;
     use nalgebra::{Matrix2x3, Vector3};
-    use paste::item;
+    use pastey::item;
     use rand::SeedableRng;
 
     macro_rules! make_test {

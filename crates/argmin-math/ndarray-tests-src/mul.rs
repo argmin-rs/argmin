@@ -14,7 +14,7 @@ mod tests {
     use ndarray::array;
     use ndarray::{Array1, Array2};
     use num_complex::Complex;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

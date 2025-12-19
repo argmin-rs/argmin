@@ -2,7 +2,7 @@ use crate::faer_tests::test_helper::*;
 use crate::ArgminSignum;
 use approx::assert_relative_eq;
 use faer::mat;
-use paste::item;
+use pastey::item;
 
 macro_rules! make_test {
     ($t:ty) => {

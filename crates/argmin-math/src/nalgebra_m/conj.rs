@@ -28,7 +28,7 @@ mod tests {
     use approx::assert_relative_eq;
     use nalgebra::Vector3;
     use num_complex::Complex;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

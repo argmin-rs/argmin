@@ -4,7 +4,7 @@ use approx::assert_relative_eq;
 use faer::Mat;
 use num_complex::Complex;
 use num_complex::ComplexFloat;
-use paste::item;
+use pastey::item;
 
 macro_rules! make_test {
     ($t:ty) => {

@@ -24,7 +24,7 @@ where
 mod tests_vec {
     use super::*;
     use approx::assert_relative_eq;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -62,7 +62,7 @@ mod tests_vec {
 mod tests_ndarray {
     use super::*;
     use ndarray::array;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {
@@ -100,7 +100,7 @@ mod tests_ndarray {
 mod tests_nalgebra {
     use super::*;
     use nalgebra::{Matrix3, Vector3};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

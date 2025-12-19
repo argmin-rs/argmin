@@ -1,7 +1,7 @@
 use crate::faer_tests::test_helper::*;
 use crate::ArgminRandom;
 use faer::mat;
-use paste::item;
+use pastey::item;
 use rand::SeedableRng;
 
 macro_rules! make_test {

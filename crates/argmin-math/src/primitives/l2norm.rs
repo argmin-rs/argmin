@@ -59,7 +59,7 @@ make_norm_complex!(f64);
 mod tests {
     use super::*;
     use approx::assert_relative_eq;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

@@ -90,7 +90,7 @@ mod tests {
     use super::*;
     use approx::assert_relative_eq;
     use nalgebra::{Matrix3, RowVector3, Vector3};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

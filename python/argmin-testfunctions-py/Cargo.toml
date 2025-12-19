@@ -19,5 +19,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 argmin_testfunctions = { version = "0.3.0", path = "../../crates/argmin-testfunctions" }
-paste = "1"
+pastey = "0.2.0"
 pyo3 = "0.26"

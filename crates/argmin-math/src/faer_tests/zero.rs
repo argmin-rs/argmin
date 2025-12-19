@@ -3,7 +3,7 @@ use crate::ArgminZeroLike;
 use approx::assert_relative_eq;
 use faer::mat;
 use faer::Mat;
-use paste::item;
+use pastey::item;
 
 macro_rules! make_test {
     ($t:ty) => {

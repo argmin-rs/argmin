@@ -1,5 +1,5 @@
 use argmin_testfunctions::*;
-use paste::paste;
+use pastey::paste;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use std::stringify;

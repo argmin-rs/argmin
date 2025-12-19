@@ -12,7 +12,7 @@ mod tests {
     use approx::assert_relative_eq;
     use argmin_math::ArgminZeroLike;
     use ndarray::{array, Array1, Array2};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

@@ -10,7 +10,7 @@ mod tests {
     use crate::ArgminScaledSub;
     use approx::assert_relative_eq;
     use nalgebra::{DVector, Matrix2, Vector3};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

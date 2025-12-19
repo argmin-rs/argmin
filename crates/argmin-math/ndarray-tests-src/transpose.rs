@@ -17,7 +17,7 @@ mod tests {
     use ndarray::{Array1, Array2};
 
     use ndarray::array;
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {

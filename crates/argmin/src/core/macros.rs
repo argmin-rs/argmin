@@ -86,7 +86,7 @@ macro_rules! float {
 #[macro_export]
 macro_rules! bulk {
     ($method_name:tt, $input:ty, $output:ty) => {
-        paste::item! {
+        pastey::item! {
             #[doc = concat!(
                 "Compute `",
                 stringify!($method_name),
@@ -145,7 +145,7 @@ macro_rules! bulk {
 #[cfg(test)]
 macro_rules! send_sync_test {
     ($n:ident, $t:ty) => {
-        paste::item! {
+        pastey::item! {
             #[test]
             #[allow(non_snake_case)]
             fn [<test_send_ $n>]() {
@@ -154,7 +154,7 @@ macro_rules! send_sync_test {
             }
         }
 
-        paste::item! {
+        pastey::item! {
             #[test]
             #[allow(non_snake_case)]
             fn [<test_sync_ $n>]() {
@@ -170,7 +170,7 @@ macro_rules! send_sync_test {
 #[macro_export]
 macro_rules! test_trait_impl {
     ($n:ident, $t:ty) => {
-        paste::item! {
+        pastey::item! {
             #[test]
             #[allow(non_snake_case)]
             fn [<test_send_ $n>]() {
@@ -179,7 +179,7 @@ macro_rules! test_trait_impl {
             }
         }
 
-        paste::item! {
+        pastey::item! {
             #[test]
             #[allow(non_snake_case)]
             fn [<test_sync_ $n>]() {
@@ -188,7 +188,7 @@ macro_rules! test_trait_impl {
             }
         }
 
-        paste::item! {
+        pastey::item! {
             #[test]
             #[allow(non_snake_case)]
             fn [<test_clone_ $n>]() {

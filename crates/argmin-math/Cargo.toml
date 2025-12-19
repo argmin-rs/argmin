@@ -55,7 +55,7 @@ thiserror = { version = "2.0" }
 cfg-if = "1"
 
 [dev-dependencies]
-paste = "1"
+pastey = "0.2.0"
 approx = "0.5.0"
 
 [features]

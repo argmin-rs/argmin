@@ -1,7 +1,7 @@
 use crate::faer_tests::test_helper::*;
 use crate::ArgminL1Norm;
 use approx::assert_relative_eq;
-use paste::item;
+use pastey::item;
 
 macro_rules! make_test {
     ($t:ty) => {

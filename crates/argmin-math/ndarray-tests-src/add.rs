@@ -13,7 +13,7 @@ mod tests {
     use argmin_math::ArgminAdd;
     use ndarray::array;
     use ndarray::{Array1, Array2};
-    use paste::item;
+    use pastey::item;
 
     macro_rules! make_test {
         ($t:ty) => {
