@@ -4,7 +4,7 @@ use faer::{
     reborrow::{IntoConst, Reborrow, ReborrowMut},
     unzip, zip, Mat, MatMut, MatRef,
 };
-use faer_traits::{ComplexField, Conjugate};
+use faer_traits::{ComplexField, Conjugate, SubByRef};
 use std::ops::{Sub, SubAssign};
 
 /// MatRef / Scalar -> MatRef

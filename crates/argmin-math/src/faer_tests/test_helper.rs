@@ -9,6 +9,8 @@ cfg_if::cfg_if! {
         use faer_traits::ComplexField;
     } else if #[cfg(feature = "faer_v0_23")] {
         use faer_traits::ComplexField;
+    } else if #[cfg(feature = "faer_v0_24")] {
+        use faer_traits::ComplexField;
     }
 }
 
