@@ -12,10 +12,12 @@ mod conj;
 mod div;
 mod dot;
 mod eye;
+mod fromslice;
 #[cfg(any(feature = "ndarray-linalg_0_16", feature = "ndarray-linalg_0_17",))]
 mod inv;
 mod l1norm;
 mod l2norm;
+mod linfnorm;
 mod minmax;
 mod mul;
 #[cfg(feature = "rand")]
@@ -32,10 +34,12 @@ pub use conj::*;
 pub use div::*;
 pub use dot::*;
 pub use eye::*;
+pub use fromslice::*;
 #[cfg(any(feature = "ndarray-linalg_0_16", feature = "ndarray-linalg_0_17",))]
 pub use inv::*;
 pub use l1norm::*;
 pub use l2norm::*;
+pub use linfnorm::*;
 pub use minmax::*;
 pub use mul::*;
 pub use scaledadd::*;

@@ -421,6 +421,21 @@ pub trait ArgminL2Norm<U> {
     fn l2_norm(&self) -> U;
 }
 
+/// Compute the l-infinity-norm (`U`) of `self`
+pub trait ArgminLInfNorm<U> {
+    /// Compute the l-infinity-norm (`U`) of `self`
+    fn linf_norm(&self) -> U;
+}
+
+/// Construct `Self` from a slice of scalars `&[T]`.
+///
+/// Used by solvers that internally manipulate scalar buffers and need to
+/// return a backend-typed parameter at the end (e.g. `LBFGSB`).
+pub trait ArgminFromSlice<T> {
+    /// Build a value of `Self` from a slice of `T`.
+    fn from_slice(s: &[T]) -> Self;
+}
+
 // Sub-optimal: self is moved. ndarray however offers array views...
 /// Return the transpose (`U`) of `self`
 pub trait ArgminTranspose<U> {

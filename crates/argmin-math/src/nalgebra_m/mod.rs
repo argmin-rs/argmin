@@ -12,9 +12,11 @@ mod conj;
 mod div;
 mod dot;
 mod eye;
+mod fromslice;
 mod inv;
 mod l1norm;
 mod l2norm;
+mod linfnorm;
 mod minmax;
 mod mul;
 #[cfg(feature = "rand")]
@@ -31,9 +33,11 @@ pub use conj::*;
 pub use div::*;
 pub use dot::*;
 pub use eye::*;
+pub use fromslice::*;
 pub use inv::*;
 pub use l1norm::*;
 pub use l2norm::*;
+pub use linfnorm::*;
 pub use minmax::*;
 pub use mul::*;
 #[cfg(feature = "rand")]
