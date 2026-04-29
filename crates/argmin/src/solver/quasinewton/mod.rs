@@ -10,6 +10,7 @@
 //! * [`BFGS`]
 //! * [`DFP`]
 //! * [`LBFGS`]
+//! * [`LBFGSB`]
 //! * [`SR1`]
 //! * [`SR1TrustRegion`]
 //!
@@ -21,11 +22,13 @@
 mod bfgs;
 mod dfp;
 mod lbfgs;
+mod lbfgsb;
 mod sr1;
 mod sr1_trustregion;
 
 pub use self::bfgs::BFGS;
 pub use self::dfp::DFP;
 pub use self::lbfgs::LBFGS;
+pub use self::lbfgsb::{ProjectedLineSearchProblem, LBFGSB};
 pub use self::sr1::SR1;
 pub use self::sr1_trustregion::SR1TrustRegion;

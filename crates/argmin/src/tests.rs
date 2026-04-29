@@ -14,7 +14,7 @@ use crate::core::{CostFunction, Error, Executor, Gradient, Hessian, State};
 use crate::solver::gradientdescent::SteepestDescent;
 use crate::solver::linesearch::{HagerZhangLineSearch, MoreThuenteLineSearch};
 use crate::solver::newton::NewtonCG;
-use crate::solver::quasinewton::{BFGS, DFP, LBFGS};
+use crate::solver::quasinewton::{BFGS, DFP, LBFGS, LBFGSB};
 
 #[derive(Clone, Default, Debug)]
 struct MaxEntropy {
@@ -183,4 +183,103 @@ fn test_lbfgs_func_count() {
     // The following value is 5 in scipy.optimize, but the convergence
     // criteria is different
     assert!(func_counts["gradient_count"] <= 11);
+}
+
+#[derive(Clone, Default, Debug)]
+struct BoundedRosenbrock;
+
+impl CostFunction for BoundedRosenbrock {
+    type Param = Array1<f64>;
+    type Output = f64;
+
+    fn cost(&self, p: &Self::Param) -> Result<Self::Output, Error> {
+        let mut s = 0.0;
+        for i in 0..(p.len() - 1) {
+            let a = p[i + 1] - p[i] * p[i];
+            let b = 1.0 - p[i];
+            s += 100.0 * a * a + b * b;
+        }
+        Ok(s)
+    }
+}
+
+impl Gradient for BoundedRosenbrock {
+    type Param = Array1<f64>;
+    type Gradient = Array1<f64>;
+
+    fn gradient(&self, p: &Self::Param) -> Result<Self::Gradient, Error> {
+        let n = p.len();
+        let mut g = Array1::<f64>::zeros(n);
+        for i in 0..(n - 1) {
+            g[i] += -400.0 * (p[i + 1] - p[i] * p[i]) * p[i] - 2.0 * (1.0 - p[i]);
+            g[i + 1] += 200.0 * (p[i + 1] - p[i] * p[i]);
+        }
+        Ok(g)
+    }
+}
+
+#[test]
+fn test_bounded_rosenbrock_lbfgsb_morethuente() {
+    // Wide bounds: unconstrained optimum (1, 1) is interior to [-2, 2]^2.
+    let cost = BoundedRosenbrock;
+    let lb: Array1<f64> = array![-2.0, -2.0];
+    let ub: Array1<f64> = array![2.0, 2.0];
+    let init: Array1<f64> = array![-1.2, 1.0];
+
+    let linesearch = MoreThuenteLineSearch::new().with_c(1e-3, 0.9).unwrap();
+    let solver = LBFGSB::new(linesearch, 10, (lb, ub));
+
+    let res = Executor::new(cost, solver)
+        .configure(|state| state.param(init).max_iters(200))
+        .run()
+        .unwrap();
+
+    let final_param = res.state.get_param().unwrap();
+    assert_relative_eq!(final_param[0], 1.0, epsilon = 1e-5);
+    assert_relative_eq!(final_param[1], 1.0, epsilon = 1e-5);
+}
+
+#[test]
+fn test_bounded_rosenbrock_lbfgsb_active_bounds() {
+    // Bounds (0.5, 0.9)^2 force the upper bound to bind: optimum is at (0.9, 0.81).
+    // (At x = (0.9, 0.81) the gradient w.r.t. x_2 is zero, only x_1 hits its
+    // upper bound.)
+    let cost = BoundedRosenbrock;
+    let lb: Array1<f64> = array![0.5, 0.5];
+    let ub: Array1<f64> = array![0.9, 0.9];
+    let init: Array1<f64> = array![0.7, 0.7];
+
+    let linesearch = MoreThuenteLineSearch::new().with_c(1e-3, 0.9).unwrap();
+    let solver = LBFGSB::new(linesearch, 10, (lb, ub));
+
+    let res = Executor::new(cost, solver)
+        .configure(|state| state.param(init).max_iters(200))
+        .run()
+        .unwrap();
+
+    let final_param = res.state.get_param().unwrap();
+    assert_relative_eq!(final_param[0], 0.9, epsilon = 1e-5);
+    assert_relative_eq!(final_param[1], 0.81, epsilon = 1e-5);
+}
+
+#[test]
+fn test_bounded_rosenbrock_lbfgsb_5d() {
+    // Wide bounds on the 5-dimensional Rosenbrock; converges to (1, ..., 1).
+    let cost = BoundedRosenbrock;
+    let lb: Array1<f64> = Array1::from_elem(5, -2.0);
+    let ub: Array1<f64> = Array1::from_elem(5, 2.0);
+    let init: Array1<f64> = array![-1.2, 1.0, -1.2, 1.0, 1.0];
+
+    let linesearch = MoreThuenteLineSearch::new().with_c(1e-3, 0.9).unwrap();
+    let solver = LBFGSB::new(linesearch, 10, (lb, ub));
+
+    let res = Executor::new(cost, solver)
+        .configure(|state| state.param(init).max_iters(500))
+        .run()
+        .unwrap();
+
+    let final_param = res.state.get_param().unwrap();
+    for i in 0..5 {
+        assert_relative_eq!(final_param[i], 1.0, epsilon = 1e-4);
+    }
 }
