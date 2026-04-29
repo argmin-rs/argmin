@@ -11,7 +11,7 @@ use crate::core::{
 };
 use argmin_math::{
     ArgminAdd, ArgminDot, ArgminL1Norm, ArgminL2Norm, ArgminMinMax, ArgminMul, ArgminSignum,
-    ArgminSub, ArgminZeroLike,
+    ArgminSub, ArgminVectorSpace, ArgminZeroLike,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -304,29 +304,20 @@ where
 impl<O, L, P, G, F> Solver<O, IterState<P, G, (), (), (), F>> for LBFGS<L, P, G, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone
-        + ArgminSub<P, P>
+    P: ArgminVectorSpace<P, F>
         + ArgminSub<F, P>
-        + ArgminAdd<P, P>
         + ArgminAdd<F, P>
         + ArgminDot<G, F>
-        + ArgminMul<F, P>
         + ArgminMul<P, P>
         + ArgminMul<G, P>
         + ArgminL1Norm<F>
         + ArgminSignum
-        + ArgminZeroLike
         + ArgminMinMax,
-    G: Clone
+    G: ArgminVectorSpace<G, F>
         + ArgminL2Norm<F>
-        + ArgminSub<G, G>
-        + ArgminAdd<G, G>
         + ArgminAdd<P, G>
-        + ArgminDot<G, F>
         + ArgminDot<P, F>
-        + ArgminMul<F, G>
         + ArgminMul<F, P>
-        + ArgminZeroLike
         + ArgminMinMax,
     L: Clone
         + LineSearch<P, F>

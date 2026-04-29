@@ -9,7 +9,7 @@ use crate::core::{
     ArgminFloat, CostFunction, Error, Executor, Gradient, IterState, LineSearch,
     OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
-use argmin_math::{ArgminAdd, ArgminDot, ArgminL2Norm, ArgminMul, ArgminSub};
+use argmin_math::{ArgminDot, ArgminL2Norm, ArgminMatrixSpace, ArgminVectorSpace};
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
 
@@ -98,9 +98,9 @@ where
 impl<O, L, P, G, H, F> Solver<O, IterState<P, G, (), H, (), F>> for DFP<L, F>
 where
     O: CostFunction<Param = P, Output = F> + Gradient<Param = P, Gradient = G>,
-    P: Clone + ArgminSub<P, P> + ArgminDot<G, F> + ArgminDot<P, H> + ArgminMul<F, P>,
-    G: Clone + ArgminSub<G, G> + ArgminL2Norm<F> + ArgminDot<P, F>,
-    H: Clone + ArgminSub<H, H> + ArgminDot<G, P> + ArgminAdd<H, H> + ArgminMul<F, H>,
+    P: ArgminVectorSpace<P, F> + ArgminDot<G, F> + ArgminDot<P, H>,
+    G: ArgminVectorSpace<G, F> + ArgminDot<P, F> + ArgminL2Norm<F>,
+    H: ArgminMatrixSpace<H, G, P, F>,
     L: Clone + LineSearch<P, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {

@@ -454,3 +454,88 @@ pub trait ArgminSignum {
     /// Returns a number that represents the sign of `self`.
     fn signum(self) -> Self;
 }
+
+/// Bundle of the math operations needed by most solvers.
+///
+/// `ArgminVectorSpace<P, F>` is satisfied by any type that already
+/// implements [`ArgminAdd`], [`ArgminSub`], [`ArgminMul`], [`ArgminDot`],
+/// [`ArgminScaledAdd`], [`ArgminZeroLike`] and [`Clone`] in the obvious
+/// way. There is a blanket impl, so downstream backends do not need
+/// to write any new impls — every existing backend (`Vec`, `ndarray`,
+/// `nalgebra`, `faer`) satisfies the trait automatically.
+///
+/// The intent is to let solver where-clauses collapse a wall of
+/// granular bounds:
+///
+/// ```ignore
+/// where
+///     P: Clone
+///         + ArgminAdd<P, P>
+///         + ArgminSub<P, P>
+///         + ArgminMul<F, P>
+///         + ArgminDot<P, F>
+///         + ArgminScaledAdd<P, F, P>
+///         + ArgminZeroLike,
+/// ```
+///
+/// into a single bound:
+///
+/// ```ignore
+/// where
+///     P: ArgminVectorSpace<P, F>,
+/// ```
+///
+/// Operations outside this set (e.g. norms, inverses, matrix
+/// transposes, mixed-type dot products) still need to be written
+/// explicitly alongside `ArgminVectorSpace`.
+pub trait ArgminVectorSpace<P, F>:
+    Clone
+    + ArgminAdd<P, P>
+    + ArgminSub<P, P>
+    + ArgminMul<F, P>
+    + ArgminDot<P, F>
+    + ArgminScaledAdd<P, F, P>
+    + ArgminZeroLike
+{
+}
+
+impl<T, P, F> ArgminVectorSpace<P, F> for T where
+    T: Clone
+        + ArgminAdd<P, P>
+        + ArgminSub<P, P>
+        + ArgminMul<F, P>
+        + ArgminDot<P, F>
+        + ArgminScaledAdd<P, F, P>
+        + ArgminZeroLike
+{
+}
+
+/// Bundle of the math operations needed by most matrix-typed solver state.
+///
+/// `ArgminMatrixSpace<M, Vin, Vout, F>` represents a matrix-shaped type
+/// `M` viewed as a linear map sending `Vin` to `Vout`, plus the scalar
+/// and pointwise matrix arithmetic ([`Clone`] + [`ArgminAdd`] +
+/// [`ArgminSub`] + [`ArgminMul`]) that quasi-Newton-style updates need.
+/// There is a blanket impl, so backends do not need to write any new
+/// impls.
+///
+/// The four type parameters are the matrix type itself (`M`), the input
+/// vector type (`Vin`), the output vector type (`Vout`), and the scalar
+/// type (`F`). For a square matrix over a single vector type `V`, set
+/// `Vin = Vout = V`. argmin's `IterState` keeps `P` (parameter) and `G`
+/// (gradient) as separate type parameters even when they're the same
+/// vector space, so the four-parameter form is required in practice
+/// (e.g. DFP's inverse Hessian needs `ArgminDot<G, P>`).
+///
+/// Operations like [`ArgminEye`], [`ArgminTranspose`], [`ArgminInv`],
+/// or extra `ArgminDot` shapes (e.g. `ArgminDot<M, M>`) are not part of
+/// this bundle and must be written explicitly alongside it.
+pub trait ArgminMatrixSpace<M, Vin, Vout, F>:
+    Clone + ArgminAdd<M, M> + ArgminSub<M, M> + ArgminMul<F, M> + ArgminDot<Vin, Vout>
+{
+}
+
+impl<T, M, Vin, Vout, F> ArgminMatrixSpace<M, Vin, Vout, F> for T where
+    T: Clone + ArgminAdd<M, M> + ArgminSub<M, M> + ArgminMul<F, M> + ArgminDot<Vin, Vout>
+{
+}

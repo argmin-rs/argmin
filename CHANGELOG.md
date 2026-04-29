@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* `LBFGS` now uses `ArgminVectorSpace` for its `P` and `G` parameter bounds, collapsing several lines of granular math-trait bounds.
+* `DFP`, `BFGS`, and `SR1` now use `ArgminMatrixSpace` for their inverse-Hessian (`H`) parameter bounds. `DFP` additionally uses `ArgminVectorSpace` for `P` and `G`.
+
 ### Fixed
 
 ## [argmin-math unreleased]
 
 ### Added
+
+* `ArgminVectorSpace<P, F>` super-trait that bundles `Clone + ArgminAdd<P,P> + ArgminSub<P,P> + ArgminMul<F,P> + ArgminDot<P,F> + ArgminScaledAdd<P,F,P> + ArgminZeroLike`, with a blanket impl over the granular traits. Lets solver where-clauses replace a wall of granular bounds with a single bound.
+* `ArgminMatrixSpace<M, Vin, Vout, F>` super-trait that bundles `Clone + ArgminAdd<M,M> + ArgminSub<M,M> + ArgminMul<F,M> + ArgminDot<Vin,Vout>`, with a blanket impl. Companion to `ArgminVectorSpace` for matrix-shaped solver state (Hessians, Jacobians, etc.).
 
 ### Changed
 

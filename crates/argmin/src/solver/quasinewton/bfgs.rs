@@ -10,7 +10,7 @@ use crate::core::{
     OptimizationResult, Problem, Solver, TerminationReason, TerminationStatus, KV,
 };
 use argmin_math::{
-    ArgminAdd, ArgminDot, ArgminEye, ArgminL2Norm, ArgminMul, ArgminSub, ArgminTranspose,
+    ArgminDot, ArgminEye, ArgminL2Norm, ArgminMatrixSpace, ArgminMul, ArgminSub, ArgminTranspose,
 };
 #[cfg(feature = "serde1")]
 use serde::{Deserialize, Serialize};
@@ -140,13 +140,7 @@ where
         + ArgminMul<F, G>
         + ArgminDot<P, F>
         + ArgminSub<G, G>,
-    H: ArgminSub<H, H>
-        + ArgminDot<G, G>
-        + ArgminDot<H, H>
-        + ArgminAdd<H, H>
-        + ArgminMul<F, H>
-        + ArgminTranspose<H>
-        + ArgminEye,
+    H: ArgminMatrixSpace<H, G, G, F> + ArgminDot<H, H> + ArgminTranspose<H> + ArgminEye,
     L: Clone + LineSearch<G, F> + Solver<O, IterState<P, G, (), (), (), F>>,
     F: ArgminFloat,
 {
