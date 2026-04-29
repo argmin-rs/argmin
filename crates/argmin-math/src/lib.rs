@@ -434,6 +434,60 @@ pub trait ArgminInv<T> {
     fn inv(&self) -> Result<T, Error>;
 }
 
+/// Result of a column-pivoted QR factorisation `J = Q · R · Pᵀ`.
+///
+/// `column_norms` contains the L2 norms of the original columns of `J` in their
+/// original order (i.e. before pivoting). MINPACK-style Levenberg-Marquardt
+/// uses these to build the diagonal scaling `D`.
+#[derive(Debug, Clone)]
+pub struct PivotedQR<Q, R, P, N> {
+    /// Orthogonal factor `Q`.
+    pub q: Q,
+    /// Upper-triangular factor `R`.
+    pub r: R,
+    /// Column permutation `P`.
+    pub permutation: P,
+    /// L2 norms of the columns of the original (un-pivoted) matrix.
+    pub column_norms: N,
+}
+
+/// Column-pivoted QR factorisation `J = Q · R · Pᵀ`.
+pub trait ArgminPivotedQR {
+    /// Type of the orthogonal factor `Q`.
+    type Q;
+    /// Type of the upper-triangular factor `R`.
+    type R;
+    /// Type representing the column permutation `P`.
+    type Permutation;
+    /// Type holding the L2 norms of the columns of the input matrix in their
+    /// original column order.
+    type ColumnNorms;
+
+    /// Compute the column-pivoted QR factorisation of `self`.
+    #[allow(clippy::type_complexity)]
+    fn qr_pivot(
+        self,
+    ) -> Result<PivotedQR<Self::Q, Self::R, Self::Permutation, Self::ColumnNorms>, Error>;
+}
+
+/// Solve `R · x = b` where `self` is upper-triangular.
+pub trait ArgminTriangularSolve<B, X> {
+    /// Solve `R · x = b` by back-substitution. Returns an error if `self` is
+    /// singular (zero on the diagonal).
+    fn solve_upper_triangular(&self, b: &B) -> Result<X, Error>;
+}
+
+/// Apply or undo a column permutation to a vector.
+///
+/// `permute` applies `P` (i.e. computes `P · v`); `unpermute` applies `Pᵀ`.
+/// For `P` represented as a column-permutation, `permute(v)[i] = v[perm[i]]`.
+pub trait ArgminPermute<V> {
+    /// Apply the permutation `P` to `v` (returns `P · v`).
+    fn permute(&self, v: &V) -> V;
+    /// Apply the inverse permutation `Pᵀ` to `v` (returns `Pᵀ · v`).
+    fn unpermute(&self, v: &V) -> V;
+}
+
 /// Create a random number
 #[cfg(feature = "rand")]
 pub trait ArgminRandom {

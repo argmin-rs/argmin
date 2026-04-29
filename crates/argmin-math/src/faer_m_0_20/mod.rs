@@ -17,6 +17,8 @@ mod l1norm;
 mod l2norm;
 mod minmax;
 mod mul;
+mod permute;
+mod pivoted_qr;
 #[cfg(feature = "rand")]
 mod random;
 //@note(geo-ant):
@@ -29,6 +31,7 @@ mod random;
 mod signum;
 mod sub;
 mod transpose;
+mod triangular_solve;
 mod zero;
 
 pub use add::*;
@@ -41,6 +44,8 @@ pub use l1norm::*;
 pub use l2norm::*;
 pub use minmax::*;
 pub use mul::*;
+pub use permute::*;
+pub use pivoted_qr::*;
 #[cfg(feature = "rand")]
 pub use random::*;
 //@note(geo-ant) see above
@@ -49,4 +54,5 @@ pub use random::*;
 pub use signum::*;
 pub use sub::*;
 pub use transpose::*;
+pub use triangular_solve::*;
 pub use zero::*;
