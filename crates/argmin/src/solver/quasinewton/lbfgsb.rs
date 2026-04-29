@@ -1203,6 +1203,87 @@ mod tests {
     }
 
     #[test]
+    fn test_subspace_minimization_5d_iter2_against_fortran() {
+        // Iter 2 of rosenbrock_5d_wide_bounds with one (s, y) pair from iter 1.
+        // All interior values come from the L-BFGS-B 3.0 Fortran reference
+        // run on the same fixture: x_k and g_k are the post-iter-1 iterate
+        // and gradient; xcp and the free set come from iter 2's Cauchy step.
+        // The expected x_bar is iter 2's post-subsm point.
+        let x_iter1 = [
+            -3.253_862_065_222_357_1e-2,
+            -9.449_504_313_854_051e-2,
+            -3.253_862_065_222_357_1e-2,
+            1.364_831_681_046_180,
+            1.0,
+        ];
+        let g_iter1 = [
+            -3.308_752_846_055_007_5,
+            -2.286_715_675_922_701_5e1,
+            7.391_451_862_308_839_4,
+            7.444_961_318_915_022e2,
+            -1.725_531_035_174_683_4e2,
+        ];
+        let x_iter0 = [-1.2, 1.0, -1.2, 1.0, 1.0];
+        let g_iter0 = [-215.6, 792.0, -655.6, -88.0, 0.0];
+
+        let s_0: Vec<f64> = (0..5).map(|i| x_iter1[i] - x_iter0[i]).collect();
+        let y_0: Vec<f64> = (0..5).map(|i| g_iter1[i] - g_iter0[i]).collect();
+        let s_dot_y: f64 = (0..5).map(|i| s_0[i] * y_0[i]).sum();
+        let y_dot_y: f64 = (0..5).map(|i| y_0[i] * y_0[i]).sum();
+        let s_dot_s: f64 = (0..5).map(|i| s_0[i] * s_0[i]).sum();
+        let theta = y_dot_y / s_dot_y;
+
+        let s_rows = vec![s_0.clone()];
+        let y_rows = vec![y_0.clone()];
+
+        let xc = vec![
+            -2.968_720_702_567_151_7e-2,
+            -7.478_860_829_209_874e-2,
+            -3.890_841_844_032_968e-2,
+            7.232_405_697_844_861_4e-1,
+            1.148_702_636_179_123_3,
+        ];
+        let lbs = vec![-2.0_f64; 5];
+        let ubs = vec![2.0_f64; 5];
+        let free: Vec<usize> = (0..5).collect();
+
+        // c = W^T (xcp - x_k) = [Y^T (xcp - x_k); θ S^T (xcp - x_k)].
+        let xcp_minus_xk: Vec<f64> = (0..5).map(|i| xc[i] - x_iter1[i]).collect();
+        let c0: f64 = (0..5).map(|i| y_0[i] * xcp_minus_xk[i]).sum();
+        let c1: f64 = theta * (0..5).map(|i| s_0[i] * xcp_minus_xk[i]).sum::<f64>();
+        let c = vec![c0, c1];
+
+        // K = [[-D, L^T]; [L, θ S^T S]]; with k=1, L is 0×0 so K is block-diag.
+        let k_matrix = vec![-s_dot_y, 0.0, 0.0, theta * s_dot_s];
+
+        let x_bar = subspace_minimization(
+            &xc,
+            &x_iter1.to_vec(),
+            &g_iter1.to_vec(),
+            &lbs,
+            &ubs,
+            &free,
+            &c,
+            &s_rows,
+            &y_rows,
+            theta,
+            &k_matrix,
+        )
+        .unwrap();
+
+        let expected = [
+            1.076_519_346_580_615_5e-1,
+            -2.943_390_705_129_036_4e-1,
+            1.675_616_247_029_443e-1,
+            6.486_738_224_976_305e-1,
+            1.176_663_445_548_723_3,
+        ];
+        for i in 0..5 {
+            approx::assert_relative_eq!(x_bar[i], expected[i], epsilon = 1e-10);
+        }
+    }
+
+    #[test]
     fn test_build_ssyy_two_pairs() {
         let mut s: VecDeque<Vec<f64>> = VecDeque::new();
         let mut y: VecDeque<Vec<f64>> = VecDeque::new();
