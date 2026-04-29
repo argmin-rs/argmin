@@ -476,25 +476,31 @@ where
             xk1 = P::max(&xk1.mul(&xi).signum(), &zeros).mul(&xk1);
         }
 
-        if state.get_iter() >= self.m as u64 {
-            self.s.pop_front();
-            self.y.pop_front();
-        }
-
         let grad = problem.gradient(&xk1)?;
 
-        self.s.push_back(xk1.sub(&param));
-        let grad = if let Some(l1_coeff) = self.l1_coeff {
+        let s_k = xk1.sub(&param);
+        let (y_k, grad) = if let Some(l1_coeff) = self.l1_coeff {
             // Stores unregularized gradient and returns L1 gradient.
             let pseudo_grad = calculate_pseudo_gradient(l1_coeff, &xk1, &grad);
-            self.y
-                .push_back(grad.sub(self.l1_prev_unreg_grad.as_ref().unwrap()));
+            let y_k = grad.sub(self.l1_prev_unreg_grad.as_ref().unwrap());
             self.l1_prev_unreg_grad = Some(grad);
-            pseudo_grad
+            (y_k, pseudo_grad)
         } else {
-            self.y.push_back(grad.sub(&prev_grad));
-            grad
+            (grad.sub(&prev_grad), grad)
         };
+
+        // Skip the (s, y) update when curvature is non-positive: the two-loop
+        // recursion divides by y^T s and the scaling by y^T y, so y_k ≈ 0
+        // would otherwise produce NaN/Inf.
+        let yks: F = y_k.dot(&s_k);
+        if yks > F::epsilon() * y_k.dot(&y_k) {
+            if self.s.len() >= self.m {
+                self.s.pop_front();
+                self.y.pop_front();
+            }
+            self.s.push_back(s_k);
+            self.y.push_back(y_k);
+        }
 
         Ok((
             state.param(xk1).cost(next_cost).gradient(grad),
@@ -740,5 +746,45 @@ mod tests {
             assert!((result_param[2] + 0.5).abs() < 1e-6);
             assert!((result_param[3]).abs() < 1e-6);
         }
+    }
+
+    // Regression test for https://github.com/argmin-rs/argmin/issues/357.
+    //
+    // When two consecutive iterates produce the same gradient (e.g. on a
+    // piecewise-linear cost where the line search lands inside a flat region),
+    // y_k = grad_{k+1} - grad_k is zero. Without a curvature check, gamma =
+    // (s^T y) / (y^T y) becomes 0/0 = NaN and 1 / (y^T s) becomes Inf,
+    // poisoning every subsequent iterate.
+    #[test]
+    fn test_zero_curvature_does_not_produce_nan() {
+        struct LinearHalfLine;
+        impl CostFunction for LinearHalfLine {
+            type Param = Vec<f64>;
+            type Output = f64;
+            fn cost(&self, x: &Self::Param) -> Result<Self::Output, Error> {
+                Ok(if x[0] < 0.0 { 100.0 } else { x[0] })
+            }
+        }
+        impl Gradient for LinearHalfLine {
+            type Param = Vec<f64>;
+            type Gradient = Vec<f64>;
+            fn gradient(&self, x: &Self::Param) -> Result<Self::Gradient, Error> {
+                Ok(if x[0] < 0.0 { vec![0.0] } else { vec![1.0] })
+            }
+        }
+
+        let linesearch = MoreThuenteLineSearch::new();
+        let lbfgs: LBFGS<_, Vec<f64>, Vec<f64>, f64> = LBFGS::new(linesearch, 10);
+        let res = Executor::new(LinearHalfLine, lbfgs)
+            .configure(|state| state.param(vec![10.0]).max_iters(5))
+            .run()
+            .unwrap();
+
+        let param = res.state.param.unwrap();
+        assert!(param[0].is_finite(), "param became NaN/Inf: {:?}", param);
+        assert!(res.state.cost.is_finite());
+        // The iterates should approach the constraint boundary at x = 0.
+        assert!(param[0] >= 0.0);
+        assert!(param[0] < 1.0);
     }
 }
