@@ -40,6 +40,13 @@ make_sub!(Complex<u64>);
 make_sub!(Complex<f32>);
 make_sub!(Complex<f64>);
 
+impl<T, const N : usize> ArgminSub<[T; N], [T; N]> for [T; N] where T : ArgminSub<T, T> {
+    #[inline]
+    fn sub(&self, other: &Self) -> Self {
+        std::array::from_fn(|idx| ArgminSub::sub(&self[idx], &other[idx]))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -55,6 +62,15 @@ mod tests {
                     let b = 8 as $t;
                     let res = <$t as ArgminSub<$t, $t>>::sub(&a, &b);
                     assert_relative_eq!(42 as f64, res as f64, epsilon = f64::EPSILON);
+                }
+
+                #[test]
+                fn [<test_sub_arr_ $t>]() {
+                    let a = [50 as $t, 25 as $t];
+                    let b = [8 as $t, 2 as $t];
+                    let res = ArgminSub::sub(&a, &b);
+                    assert_relative_eq!(42 as f64, res[0] as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(23 as f64, res[1] as f64, epsilon = f64::EPSILON);
                 }
             }
         };

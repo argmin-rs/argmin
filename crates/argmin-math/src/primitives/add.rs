@@ -40,6 +40,13 @@ make_add!(Complex<u64>);
 make_add!(Complex<f32>);
 make_add!(Complex<f64>);
 
+impl<T, const N : usize> ArgminAdd<[T; N], [T; N]> for [T; N] where T : ArgminAdd<T, T> {
+    #[inline]
+    fn add(&self, other: &Self) -> Self {
+        std::array::from_fn(|idx| ArgminAdd::add(&self[idx], &other[idx]))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -55,6 +62,15 @@ mod tests {
                     let b = 34 as $t;
                     let res = <$t as ArgminAdd<$t, $t>>::add(&a, &b);
                     assert_relative_eq!(42 as f64, res as f64, epsilon = f64::EPSILON);
+                }
+
+                #[test]
+                fn [<test_add_arr_ $t>]() {
+                    let a = [8 as $t, 9 as $t];
+                    let b = [34 as $t, 14 as $t];
+                    let res = ArgminAdd::add(&a, &b);
+                    assert_relative_eq!(42 as f64, res[0] as f64, epsilon = f64::EPSILON);
+                    assert_relative_eq!(23 as f64, res[1] as f64, epsilon = f64::EPSILON);
                 }
             }
         };

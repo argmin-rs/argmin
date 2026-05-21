@@ -32,10 +32,10 @@
 //!
 //! ### Default features
 //!
-//! | Feature                | Default | Comment                                               |
-//! |------------------------|---------|-------------------------------------------------------|
-//! | `primitives`           | yes     | basic integer and floating point types                |
-//! | `vec`                  | yes     | `Vec`s (basic functionality)                          |
+//! | Feature                | Default | Comment                                                                |
+//! |------------------------|---------|------------------------------------------------------------------------|
+//! | `primitives`           | yes     | basic integer and floating point types, and fixed-sized arrays thereof |
+//! | `vec`                  | yes     | `Vec`s (basic functionality)                                           |
 //!
 //! ### `ndarray`
 //!
