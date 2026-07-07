@@ -43,7 +43,11 @@
 //! |---------------------------------|---------|--------------------------------------------------------------------|
 //! | `ndarray_latest`                | no      | latest supported version                                           |
 //! | `ndarray_latest-nolinalg`       | no      | latest supported version without `ndarray-linalg`                  |
+//! | `ndarray_v0_17`                 | no      | version 0.17 with ndarray-linalg 0.18                              |
+//! | `ndarray_v0_16`                 | no      | version 0.16 with ndarray-linalg 0.17                              |
 //! | `ndarray_v0_15`                 | no      | version 0.15 with ndarray-linalg 0.16                              |
+//! | `ndarray_v0_17-nolinalg`        | no      | version 0.17 without `ndarray-linalg`                              |
+//! | `ndarray_v0_16-nolinalg`        | no      | version 0.16 without `ndarray-linalg`                              |
 //! | `ndarray_v0_15-nolinalg`        | no      | version 0.15 without `ndarray-linalg`                              |
 //! | `ndarray_v0_14-nolinalg`        | no      | version 0.14 without `ndarray-linalg`                              |
 //! | `ndarray_v0_13-nolinalg`        | no      | version 0.13 without `ndarray-linalg`                              |
@@ -232,7 +236,9 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray_0_16")] {
+    if #[cfg(feature = "ndarray_0_17")] {
+        extern crate ndarray_0_17 as ndarray;
+    } else if #[cfg(feature = "ndarray_0_16")] {
         extern crate ndarray_0_16 as ndarray;
     } else if #[cfg(feature = "ndarray_0_15")] {
         extern crate ndarray_0_15 as ndarray;
@@ -244,7 +250,9 @@ cfg_if::cfg_if! {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "ndarray-linalg_0_17")] {
+    if #[cfg(feature = "ndarray-linalg_0_18")] {
+        extern crate ndarray_linalg_0_18 as ndarray_linalg;
+    } else if #[cfg(feature = "ndarray-linalg_0_17")] {
         extern crate ndarray_linalg_0_17 as ndarray_linalg;
     } else if #[cfg(feature = "ndarray-linalg_0_16")] {
         extern crate ndarray_linalg_0_16 as ndarray_linalg;

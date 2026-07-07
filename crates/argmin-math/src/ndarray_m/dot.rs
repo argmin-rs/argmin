@@ -6,7 +6,7 @@
 // copied, modified, or distributed except according to those terms.
 
 use crate::ArgminDot;
-use ndarray::{Array1, Array2};
+use ndarray::{Array1, Array2, linalg::Dot};
 use num_complex::Complex;
 
 macro_rules! make_dot_ndarray {
@@ -14,7 +14,7 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<Array1<$t>, $t> for Array1<$t> {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> $t {
-                ndarray::Array1::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
@@ -42,14 +42,14 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<Array1<$t>, Array1<$t>> for Array2<$t> {
             #[inline]
             fn dot(&self, other: &Array1<$t>) -> Array1<$t> {
-                ndarray::Array2::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
         impl ArgminDot<Array2<$t>, Array2<$t>> for Array2<$t> {
             #[inline]
             fn dot(&self, other: &Array2<$t>) -> Array2<$t> {
-                ndarray::Array2::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
@@ -72,7 +72,7 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<Array1<Complex<$t>>, Complex<$t>> for Array1<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Complex<$t> {
-                ndarray::Array1::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
@@ -100,14 +100,14 @@ macro_rules! make_dot_ndarray {
         impl ArgminDot<Array1<Complex<$t>>, Array1<Complex<$t>>> for Array2<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Array1<Complex<$t>>) -> Array1<Complex<$t>> {
-                ndarray::Array2::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
         impl ArgminDot<Array2<Complex<$t>>, Array2<Complex<$t>>> for Array2<Complex<$t>> {
             #[inline]
             fn dot(&self, other: &Array2<Complex<$t>>) -> Array2<Complex<$t>> {
-                ndarray::Array2::dot(self, other)
+                Dot::dot(self, other)
             }
         }
 
