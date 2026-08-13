@@ -1,3 +1,4 @@
+use faer::Col;
 use faer::Mat;
 
 cfg_if::cfg_if! {
@@ -9,6 +10,8 @@ cfg_if::cfg_if! {
         use faer_traits::ComplexField;
     } else if #[cfg(feature = "faer_v0_23")] {
         use faer_traits::ComplexField;
+    } else if #[cfg(feature = "faer_v0_24")] {
+        use faer_traits::ComplexField;
     }
 }
 
@@ -18,9 +21,20 @@ pub fn column_vector_from_vec<E: ComplexField + Copy>(vec: Vec<E>) -> Mat<E> {
     column_vector_from_slice(vec.as_slice())
 }
 
+/// create a column vector from a Vec instance
+/// equivalent to the nalgebra call DVector::from_vec
+pub fn col_from_vec<E: ComplexField + Copy>(vec: Vec<E>) -> Col<E> {
+    col_from_slice(vec.as_slice())
+}
+
 /// create an owning column vector from a slice
 pub fn column_vector_from_slice<E: ComplexField + Copy>(slice: &[E]) -> Mat<E> {
     Mat::<E>::from_fn(slice.len(), 1, |ir, _ic| slice[ir])
+}
+
+/// create an owning column vector from a slice
+pub fn col_from_slice<E: ComplexField + Copy>(slice: &[E]) -> Col<E> {
+    Col::<E>::from_fn(slice.len(), |i| slice[i])
 }
 
 /// helper method to translate an nalgebra call Vector3::new(a,b,c) to the
@@ -29,6 +43,14 @@ pub fn vector3_new<E: ComplexField + Copy>(a: E, b: E, c: E) -> Mat<E> {
     let v = column_vector_from_slice(&[a, b, c]);
     assert_eq!(v.nrows(), 3);
     assert_eq!(v.ncols(), 1);
+    v
+}
+
+/// helper method to translate and nalgebra call Vector3::new(a,b,c) to the
+/// equivalent faer col constructor
+pub fn col3_new<E: ComplexField + Copy>(a: E, b: E, c: E) -> Col<E> {
+    let v = col_from_slice(&[a, b, c]);
+    assert_eq!(v.nrows(), 3);
     v
 }
 
@@ -45,6 +67,15 @@ pub fn row_vector3_new<E: ComplexField>(a: E, b: E, c: E) -> Mat<E> {
 /// equivalent faer matrix constructor
 pub fn vector2_new<E: ComplexField + Copy>(a: E, b: E) -> Mat<E> {
     let v = column_vector_from_slice(&[a, b]);
+    assert_eq!(v.nrows(), 2);
+    assert_eq!(v.ncols(), 1);
+    v
+}
+
+/// helper method to translate an nalgebra call Vector2::new(a,b) to the
+/// equivalent faer col constructor
+pub fn col2_new<E: ComplexField + Copy>(a: E, b: E) -> Col<E> {
+    let v = col_from_slice(&[a, b]);
     assert_eq!(v.nrows(), 2);
     assert_eq!(v.ncols(), 1);
     v

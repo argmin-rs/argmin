@@ -143,6 +143,8 @@ jobs:
       # faer
       - name: argmin-math (faer_latest)
         run: cargo test -p argmin-math --no-default-features --features "faer_latest"
+      - name: argmin-math (faer_v0_24)
+        run: cargo test -p argmin-math --no-default-features --features "faer_v0_24"
       - name: argmin-math (faer_v0_23)
         run: cargo test -p argmin-math --no-default-features --features "faer_v0_23"
       - name: argmin-math (faer_v0_22)

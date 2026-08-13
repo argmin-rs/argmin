@@ -50,3 +50,9 @@ pub use signum::*;
 pub use sub::*;
 pub use transpose::*;
 pub use zero::*;
+
+#[cfg(not(feature = "faer_v0_20"))]
+mod col;
+
+#[cfg(not(feature = "faer_v0_20"))]
+pub use col::*;

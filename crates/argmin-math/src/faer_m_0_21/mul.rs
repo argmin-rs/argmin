@@ -1,10 +1,10 @@
 use crate::ArgminMul;
 use faer::{
-    mat::{AsMatMut, AsMatRef},
+    mat::AsMatRef,
     reborrow::{IntoConst, Reborrow, ReborrowMut},
-    Mat, MatMut, MatRef,
+    unzip, zip, Mat, MatRef,
 };
-use faer_traits::ComplexField;
+use faer_traits::{ComplexField, MulByRef};
 use std::ops::Mul;
 
 /// MatRef * Scalar -> Mat
@@ -25,7 +25,7 @@ where
 {
     #[inline]
     fn mul(&self, other: &MatRef<'a, E>) -> Mat<E> {
-        // commutative with MatRef + Scalar so we can fall back on that case
+        // commutative with MatRef * Scalar so we can fall back on that case
         <_ as ArgminMul<_, _>>::mul(other, self)
     }
 }

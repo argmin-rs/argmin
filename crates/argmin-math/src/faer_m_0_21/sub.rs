@@ -1,13 +1,11 @@
 use crate::ArgminSub;
-use faer::{
-    mat::AsMatRef,
-    reborrow::{IntoConst, Reborrow, ReborrowMut},
-    unzip, zip, Mat, MatMut, MatRef,
-};
-use faer_traits::{ComplexField, Conjugate};
-use std::ops::{Sub, SubAssign};
+use faer::{mat::AsMatRef, unzip, zip, Mat, MatRef};
+use faer_traits::{ComplexField, Conjugate, SubByRef};
 
-/// MatRef / Scalar -> MatRef
+#[cfg(feature = "faer_v0_21")]
+use faer::{unzip, zip};
+
+/// MatRef / Scalar -> Mat
 impl<E> ArgminSub<E, Mat<E>> for MatRef<'_, E>
 where
     E: ComplexField,

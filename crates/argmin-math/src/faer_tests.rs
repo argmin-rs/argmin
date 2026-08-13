@@ -15,4 +15,7 @@ mod sub;
 mod transpose;
 mod zero;
 
+#[cfg(not(feature = "faer_v0_20"))]
+mod col;
+
 pub mod test_helper;

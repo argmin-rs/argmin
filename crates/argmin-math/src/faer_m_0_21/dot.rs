@@ -136,7 +136,7 @@ mod multiply_matrix_with_scalar {
         }
     }
 
-    // MatRef . Scalar -> Mat
+    // Scalar . MatRef -> Mat
     impl<'a, E: ComplexField> ArgminDot<MatRef<'a, E>, Mat<E>> for E {
         #[inline]
         fn dot(&self, other: &MatRef<'a, E>) -> Mat<E> {
@@ -144,7 +144,7 @@ mod multiply_matrix_with_scalar {
         }
     }
 
-    // Mat . Scalar -> Mat
+    // Scalar . Mat -> Mat
     impl<E: ComplexField> ArgminDot<Mat<E>, Mat<E>> for E {
         #[inline]
         fn dot(&self, other: &Mat<E>) -> Mat<E> {
