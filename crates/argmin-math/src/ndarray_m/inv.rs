@@ -7,10 +7,12 @@
 
 use crate::ArgminInv;
 use crate::Error;
-use ndarray::Array2;
 use ndarray_linalg::Inverse;
 use num_complex::Complex;
 
+#[cfg(any(feature = "ndarray-linalg_0_16", feature = "ndarray-linalg_0_17"))]
+use ndarray::Array2;
+#[cfg(any(feature = "ndarray-linalg_0_16", feature = "ndarray-linalg_0_17"))]
 macro_rules! make_inv {
     ($t:ty) => {
         impl ArgminInv<Array2<$t>> for Array2<$t>
@@ -20,6 +22,31 @@ macro_rules! make_inv {
             #[inline]
             fn inv(&self) -> Result<Array2<$t>, Error> {
                 Ok(<Self as Inverse>::inv(&self)?)
+            }
+        }
+
+        // inverse for scalars (1d solvers)
+        impl ArgminInv<$t> for $t {
+            #[inline]
+            fn inv(&self) -> Result<$t, Error> {
+                Ok(1.0 / self)
+            }
+        }
+    };
+}
+
+#[cfg(feature = "ndarray-linalg_0_18")]
+use ndarray::{Array2, ArrayRef2};
+#[cfg(feature = "ndarray-linalg_0_18")]
+macro_rules! make_inv {
+    ($t:ty) => {
+        impl ArgminInv<Array2<$t>> for Array2<$t>
+        where
+            ArrayRef2<$t>: Inverse,
+        {
+            #[inline]
+            fn inv(&self) -> Result<Array2<$t>, Error> {
+                Ok(<ArrayRef2<$t> as Inverse>::inv(&self)?)
             }
         }
 

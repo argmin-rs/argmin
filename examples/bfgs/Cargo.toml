@@ -11,4 +11,4 @@ argmin-math = { version = "*", features = ["ndarray_latest-nolinalg"], path = ".
 argmin-observer-slog = { version = "*", path = "../../crates/argmin-observer-slog" }
 argmin_testfunctions = { version = "*", path = "../../crates/argmin-testfunctions" }
 finitediff = { version = "*", path = "../../crates/finitediff", features = ["ndarray"] }
-ndarray = "0.16"
+ndarray = "0.17"
