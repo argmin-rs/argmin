@@ -13,7 +13,13 @@ macro_rules! make_random {
         impl ArgminRandom for $t {
             #[inline]
             fn rand_from_range<R: Rng>(min: &Self, max: &Self, rng: &mut R) -> $t {
-                rng.random_range(*min..*max)
+                if min == max {
+                    *min
+                } else if min < max {
+                    rng.random_range(*min..*max)
+                } else {
+                    rng.random_range(*max..*min)
+                }
             }
         }
     };
@@ -62,4 +68,21 @@ mod tests {
     make_test!(u32);
     make_test!(i64);
     make_test!(u64);
+
+    #[test]
+    fn test_random_f64_reversed_range() {
+        let min = 2.0;
+        let max = -1.0;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+        let random = f64::rand_from_range(&min, &max, &mut rng);
+        assert!((-1.0..2.0).contains(&random));
+    }
+
+    #[test]
+    fn test_random_f64_equal_range() {
+        let min = 1.5;
+        let max = 1.5;
+        let mut rng = rand::rngs::StdRng::seed_from_u64(42);
+        assert_eq!(f64::rand_from_range(&min, &max, &mut rng), min);
+    }
 }
